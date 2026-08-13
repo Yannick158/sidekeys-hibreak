@@ -53,6 +53,9 @@
     <string name="action_media_play_pause">Media: play/pause</string>
     <string name="action_media_next">Media: next track</string>
     <string name="action_media_previous">Media: previous track</string>
+    <string name="action_volume_up">Volume up</string>
+    <string name="action_volume_down">Volume down</string>
+    <string name="action_volume_mute">Toggle mute</string>
     <string name="action_dnd">Toggle Do Not Disturb</string>
     <string name="action_custom_intent">Custom intent (expert)</string>
 

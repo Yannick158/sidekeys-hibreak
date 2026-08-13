@@ -53,6 +53,9 @@
     <string name="action_media_play_pause">Medien: Wiedergabe/Pause</string>
     <string name="action_media_next">Medien: Nächster Titel</string>
     <string name="action_media_previous">Medien: Voriger Titel</string>
+    <string name="action_volume_up">Lautstärke lauter</string>
+    <string name="action_volume_down">Lautstärke leiser</string>
+    <string name="action_volume_mute">Stumm umschalten</string>
     <string name="action_dnd">„Nicht stören" umschalten</string>
     <string name="action_custom_intent">Eigener Intent (Experten)</string>
 

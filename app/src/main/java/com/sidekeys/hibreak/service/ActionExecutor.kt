@@ -77,6 +77,9 @@ class ActionExecutor(private val service: AccessibilityService) {
             ActionType.MEDIA_PLAY_PAUSE -> dispatchMediaKey(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
             ActionType.MEDIA_NEXT -> dispatchMediaKey(KeyEvent.KEYCODE_MEDIA_NEXT)
             ActionType.MEDIA_PREVIOUS -> dispatchMediaKey(KeyEvent.KEYCODE_MEDIA_PREVIOUS)
+            ActionType.VOLUME_UP -> adjustVolume(AudioManager.ADJUST_RAISE)
+            ActionType.VOLUME_DOWN -> adjustVolume(AudioManager.ADJUST_LOWER)
+            ActionType.VOLUME_MUTE_TOGGLE -> adjustVolume(AudioManager.ADJUST_TOGGLE_MUTE)
             ActionType.DND_TOGGLE -> toggleDoNotDisturb()
             ActionType.CUSTOM_INTENT -> sendCustomIntent(action.data)
         }
@@ -177,6 +180,23 @@ class ActionExecutor(private val service: AccessibilityService) {
         val audioManager = service.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         audioManager.dispatchMediaKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, keyCode))
         audioManager.dispatchMediaKeyEvent(KeyEvent(KeyEvent.ACTION_UP, keyCode))
+    }
+
+    /**
+     * Adjusts the music stream and shows the system volume UI, so a remapped key
+     * behaves like a real volume rocker. [direction] is one of
+     * [AudioManager.ADJUST_RAISE], [AudioManager.ADJUST_LOWER] or
+     * [AudioManager.ADJUST_TOGGLE_MUTE].
+     */
+    private fun adjustVolume(direction: Int) {
+        val audioManager = service.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        runCatching {
+            audioManager.adjustStreamVolume(
+                AudioManager.STREAM_MUSIC,
+                direction,
+                AudioManager.FLAG_SHOW_UI,
+            )
+        }.onFailure { toast(R.string.error_action_failed) }
     }
 
     private fun toggleDoNotDisturb() {

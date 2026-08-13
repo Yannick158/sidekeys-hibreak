@@ -21,6 +21,9 @@ enum class ActionType {
     MEDIA_PLAY_PAUSE,
     MEDIA_NEXT,
     MEDIA_PREVIOUS,
+    VOLUME_UP,
+    VOLUME_DOWN,
+    VOLUME_MUTE_TOGGLE,
     DND_TOGGLE,
     CUSTOM_INTENT,
 }

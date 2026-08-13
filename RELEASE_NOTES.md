@@ -1,12 +1,16 @@
-## SideKeys v1.0.1
+## SideKeys v1.0.2
 
-Freely remap the two side keys of the **Bigme HiBreak Pro** — separately for
-single press, double press and long press per key.
+Freely remap the two side keys of the **Bigme HiBreak Pro** — and the volume keys,
+or any hardware key — separately for single press, double press and long press.
+
+### New in 1.0.2
+- **Volume Up / Volume Down / Toggle Mute** as actions — e.g. turn a side key into
+  a volume control, or repurpose the volume keys for something else entirely.
 
 ### Features
 - Launch Google Assistant, open Google Wallet, launch any app
 - System actions: Home, Back, Recent apps, Notifications, Quick settings, Power menu, Lock screen, Screenshot
-- Flashlight, media controls, Do Not Disturb, custom intent (expert)
+- Flashlight, media controls, **volume up/down/mute**, Do Not Disturb, custom intent (expert)
 - E-ink optimized (black & white, no animations), hardware key debounce, runtime key capture
 - UI in English (default) and German
 

@@ -24,6 +24,9 @@ fun ActionType.labelRes(): Int = when (this) {
     ActionType.MEDIA_PLAY_PAUSE -> R.string.action_media_play_pause
     ActionType.MEDIA_NEXT -> R.string.action_media_next
     ActionType.MEDIA_PREVIOUS -> R.string.action_media_previous
+    ActionType.VOLUME_UP -> R.string.action_volume_up
+    ActionType.VOLUME_DOWN -> R.string.action_volume_down
+    ActionType.VOLUME_MUTE_TOGGLE -> R.string.action_volume_mute
     ActionType.DND_TOGGLE -> R.string.action_dnd
     ActionType.CUSTOM_INTENT -> R.string.action_custom_intent
 }

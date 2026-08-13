@@ -17,7 +17,7 @@ launch apps** — exactly the gap SideKeys fills.
 - System actions: Home, Back, Recent apps, Notifications, Quick settings,
   Power menu, Lock screen, Screenshot
 - Toggle flashlight, media controls (play/pause, next/previous),
-  toggle Do Not Disturb
+  **volume up / down / mute**, toggle Do Not Disturb
 - **Custom intent** (expert option): starts arbitrary activities or sends
   broadcasts — so you can wire up even Bigme-specific functions that are
   otherwise only reachable through the Bigme settings

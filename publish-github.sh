@@ -19,7 +19,7 @@ gh repo create "$REPO_NAME" \
 
 echo "==> Baue frische signierte Release-APK…"
 export SIDEKEYS_KEYSTORE_DIR="${SIDEKEYS_KEYSTORE_DIR:-$HOME/.android-keys/sidekeys}"
-./gradlew --quiet assembleRelease
+~/android-build-tools/gradle-8.10.2/bin/gradle --quiet assembleRelease
 cp app/build/outputs/apk/release/app-release.apk SideKeys-release.apk
 
 echo "==> Erstelle Release v1.0.1 und hänge die APK an…"

@@ -1,0 +1,18 @@
+*.iml
+.gradle/
+local.properties
+.idea/
+.DS_Store
+build/
+captures/
+.externalNativeBuild
+.cxx
+
+# Local AI-tooling config (skills/agents) — not part of the app.
+.claude/
+
+# Signing material stays local — never publish the keystore or its passwords.
+keystore/
+
+# Built artifacts
+*.apk

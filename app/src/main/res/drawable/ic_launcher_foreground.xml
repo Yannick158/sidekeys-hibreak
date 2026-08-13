@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Phone outline with two side keys, black on white -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M38,26 h26 a4,4 0 0 1 4,4 v48 a4,4 0 0 1 -4,4 h-26 a4,4 0 0 1 -4,-4 v-48 a4,4 0 0 1 4,-4 z m2,6 v44 h22 v-44 z" />
+    <!-- Upper side key -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M70,38 h5 v10 h-5 z" />
+    <!-- Lower side key -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M70,54 h5 v10 h-5 z" />
+</vector>

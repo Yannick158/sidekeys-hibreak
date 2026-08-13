@@ -18,19 +18,22 @@ android {
         versionName = "1.0.1"
     }
 
-    // The keystore lives only on the developer machine (keystore/ is gitignored).
-    // Without it, release builds fall back to the debug signing config so the
-    // public repo still builds out of the box.
-    val keystoreProps = rootProject.file("keystore/keystore.properties")
-    val hasReleaseKeystore = keystoreProps.exists()
+    // The signing keystore lives OUTSIDE the repo tree so it can never be
+    // published by accident (zip upload, `git add -f`, web UI, ...). Point
+    // SIDEKEYS_KEYSTORE_DIR at the directory holding sidekeys.jks and
+    // keystore.properties. Without it, a release build fails fast — pass
+    // -PallowDebugSigning for a local, debug-signed test build (never ship it).
+    val keystoreDir = System.getenv("SIDEKEYS_KEYSTORE_DIR")
+    val keystoreProps = keystoreDir?.let { File(it, "keystore.properties") }
+    val hasReleaseKeystore = keystoreProps?.exists() == true
 
     signingConfigs {
         if (hasReleaseKeystore) {
             create("release") {
                 val props = Properties().apply {
-                    keystoreProps.inputStream().use { load(it) }
+                    keystoreProps!!.inputStream().use { load(it) }
                 }
-                storeFile = rootProject.file("keystore/${props.getProperty("storeFile")}")
+                storeFile = File(keystoreDir, props.getProperty("storeFile"))
                 storePassword = props.getProperty("storePassword")
                 keyAlias = props.getProperty("keyAlias")
                 keyPassword = props.getProperty("keyPassword")
@@ -42,10 +45,17 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            signingConfig = if (hasReleaseKeystore) {
-                signingConfigs.getByName("release")
-            } else {
-                signingConfigs.getByName("debug")
+            signingConfig = when {
+                hasReleaseKeystore -> signingConfigs.getByName("release")
+                project.hasProperty("allowDebugSigning") -> {
+                    logger.warn("WARNUNG: release wird mit dem lokalen DEBUG-Key signiert — NICHT veröffentlichen!")
+                    signingConfigs.getByName("debug")
+                }
+                else -> throw GradleException(
+                    "Kein Release-Keystore gefunden. Setze SIDEKEYS_KEYSTORE_DIR auf das Verzeichnis " +
+                        "mit keystore.properties, oder baue ein lokales Testbuild mit " +
+                        "./gradlew assembleRelease -PallowDebugSigning",
+                )
             }
         }
     }

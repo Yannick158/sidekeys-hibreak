@@ -100,17 +100,38 @@ Voraussetzungen: JDK 17, Android SDK (Platform 34).
 
 Die APK liegt danach in `app/build/outputs/apk/release/`.
 
-**Signierung:** Der Release-Keystore ist nicht Teil des Repositories
-(`keystore/` ist gitignored). Liegt lokal ein `keystore/keystore.properties`
-mit `storeFile`, `storePassword`, `keyAlias` und `keyPassword` vor, wird damit
-signiert — andernfalls fällt der Build automatisch auf die Debug-Signatur
-zurück, sodass das Projekt ohne weitere Einrichtung baubar bleibt.
+**Signierung:** Der Release-Keystore liegt bewusst **außerhalb** des Repos, damit
+er nicht versehentlich veröffentlicht werden kann. Setze die Umgebungsvariable
+`SIDEKEYS_KEYSTORE_DIR` auf das Verzeichnis mit `sidekeys.jks` und
+`keystore.properties` (Vorlage: [keystore.properties.example](keystore.properties.example)):
+
+```bash
+export SIDEKEYS_KEYSTORE_DIR=~/.android-keys/sidekeys
+./gradlew assembleRelease
+```
+
+Ohne diese Variable schlägt der Release-Build **bewusst fehl** (verhindert ein
+versehentlich debug-signiertes „Release"). Für ein lokales Testbuild:
+
+```bash
+./gradlew assembleRelease -PallowDebugSigning
+```
+
 Eigenen Keystore erzeugen:
 
 ```bash
-keytool -genkeypair -keystore keystore/sidekeys.jks -alias sidekeys \
-  -keyalg RSA -keysize 2048 -validity 10000
+keytool -genkeypair -keystore ~/.android-keys/sidekeys/sidekeys.jks \
+  -alias sidekeys -keyalg RSA -keysize 4096 -validity 10000
 ```
+
+**Echtheit prüfen:** Offizielle APKs sind mit dem Maintainer-Schlüssel signiert.
+Fingerprint des Signaturzertifikats (SHA-256):
+
+```
+CE:1A:7F:AC:78:29:3F:ED:0C:B7:6A:48:7F:7C:09:FB:81:EA:44:89:AD:36:75:29:72:27:9C:CD:8B:34:F9:D3
+```
+
+Verifizieren mit: `apksigner verify --print-certs SideKeys-release.apk`
 
 ## Architektur
 

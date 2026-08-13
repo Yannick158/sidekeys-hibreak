@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SideKeys</string>
+    <string name="service_label">SideKeys Tastenbelegung</string>
+    <string name="service_summary">Belegt die Seitentasten des HiBreak Pro mit eigenen Funktionen</string>
+    <string name="service_description">SideKeys fängt die Hardware-Seitentasten ab und führt die von dir gewählten Aktionen aus (z. B. Google Assistant, Google Wallet oder App-Start). Der Dienst liest keine Bildschirminhalte und sammelt keine Daten.</string>
+
+    <!-- Home -->
+    <string name="service_active">✓ Dienst aktiv — Tasten werden abgefangen</string>
+    <string name="service_inactive">Dienst nicht aktiv</string>
+    <string name="service_inactive_hint">Damit die Seitentasten belegt werden können, muss SideKeys als Bedienungshilfe aktiviert werden. Tippe unten und aktiviere „SideKeys Tastenbelegung".\n\nFalls der Schalter gesperrt ist („Eingeschränkte Einstellung"): App-Info von SideKeys öffnen → Menü (⋮) → „Eingeschränkte Einstellungen zulassen" — das verlangt Android bei per APK installierten Apps.</string>
+    <string name="enable_service">Bedienungshilfe aktivieren</string>
+    <string name="add_key">+ Taste zuordnen</string>
+    <string name="no_mappings_hint">Noch keine Taste belegt. Tippe auf „Taste zuordnen" und drücke dann eine der Seitentasten deines HiBreak Pro.</string>
+    <string name="delete">Löschen</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="ok">OK</string>
+    <string name="save">Speichern</string>
+    <string name="loading">Lade…</string>
+    <string name="confirm_delete_title">Belegung löschen?</string>
+    <string name="confirm_delete_text">Die Belegung für „%1$s" wird entfernt. Die Taste erhält ihre ursprüngliche Funktion zurück.</string>
+
+    <!-- Capture -->
+    <string name="capture_title">Taste erfassen</string>
+    <string name="capture_prompt">Drücke jetzt die Seitentaste, die du belegen möchtest</string>
+    <string name="capture_hint">Funktioniert mit beiden Zusatztasten des HiBreak Pro — und auch mit anderen Hardware-Tasten.</string>
+    <string name="capture_service_hint">Hinweis: Die Erfassung funktioniert auch jetzt schon. Damit die Taste später systemweit reagiert, muss aber die Bedienungshilfe aktiviert sein.</string>
+    <string name="key_generic">Taste %1$d</string>
+
+    <!-- Mapping -->
+    <string name="mapping_intro">Wähle für jede Druckart eine Aktion. Mit ▶ kannst du die Aktion sofort testen.</string>
+    <string name="single_press">Einfacher Druck</string>
+    <string name="double_press">Doppeldruck</string>
+    <string name="long_press">Langer Druck</string>
+    <string name="choose_action">Aktion wählen</string>
+    <string name="test_action">Aktion testen</string>
+    <string name="error_service_off">Dienst nicht aktiv — bitte zuerst die Bedienungshilfe aktivieren.</string>
+
+    <!-- Actions -->
+    <string name="action_none">Keine Aktion</string>
+    <string name="action_assistant">Google Assistant starten</string>
+    <string name="action_wallet">Google Wallet öffnen</string>
+    <string name="action_launch_app">App starten</string>
+    <string name="action_home">Startbildschirm</string>
+    <string name="action_back">Zurück</string>
+    <string name="action_recents">Letzte Apps</string>
+    <string name="action_notifications">Benachrichtigungen öffnen</string>
+    <string name="action_quick_settings">Schnelleinstellungen öffnen</string>
+    <string name="action_power_dialog">Ausschalt-Menü</string>
+    <string name="action_lock_screen">Bildschirm sperren</string>
+    <string name="action_screenshot">Screenshot aufnehmen</string>
+    <string name="action_flashlight">Taschenlampe umschalten</string>
+    <string name="action_media_play_pause">Medien: Wiedergabe/Pause</string>
+    <string name="action_media_next">Medien: Nächster Titel</string>
+    <string name="action_media_previous">Medien: Voriger Titel</string>
+    <string name="action_dnd">„Nicht stören" umschalten</string>
+    <string name="action_custom_intent">Eigener Intent (Experten)</string>
+
+    <!-- Custom intent -->
+    <string name="custom_intent_title">Eigener Intent</string>
+    <string name="custom_intent_hint">Für Spezialfunktionen, z. B. Bigme-eigene Einstellungen. Mindestens Action oder Komponente angeben.</string>
+    <string name="custom_intent_mode_activity">Activity</string>
+    <string name="custom_intent_mode_broadcast">Broadcast</string>
+    <string name="custom_intent_action">Intent-Action (z. B. android.settings.SETTINGS)</string>
+    <string name="custom_intent_component">Komponente (paket/.Klasse)</string>
+    <string name="custom_intent_data">Daten-URI (optional)</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Einstellungen</string>
+    <string name="setting_long_press">Dauer für langen Druck</string>
+    <string name="setting_double_press">Zeitfenster für Doppeldruck</string>
+    <string name="setting_haptic">Vibration bei Tastendruck</string>
+    <string name="double_press_note">Hinweis: Ist ein Doppeldruck belegt, wird der einfache Druck erst nach diesem Zeitfenster ausgelöst.</string>
+    <string name="setting_debounce">Tasten-Entprellung</string>
+    <string name="debounce_note">Die Seitentasten des HiBreak Pro lösen manchmal doppelt aus. Drücke, die schneller als dieses Intervall aufeinander folgen, werden ignoriert.</string>
+    <string name="milliseconds">%1$d ms</string>
+    <string name="tips_title">Tipps für das HiBreak Pro</string>
+    <string name="tips_text">• Falls eine Seitentaste nicht ankommt: In den Bigme-Einstellungen unter „Benutzerdefinierte Taste" die Belegung auf „Keine" stellen, damit SideKeys sie erhält.\n\n• Bigme/MediaTek „DuraSpeed" beendet Hintergrund-Apps aggressiv. Sollte der Dienst stoppen, DuraSpeed deaktivieren (per ADB: settings put global setting.duraspeed.enabled 0) und SideKeys von der Akku-Optimierung ausnehmen.</string>
+
+    <!-- App picker -->
+    <string name="app_picker_title">App wählen</string>
+    <string name="search">Suchen</string>
+
+    <!-- Errors -->
+    <string name="error_assistant_not_available">Kein Assistent gefunden. Ist der Google Assistant installiert?</string>
+    <string name="error_wallet_not_installed">Google Wallet ist nicht installiert.</string>
+    <string name="error_app_not_found">App nicht gefunden — wurde sie deinstalliert?</string>
+    <string name="error_requires_android_9">Diese Aktion benötigt Android 9 oder neuer.</string>
+    <string name="error_no_flashlight">Keine Taschenlampe auf diesem Gerät gefunden.</string>
+    <string name="error_action_failed">Aktion konnte nicht ausgeführt werden.</string>
+    <string name="error_dnd_permission">Bitte erlaube SideKeys den Zugriff auf „Nicht stören" und versuche es erneut.</string>
+</resources>

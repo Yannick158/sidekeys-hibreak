@@ -1,159 +1,156 @@
-# SideKeys — Tastenbelegung für das Bigme HiBreak Pro
+# SideKeys — button mapper for the Bigme HiBreak Pro
 
-SideKeys belegt die beiden zusätzlichen Hardware-Tasten an der Seite des
-Bigme HiBreak Pro (und beliebige andere Hardware-Tasten) mit eigenen Funktionen —
-pro Taste getrennt für **einfachen Druck**, **Doppeldruck** und **langen Druck**.
+SideKeys lets you freely remap the two extra hardware keys on the side of the
+Bigme HiBreak Pro (and any other hardware key) — separately for **single press**,
+**double press** and **long press** per key.
 
-Das HiBreak Pro läuft mit Android 14; die Bigme-eigenen Einstellungen
-(„Benutzerdefinierte Taste") bieten nur eine feste Aktionsliste (Home, Zurück,
-Screenshot, App-Wechsler, Cache leeren, Vollrefresh, E-Ink-Center, Vorherige/
-Nächste Seite, Licht) und können insbesondere **keine Apps starten** — genau
-diese Lücke schließt SideKeys.
+The HiBreak Pro runs Android 14. Its stock settings ("Custom key") only offer a
+fixed action list (Home, Back, Screenshot, App switcher, Clear cache, Full
+refresh, E Ink Center, Previous/Next page, Light) and in particular **cannot
+launch apps** — exactly the gap SideKeys fills.
 
-## Funktionen
+## Features
 
-- **Google Assistant starten**
-- **Google Wallet öffnen** (mit Fallback auf Web-Link/Play Store)
-- **Beliebige App starten** (Auswahl aus allen installierten Apps)
-- Systemaktionen: Startbildschirm, Zurück, Letzte Apps, Benachrichtigungen,
-  Schnelleinstellungen, Ausschalt-Menü, Bildschirm sperren, Screenshot
-- Taschenlampe umschalten, Medien steuern (Play/Pause, Vor/Zurück),
-  „Nicht stören" umschalten
-- **Eigener Intent** (Experten-Option): startet beliebige Activities oder sendet
-  Broadcasts — damit lassen sich auch Bigme-eigene Spezialfunktionen anbinden,
-  die sonst nur über die Bigme-Einstellungen erreichbar sind
-- **Tasten-Entprellung**: die HiBreak-Pro-Seitentasten prellen hardwareseitig
-  (bekanntes Problem, z. B. Seiten-Überspringen in Lese-Apps) — SideKeys filtert
-  Geisterdrücke; das Intervall ist einstellbar
-- E-Ink-optimierte Oberfläche: reines Schwarz-Weiß, keine Animationen
+- **Launch Google Assistant**
+- **Open Google Wallet** (with fallback to the app-link / Play Store)
+- **Launch any app** (pick from all installed apps, with search)
+- System actions: Home, Back, Recent apps, Notifications, Quick settings,
+  Power menu, Lock screen, Screenshot
+- Toggle flashlight, media controls (play/pause, next/previous),
+  toggle Do Not Disturb
+- **Custom intent** (expert option): starts arbitrary activities or sends
+  broadcasts — so you can wire up even Bigme-specific functions that are
+  otherwise only reachable through the Bigme settings
+- **Key debounce**: the HiBreak Pro side keys bounce in hardware (a known issue,
+  e.g. page-skipping in reader apps) — SideKeys filters ghost presses; the
+  interval is adjustable
+- E-ink optimized UI: pure black & white, no animations
 
 ## Installation
 
-1. `SideKeys-release.apk` auf das Handy kopieren (oder per `adb install`).
-2. Installation aus unbekannten Quellen erlauben, APK antippen und installieren.
-3. App öffnen → **„Bedienungshilfe aktivieren"** antippen → in den
-   Einstellungen **„SideKeys Tastenbelegung"** einschalten.
-   (Ohne diesen Schritt kann Android der App keine Hardware-Tasten liefern.)
-4. **Android 13/14, „Eingeschränkte Einstellung":** Bei per APK installierten
-   Apps sperrt Android den Bedienungshilfe-Schalter zunächst. Lösung:
-   App-Info von SideKeys öffnen → Menü (⋮) oben rechts →
-   **„Eingeschränkte Einstellungen zulassen"** → danach die Bedienungshilfe
-   aktivieren.
+1. Copy `SideKeys-release.apk` to the phone (or use `adb install`).
+2. Allow installation from unknown sources, tap the APK and install.
+3. Open the app → tap **"Enable accessibility service"** → in settings enable
+   **"SideKeys Button Mapper"**.
+   (Without this step Android cannot deliver hardware keys to the app.)
+4. **Android 13/14, "Restricted setting":** for sideloaded apps Android blocks
+   the accessibility toggle at first. Fix: open SideKeys app info →
+   menu (⋮) top right → **"Allow restricted settings"** → then enable the
+   accessibility service.
 
 ```bash
 adb install SideKeys-release.apk
 ```
 
-## Benutzung
+## Usage
 
-1. **„+ Taste zuordnen"** antippen.
-2. Die gewünschte Seitentaste **drücken** — die App erkennt den Keycode automatisch.
-3. Für einfachen Druck / Doppeldruck / langen Druck je eine Aktion wählen
-   (mit ▶ sofort testbar) und **Speichern**.
+1. Tap **"+ Assign key"**.
+2. **Press** the side key you want to assign — the app detects the keycode
+   automatically.
+3. Pick an action for single / double / long press (test instantly with ▶) and
+   tap **Save**.
 
-Wichtig zu wissen:
+Good to know:
 
-- Ist nur der einfache Druck belegt, reagiert die Taste sofort. Sobald ein
-  Doppeldruck belegt ist, wartet der einfache Druck das Doppeldruck-Zeitfenster
-  ab (einstellbar unter Einstellungen).
-- Wird eine Belegung gelöscht, erhält die Taste ihre ursprüngliche
-  (Bigme-)Funktion zurück — die App reicht nicht gemappte Tasten unverändert durch.
-- Falls die Bigme-Firmware eine Taste bereits selbst abfängt, bevor sie bei
-  Apps ankommt, stelle die Taste in den Bigme-Einstellungen auf „keine
-  Funktion"/Standard, damit SideKeys sie erhält.
+- If only the single press is assigned, the key reacts immediately. As soon as a
+  double press is assigned, the single press waits for the double-press window
+  (adjustable in Settings).
+- Deleting a mapping restores the key's original (Bigme) function — the app
+  passes unmapped keys straight through, unchanged.
+- If the Bigme firmware already grabs a key before it reaches apps, set that key
+  to "None" in the Bigme settings so SideKeys receives it.
 
-## Hinweise zur Bigme-Firmware
+## Notes on the Bigme firmware
 
-- **Wichtig — Bigme-Tastenbelegung auf „Keine" stellen:** Die Bigme-Firmware
-  führt ihre eigene Tastenbelegung parallel zu SideKeys aus. Symptom: Nach dem
-  Erfassen einer Taste erscheint der Zuordnungs-Screen nur kurz und verschwindet
-  wieder, weil die Bigme-Aktion (z. B. Seitenwechsel/E-Ink-Center) dazwischenfunkt —
-  mit langem Halten funktioniert es, weil dort meist keine Bigme-Aktion liegt.
-  Lösung: In den Bigme-Einstellungen unter „Benutzerdefinierte Taste" für beide
-  Tasten **Einzeltipp und langes Drücken auf „Keine"** stellen.
-  (Die Tasten senden normale KeyEvents — die App Key Mapper funktioniert auf dem
-  Gerät nachweislich, SideKeys nutzt denselben Mechanismus. Wahrscheinliche
-  Keycodes sind BILD-AUF/BILD-AB (92/93), der Capture-Screen erkennt aber jeden Code.)
-- **DuraSpeed deaktivieren:** Die MediaTek-Funktion „DuraSpeed" beendet
-  Hintergrund-Apps aggressiv und kann auch den SideKeys-Dienst treffen.
-  Abschalten per ADB:
+- **Important — set the Bigme key assignment to "None":** the Bigme firmware runs
+  its own key handling in parallel with SideKeys. Symptom: after capturing a key
+  the mapping screen only shows briefly and disappears, because the Bigme action
+  (e.g. page turn / E Ink Center) interferes — long press works because usually
+  no Bigme action sits there. Fix: in the Bigme settings under "Custom key" set
+  **both Single Tap and Long Press to "None"** for both keys.
+- **Disable DuraSpeed:** the MediaTek "DuraSpeed" feature aggressively kills
+  background apps and can hit the SideKeys service too. Turn it off via ADB:
 
   ```bash
   adb shell settings put global setting.duraspeed.enabled 0
   ```
 
-  Zusätzlich SideKeys von der Akku-Optimierung ausnehmen
-  (Einstellungen → Apps → SideKeys → Akku → „Nicht optimieren").
-- Der Capture-Screen zeigt jeden erkannten Keycode an — er funktioniert auch
-  für Kopfhörer- oder Bluetooth-Tasten.
-- Über **„Eigener Intent"** lassen sich Bigme-Spezialfunktionen auslösen, z. B.
-  `Activity`-Start der Bigme-Einstellungen oder (falls von Bigme dokumentiert)
-  E-Ink-Refresh-Broadcasts.
+  Also exempt SideKeys from battery optimization
+  (Settings → Apps → SideKeys → Battery → "Don't optimize").
+- The capture screen shows every detected keycode — it also works for headset or
+  Bluetooth keys.
+- Via **"Custom intent"** you can trigger Bigme-specific functions, e.g. an
+  `Activity` start of the Bigme settings or (if documented by Bigme) e-ink
+  refresh broadcasts.
 
-## Projekt bauen (für Entwickler)
+## Building (for developers)
 
-Voraussetzungen: JDK 17, Android SDK (Platform 34).
+Requirements: JDK 17, Android SDK (Platform 34).
 
 ```bash
 ./gradlew assembleRelease
 ```
 
-Die APK liegt danach in `app/build/outputs/apk/release/`.
+The APK then lives in `app/build/outputs/apk/release/`.
 
-**Signierung:** Der Release-Keystore liegt bewusst **außerhalb** des Repos, damit
-er nicht versehentlich veröffentlicht werden kann. Setze die Umgebungsvariable
-`SIDEKEYS_KEYSTORE_DIR` auf das Verzeichnis mit `sidekeys.jks` und
-`keystore.properties` (Vorlage: [keystore.properties.example](keystore.properties.example)):
+**Signing:** the release keystore lives **outside** the repo on purpose, so it
+can never be published by accident. Set the environment variable
+`SIDEKEYS_KEYSTORE_DIR` to the directory holding `sidekeys.jks` and
+`keystore.properties` (template: [keystore.properties.example](keystore.properties.example)):
 
 ```bash
 export SIDEKEYS_KEYSTORE_DIR=~/.android-keys/sidekeys
 ./gradlew assembleRelease
 ```
 
-Ohne diese Variable schlägt der Release-Build **bewusst fehl** (verhindert ein
-versehentlich debug-signiertes „Release"). Für ein lokales Testbuild:
+Without that variable the release build **fails on purpose** (prevents an
+accidentally debug-signed "release"). For a local test build:
 
 ```bash
 ./gradlew assembleRelease -PallowDebugSigning
 ```
 
-Eigenen Keystore erzeugen:
+Create your own keystore:
 
 ```bash
 keytool -genkeypair -keystore ~/.android-keys/sidekeys/sidekeys.jks \
   -alias sidekeys -keyalg RSA -keysize 4096 -validity 10000
 ```
 
-**Echtheit prüfen:** Offizielle APKs sind mit dem Maintainer-Schlüssel signiert.
-Fingerprint des Signaturzertifikats (SHA-256):
+**Verify authenticity:** official APKs are signed with the maintainer key.
+Signing certificate fingerprint (SHA-256):
 
 ```
 CE:1A:7F:AC:78:29:3F:ED:0C:B7:6A:48:7F:7C:09:FB:81:EA:44:89:AD:36:75:29:72:27:9C:CD:8B:34:F9:D3
 ```
 
-Verifizieren mit: `apksigner verify --print-certs SideKeys-release.apk`
+Verify with: `apksigner verify --print-certs SideKeys-release.apk`
 
-## Architektur
+## Architecture
 
-Kotlin · Jetpack Compose (Material 3) · MVVM mit UiState/StateFlow ·
-DataStore Preferences · kotlinx-serialization · AccessibilityService mit
+Kotlin · Jetpack Compose (Material 3) · MVVM with UiState/StateFlow ·
+DataStore Preferences · kotlinx-serialization · AccessibilityService with
 `FLAG_REQUEST_FILTER_KEY_EVENTS` (`canRequestFilterKeyEvents`).
 
 ```
 app/src/main/java/com/sidekeys/hibreak/
-├── MainActivity.kt              # Single-Activity, Capture-Fallback
-├── ui/SideKeysApp.kt            # Navigation (ohne Animationen)
+├── MainActivity.kt              # Single activity, capture fallback
+├── ui/SideKeysApp.kt            # Navigation (no animations)
 ├── core/
 │   ├── model/                   # KeyMapping, KeyAction, Settings
-│   ├── data/                    # DataStore-Repository
-│   ├── common/                  # Keycode-Namen, Labels, Service-Status
-│   └── designsystem/            # E-Ink-Theme + Komponenten
+│   ├── data/                    # DataStore repository
+│   ├── common/                  # Keycode names, labels, service state
+│   └── designsystem/            # E-ink theme + components
 ├── service/
-│   ├── KeyInterceptorService.kt # AccessibilityService (Key-Filter)
-│   ├── KeyPressHandler.kt       # Einfach/Doppel/Lang-Zustandsautomat
-│   └── ActionExecutor.kt        # Führt alle Aktionen aus
+│   ├── KeyInterceptorService.kt # AccessibilityService (key filter)
+│   ├── KeyPressHandler.kt       # Single/double/long state machine
+│   └── ActionExecutor.kt        # Runs all actions
 └── feature/                     # home, capture, mapping, apppicker, settings
 ```
 
-Die App liest keine Bildschirminhalte, hat keine Internet-Berechtigung und
-sammelt keine Daten.
+The app reads no screen content, has no internet permission and collects no data.
+The UI ships in English (default) and German (`values-de`).
+
+## License
+
+[MIT](LICENSE)

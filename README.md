@@ -1,8 +1,8 @@
 # SideKeys — button mapper for the Bigme HiBreak Pro
 
 SideKeys lets you freely remap the two extra hardware keys on the side of the
-Bigme HiBreak Pro (and any other hardware key) — separately for **single press**,
-**double press** and **long press** per key.
+Bigme HiBreak Pro — and any other hardware key, **including the volume keys** —
+separately for **single press**, **double press** and **long press** per key.
 
 The HiBreak Pro runs Android 14. Its stock settings ("Custom key") only offer a
 fixed action list (Home, Back, Screenshot, App switcher, Clear cache, Full
@@ -45,8 +45,8 @@ adb install SideKeys-release.apk
 ## Usage
 
 1. Tap **"+ Assign key"**.
-2. **Press** the side key you want to assign — the app detects the keycode
-   automatically.
+2. **Press** the key you want to assign — a side key **or a volume key** — the app
+   detects the keycode automatically.
 3. Pick an action for single / double / long press (test instantly with ▶) and
    tap **Save**.
 
@@ -57,6 +57,9 @@ Good to know:
   (adjustable in Settings).
 - Deleting a mapping restores the key's original (Bigme) function — the app
   passes unmapped keys straight through, unchanged.
+- Heads-up for **volume keys**: once you map a volume key, that key runs your
+  action instead of changing the volume. Delete the mapping to get the volume
+  function back.
 - If the Bigme firmware already grabs a key before it reaches apps, set that key
   to "None" in the Bigme settings so SideKeys receives it.
 

@@ -4,6 +4,14 @@
 
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Shizuku: run ADB-level shell commands (charge control, battery saver) without root -->
+    <uses-permission android:name="moe.shizuku.manager.permission.API_V23" />
+    <!-- Granted once via Shizuku (or adb); lets Battery Saver be toggled natively
+         afterwards without Shizuku running. -->
+    <uses-permission
+        android:name="android.permission.WRITE_SECURE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
 
     <queries>
         <intent>
@@ -49,5 +57,26 @@
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessibility_service_config" />
         </service>
+
+        <!-- Battery Saver Quick Settings tile -->
+        <service
+            android:name=".qs.BatterySaverTile"
+            android:exported="true"
+            android:icon="@drawable/ic_battery_saver"
+            android:label="@string/tile_battery_saver"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <!-- Shizuku -->
+        <provider
+            android:name="rikka.shizuku.ShizukuProvider"
+            android:authorities="${applicationId}.shizuku"
+            android:multiprocess="false"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
     </application>
 </manifest>

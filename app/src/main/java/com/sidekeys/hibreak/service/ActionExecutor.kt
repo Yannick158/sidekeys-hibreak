@@ -11,6 +11,8 @@ import android.hardware.camera2.CameraManager
 import android.media.AudioManager
 import android.net.Uri
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
@@ -31,6 +33,7 @@ import kotlinx.serialization.json.Json
 class ActionExecutor(private val service: AccessibilityService) {
 
     private val json = Json { ignoreUnknownKeys = true }
+    private val mainHandler = Handler(Looper.getMainLooper())
     private val cameraManager = service.getSystemService(Context.CAMERA_SERVICE) as CameraManager
     private var torchCameraId: String? = null
     private var torchEnabled = false
@@ -81,6 +84,7 @@ class ActionExecutor(private val service: AccessibilityService) {
             ActionType.VOLUME_DOWN -> adjustVolume(AudioManager.ADJUST_LOWER)
             ActionType.VOLUME_MUTE_TOGGLE -> adjustVolume(AudioManager.ADJUST_TOGGLE_MUTE)
             ActionType.DND_TOGGLE -> toggleDoNotDisturb()
+            ActionType.BATTERY_SAVER_TOGGLE -> toggleBatterySaver()
             ActionType.CUSTOM_INTENT -> sendCustomIntent(action.data)
         }
     }
@@ -197,6 +201,36 @@ class ActionExecutor(private val service: AccessibilityService) {
                 AudioManager.FLAG_SHOW_UI,
             )
         }.onFailure { toast(R.string.error_action_failed) }
+    }
+
+    private fun toggleBatterySaver() {
+        // Native path (WRITE_SECURE_SETTINGS held): fast, no Shizuku, main thread ok.
+        if (PowerSaver.hasWriteSecureSettings(service)) {
+            val target = !PowerSaver.isEnabled(service)
+            val ok = PowerSaver.setEnabled(service, target)
+            toast(if (!ok) R.string.error_action_failed else if (target) R.string.battery_saver_on else R.string.battery_saver_off)
+            return
+        }
+        // Live Shizuku path: blocks, so run off the main thread.
+        if (ShizukuShell.isAvailable() && ShizukuShell.isPermissionGranted()) {
+            Thread {
+                val result = PowerSaver.toggle(service)
+                mainHandler.post {
+                    when (result) {
+                        true -> toast(R.string.battery_saver_on)
+                        false -> toast(R.string.battery_saver_off)
+                        null -> toast(R.string.error_action_failed)
+                    }
+                }
+            }.start()
+            return
+        }
+        // No privilege at all: open the Battery Saver settings page as a fallback.
+        if (startActivitySafely(Intent(Settings.ACTION_BATTERY_SAVER_SETTINGS))) {
+            toast(R.string.battery_saver_manual)
+        } else {
+            toast(R.string.error_shizuku_required)
+        }
     }
 
     private fun toggleDoNotDisturb() {

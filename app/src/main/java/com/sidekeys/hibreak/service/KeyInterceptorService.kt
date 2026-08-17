@@ -2,13 +2,20 @@ package com.sidekeys.hibreak.service
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.os.BatteryManager
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.KeyEvent
 import android.view.accessibility.AccessibilityEvent
+import androidx.core.content.ContextCompat
 import com.sidekeys.hibreak.core.common.KeyCodeNames
 import com.sidekeys.hibreak.core.data.Graph
+import com.sidekeys.hibreak.core.model.ChargeSettings
 import com.sidekeys.hibreak.core.model.KeyAction
 import com.sidekeys.hibreak.core.model.KeyMapping
 import com.sidekeys.hibreak.core.model.KeySettings
@@ -80,11 +87,31 @@ class KeyInterceptorService : AccessibilityService() {
     @Volatile
     private var settings: KeySettings = KeySettings()
 
+    @Volatile
+    private var chargeSettings: ChargeSettings = ChargeSettings()
+
+    /** True once the charge alarm has fired for the current charging session. */
+    @Volatile
+    private var alarmedThisCharge = false
+
+    private val batteryReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            handleBattery(intent)
+        }
+    }
+
     override fun onServiceConnected() {
         super.onServiceConnected()
         instance = this
         isRunning = true
         executor = ActionExecutor(this)
+
+        ContextCompat.registerReceiver(
+            this,
+            batteryReceiver,
+            IntentFilter(Intent.ACTION_BATTERY_CHANGED),
+            ContextCompat.RECEIVER_NOT_EXPORTED,
+        )
 
         // Make sure key filtering is active even if the XML config was ignored.
         serviceInfo = (serviceInfo ?: AccessibilityServiceInfo()).apply {
@@ -105,6 +132,32 @@ class KeyInterceptorService : AccessibilityService() {
         }
         scope.launch {
             repository.settings.collect { settings = it }
+        }
+        scope.launch {
+            repository.chargeSettings.collect { chargeSettings = it }
+        }
+    }
+
+    /**
+     * Charge alarm: when plugged in and the target level is reached, alert once
+     * per charging session so the user can unplug. Works on any device — no root
+     * or writable charging node required.
+     */
+    private fun handleBattery(intent: Intent) {
+        val cfg = chargeSettings
+        val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+        val scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
+        if (level < 0 || scale <= 0) return
+        val percent = level * 100 / scale
+        val plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) > 0
+
+        if (cfg.alarmEnabled && plugged && percent >= cfg.alarmPercent) {
+            if (!alarmedThisCharge) {
+                alarmedThisCharge = true
+                ChargeAlarm.alert(this, percent)
+            }
+        } else if (!plugged || percent < cfg.alarmPercent) {
+            alarmedThisCharge = false
         }
     }
 
@@ -196,12 +249,13 @@ class KeyInterceptorService : AccessibilityService() {
             instance = null
             isRunning = false
         }
+        scope.cancel()
+        runCatching { unregisterReceiver(batteryReceiver) }
         pressHandlers.values.forEach { it.reset() }
         pressHandlers.clear()
         captureConsumedDowns.clear()
         captureGraceUntil.clear()
         executor?.release()
         executor = null
-        scope.cancel()
     }
 }

@@ -26,6 +26,23 @@ launch apps** — exactly the gap SideKeys fills.
   interval is adjustable
 - E-ink optimized UI: pure black & white, no animations
 
+### Battery extras
+
+- **Charge alarm**: get a sound + vibration + notification when the battery
+  reaches a level you pick while plugged in, so you can unplug to protect it.
+  Works on any device — no root, no Shizuku.
+- **Battery Saver toggle** — as a key action and as a **Quick Settings tile**
+  (the tile the HiBreak Pro's stock quick settings is missing). Needs
+  [Shizuku](https://shizuku.rikka.app/) once; grant WRITE_SECURE_SETTINGS in the
+  app and it then works natively, even without Shizuku running.
+- **One-tap accessibility enable** (with Shizuku / the granted permission) so you
+  don't have to redo the "Allow restricted settings" dance after every update.
+
+> Note: a true hardware **charge limit** (stop charging at X%) is **not possible
+> on the Bigme HiBreak Pro** — its kernel exposes no writable charging-control
+> node, so no app (even with root) can stop charging. The charge alarm is the
+> honest, working alternative.
+
 ## Installation
 
 1. Copy `SideKeys-release.apk` to the phone (or use `adb install`).
@@ -36,7 +53,9 @@ launch apps** — exactly the gap SideKeys fills.
 4. **Android 13/14, "Restricted setting":** for sideloaded apps Android blocks
    the accessibility toggle at first. Fix: open SideKeys app info →
    menu (⋮) top right → **"Allow restricted settings"** → then enable the
-   accessibility service.
+   accessibility service. (With Shizuku set up, the app's **"Enable in one tap"**
+   button skips this on future updates. Installing updates via `adb install -r`
+   or Shizuku avoids the prompt entirely.)
 
 ```bash
 adb install SideKeys-release.apk

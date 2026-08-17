@@ -1,24 +1,29 @@
-## SideKeys v1.0.2
+## SideKeys v1.2.1
 
 Freely remap the two side keys of the **Bigme HiBreak Pro** — and the volume keys,
 or any hardware key — separately for single press, double press and long press.
 
-### New in 1.0.2
-- **Volume Up / Volume Down / Toggle Mute** as actions — e.g. turn a side key into
-  a volume control, or repurpose the volume keys for something else entirely.
+### New since 1.0
+- **Volume Up / Down / Mute** and **Battery Saver** as actions
+- **Battery Saver Quick Settings tile** (the one the stock HiBreak Pro is missing)
+- **Charge alarm**: sound + vibration + notification at your chosen level so you
+  can unplug — works on any device, no root, no Shizuku
+- **One-tap accessibility enable** via Shizuku / permission (skips the
+  "Allow restricted settings" dance after updates)
+- **Battery Saver without Shizuku**: grant WRITE_SECURE_SETTINGS once, then the
+  toggle works natively
 
 ### Features
 - Launch Google Assistant, open Google Wallet, launch any app
 - System actions: Home, Back, Recent apps, Notifications, Quick settings, Power menu, Lock screen, Screenshot
-- Flashlight, media controls, **volume up/down/mute**, Do Not Disturb, custom intent (expert)
+- Flashlight, media controls, volume up/down/mute, Do Not Disturb, custom intent (expert)
 - E-ink optimized (black & white, no animations), hardware key debounce, runtime key capture
 - UI in English (default) and German
 
-### Installation
-1. Download and install `SideKeys-release.apk`
-2. Open the app → "Enable accessibility service" → turn on SideKeys
-3. Android 13/14: if the toggle is blocked → app info → ⋮ → "Allow restricted settings"
-4. In the Bigme settings set the "Custom key" to "None" so the keys reach SideKeys
+### Not possible on the HiBreak Pro
+A true hardware charge limit (stop charging at X%) can't be done on this device —
+its kernel exposes no writable charging-control node, so no app (even with root)
+can stop charging. The charge alarm is the working alternative.
 
 ### Verify authenticity
 Certificate fingerprint (SHA-256):

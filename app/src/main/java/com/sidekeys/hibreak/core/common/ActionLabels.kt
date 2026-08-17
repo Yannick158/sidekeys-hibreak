@@ -28,6 +28,7 @@ fun ActionType.labelRes(): Int = when (this) {
     ActionType.VOLUME_DOWN -> R.string.action_volume_down
     ActionType.VOLUME_MUTE_TOGGLE -> R.string.action_volume_mute
     ActionType.DND_TOGGLE -> R.string.action_dnd
+    ActionType.BATTERY_SAVER_TOGGLE -> R.string.action_battery_saver
     ActionType.CUSTOM_INTENT -> R.string.action_custom_intent
 }
 

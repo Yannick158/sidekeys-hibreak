@@ -9,7 +9,10 @@
     <string name="service_active">✓ Dienst aktiv — Tasten werden abgefangen</string>
     <string name="service_inactive">Dienst nicht aktiv</string>
     <string name="service_inactive_hint">Damit die Seitentasten belegt werden können, muss SideKeys als Bedienungshilfe aktiviert werden. Tippe unten und aktiviere „SideKeys Tastenbelegung".\n\nFalls der Schalter gesperrt ist („Eingeschränkte Einstellung"): App-Info von SideKeys öffnen → Menü (⋮) → „Eingeschränkte Einstellungen zulassen" — das verlangt Android bei per APK installierten Apps.</string>
-    <string name="enable_service">Bedienungshilfe aktivieren</string>
+    <string name="enable_service">Manuell aktivieren (Einstellungen)</string>
+    <string name="enable_service_shizuku">In einem Tipp aktivieren (Shizuku / Berechtigung)</string>
+    <string name="enable_service_failed">Dienst konnte nicht automatisch aktiviert werden.</string>
+    <string name="enable_service_needs_shizuku">Benötigt laufendes Shizuku, oder den einmalig unter „Lade-Limit" erteilten Dauerzugriff.</string>
     <string name="add_key">+ Taste zuordnen</string>
     <string name="no_mappings_hint">Noch keine Taste belegt. Tippe auf „Taste zuordnen" und drücke dann eine der Seitentasten deines HiBreak Pro.</string>
     <string name="delete">Löschen</string>
@@ -57,6 +60,7 @@
     <string name="action_volume_down">Lautstärke leiser</string>
     <string name="action_volume_mute">Stumm umschalten</string>
     <string name="action_dnd">„Nicht stören" umschalten</string>
+    <string name="action_battery_saver">Energiesparmodus umschalten</string>
     <string name="action_custom_intent">Eigener Intent (Experten)</string>
 
     <!-- Custom intent -->
@@ -84,7 +88,30 @@
     <string name="app_picker_title">App wählen</string>
     <string name="search">Suchen</string>
 
+    <!-- Batterie-Sparmodus / Quick-Settings-Kachel -->
+    <string name="tile_battery_saver">Energiesparmodus</string>
+    <string name="battery_saver_on">Energiesparmodus an</string>
+    <string name="battery_saver_off">Energiesparmodus aus</string>
+    <string name="battery_saver_manual">Öffne Energiespar-Einstellungen…</string>
+    <string name="battery_saver_perm_title">Energiesparmodus ohne Shizuku</string>
+    <string name="battery_saver_perm_intro">Erteile SideKeys einmalig die Berechtigung WRITE_SECURE_SETTINGS (über Shizuku). Danach funktionieren die Tastenaktion und die Kachel für den Energiesparmodus nativ — auch wenn Shizuku nicht läuft.</string>
+    <string name="battery_saver_perm_grant">Dauerhaften Zugriff aktivieren</string>
+    <string name="battery_saver_perm_granted">✓ Dauerhafter Zugriff erteilt — Energiesparmodus geht ohne Shizuku.</string>
+
+    <!-- Akku-Screen / Ladewecker -->
+    <string name="battery_title">Akku</string>
+    <string name="charge_limit_menu">Akku &amp; Ladewecker</string>
+    <string name="charge_shizuku_grant">Shizuku-Zugriff erteilen</string>
+    <string name="charge_alarm_enable">Ladewecker</string>
+    <string name="charge_alarm_percent">Wecken bei %1$d%%</string>
+    <string name="charge_alarm_desc">Funktioniert auf jedem Gerät (kein Root/Shizuku). Ist das Kabel dran und dieser Stand erreicht, gibt SideKeys Ton + Vibration + Benachrichtigung, damit du aussteckst.</string>
+    <string name="charge_alarm_channel">Ladewecker</string>
+    <string name="charge_alarm_title">Zeit zum Ausstecken</string>
+    <string name="charge_alarm_text">Akku bei %1$d%% — zum Schonen bitte ausstecken.</string>
+    <string name="shizuku_explainer">Shizuku gibt Apps ADB-Rechte ohne Root. Du startest es einmalig über Wireless Debugging (auf Android 11+ ohne PC). SideKeys nutzt es, um den Energiesparmodus zu schalten.</string>
+
     <!-- Errors -->
+    <string name="error_shizuku_required">Der Energiesparmodus-Schalter braucht Shizuku. Richte es unter „Lade-Limit" ein.</string>
     <string name="error_assistant_not_available">Kein Assistent gefunden. Ist der Google Assistant installiert?</string>
     <string name="error_wallet_not_installed">Google Wallet ist nicht installiert.</string>
     <string name="error_app_not_found">App nicht gefunden — wurde sie deinstalliert?</string>

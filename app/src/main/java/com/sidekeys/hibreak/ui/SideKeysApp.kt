@@ -13,6 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.sidekeys.hibreak.feature.apppicker.AppPickerScreen
 import com.sidekeys.hibreak.feature.capture.CaptureScreen
+import com.sidekeys.hibreak.feature.charge.ChargeLimitScreen
 import com.sidekeys.hibreak.feature.home.HomeScreen
 import com.sidekeys.hibreak.feature.mapping.MappingScreen
 import com.sidekeys.hibreak.feature.settings.SettingsScreen
@@ -23,6 +24,7 @@ object Routes {
     const val MAPPING = "mapping/{keyCode}"
     const val APP_PICKER = "apppicker"
     const val SETTINGS = "settings"
+    const val CHARGE = "charge"
 
     fun mapping(keyCode: Int) = "mapping/$keyCode"
 }
@@ -48,6 +50,7 @@ fun SideKeysApp() {
                     onAddKey = { navController.navigate(Routes.CAPTURE) },
                     onEditKey = { keyCode -> navController.navigate(Routes.mapping(keyCode)) },
                     onOpenSettings = { navController.navigate(Routes.SETTINGS) },
+                    onOpenChargeLimit = { navController.navigate(Routes.CHARGE) },
                 )
             }
             composable(Routes.CAPTURE) {
@@ -89,6 +92,9 @@ fun SideKeysApp() {
             }
             composable(Routes.SETTINGS) {
                 SettingsScreen(onBack = { navController.popBackStack() })
+            }
+            composable(Routes.CHARGE) {
+                ChargeLimitScreen(onBack = { navController.popBackStack() })
             }
         }
     }

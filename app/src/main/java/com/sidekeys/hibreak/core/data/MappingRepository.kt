@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.sidekeys.hibreak.core.model.ChargeSettings
 import com.sidekeys.hibreak.core.model.KeyMapping
 import com.sidekeys.hibreak.core.model.KeySettings
 import java.io.IOException
@@ -21,9 +22,11 @@ import kotlinx.serialization.json.Json
 interface MappingRepository {
     val mappings: Flow<List<KeyMapping>>
     val settings: Flow<KeySettings>
+    val chargeSettings: Flow<ChargeSettings>
     suspend fun saveMapping(mapping: KeyMapping)
     suspend fun deleteMapping(keyCode: Int)
     suspend fun saveSettings(settings: KeySettings)
+    suspend fun saveChargeSettings(settings: ChargeSettings)
 }
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
@@ -41,6 +44,7 @@ class DataStoreMappingRepository(context: Context) : MappingRepository {
 
     private val mappingsKey = stringPreferencesKey("mappings")
     private val settingsKey = stringPreferencesKey("settings")
+    private val chargeKey = stringPreferencesKey("charge")
 
     private val safeData = store.data.catch { e ->
         if (e is IOException) {
@@ -61,6 +65,12 @@ class DataStoreMappingRepository(context: Context) : MappingRepository {
         prefs[settingsKey]?.let { raw ->
             runCatching { json.decodeFromString(KeySettings.serializer(), raw) }.getOrDefault(KeySettings())
         } ?: KeySettings()
+    }
+
+    override val chargeSettings: Flow<ChargeSettings> = safeData.map { prefs ->
+        prefs[chargeKey]?.let { raw ->
+            runCatching { json.decodeFromString(ChargeSettings.serializer(), raw) }.getOrDefault(ChargeSettings())
+        } ?: ChargeSettings()
     }
 
     override suspend fun saveMapping(mapping: KeyMapping) {
@@ -85,6 +95,12 @@ class DataStoreMappingRepository(context: Context) : MappingRepository {
     override suspend fun saveSettings(settings: KeySettings) {
         safeEdit { prefs ->
             prefs[settingsKey] = json.encodeToString(KeySettings.serializer(), settings)
+        }
+    }
+
+    override suspend fun saveChargeSettings(settings: ChargeSettings) {
+        safeEdit { prefs ->
+            prefs[chargeKey] = json.encodeToString(ChargeSettings.serializer(), settings)
         }
     }
 

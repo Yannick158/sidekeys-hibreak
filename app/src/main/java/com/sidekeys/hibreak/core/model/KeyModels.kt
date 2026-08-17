@@ -25,6 +25,7 @@ enum class ActionType {
     VOLUME_DOWN,
     VOLUME_MUTE_TOGGLE,
     DND_TOGGLE,
+    BATTERY_SAVER_TOGGLE,
     CUSTOM_INTENT,
 }
 
@@ -78,6 +79,17 @@ data class KeyMapping(
         PressType.LONG -> longPress
     }
 }
+
+/**
+ * Charge alarm: alert (sound/vibration/notification) at [alarmPercent] while
+ * plugged in, so the user can unplug. Works on any device — no root or writable
+ * charging node needed.
+ */
+@Serializable
+data class ChargeSettings(
+    val alarmEnabled: Boolean = false,
+    val alarmPercent: Int = 80,
+)
 
 /** Global behaviour settings. */
 @Serializable

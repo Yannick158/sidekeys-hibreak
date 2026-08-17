@@ -2,6 +2,7 @@ package com.sidekeys.hibreak.feature.home
 
 import android.content.Intent
 import android.provider.Settings
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,12 +42,14 @@ import com.sidekeys.hibreak.core.designsystem.EInkCard
 import com.sidekeys.hibreak.core.designsystem.EInkHeader
 import com.sidekeys.hibreak.core.designsystem.EInkOutlinedButton
 import com.sidekeys.hibreak.core.model.KeyMapping
+import com.sidekeys.hibreak.service.AccessibilityEnabler
 
 @Composable
 fun HomeScreen(
     onAddKey: () -> Unit,
     onEditKey: (Int) -> Unit,
     onOpenSettings: () -> Unit,
+    onOpenChargeLimit: () -> Unit,
 ) {
     val context = LocalContext.current
     val viewModel: HomeViewModel =
@@ -91,7 +94,28 @@ fun HomeScreen(
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     Spacer(Modifier.height(12.dp))
+                    // One-tap enable via Shizuku / WRITE_SECURE_SETTINGS — skips the
+                    // "Allow restricted settings" dance that Android re-arms on every update.
                     EInkButton(
+                        text = stringResource(R.string.enable_service_shizuku),
+                        onClick = {
+                            if (AccessibilityEnabler.canEnable(context)) {
+                                Thread {
+                                    val ok = AccessibilityEnabler.enable(context)
+                                    if (!ok) {
+                                        android.os.Handler(android.os.Looper.getMainLooper()).post {
+                                            Toast.makeText(context, R.string.enable_service_failed, Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                }.start()
+                            } else {
+                                Toast.makeText(context, R.string.enable_service_needs_shizuku, Toast.LENGTH_LONG).show()
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    EInkOutlinedButton(
                         text = stringResource(R.string.enable_service),
                         onClick = {
                             context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
@@ -129,6 +153,11 @@ fun HomeScreen(
             EInkOutlinedButton(
                 text = stringResource(R.string.add_key),
                 onClick = onAddKey,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            EInkOutlinedButton(
+                text = stringResource(R.string.charge_limit_menu),
+                onClick = onOpenChargeLimit,
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(8.dp))

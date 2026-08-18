@@ -13,6 +13,10 @@
     <string name="enable_step1_note">Öffnet die App-Info. Dort: Menü (⋮) oben rechts → „Eingeschränkte Einstellungen zulassen". Ohne das bleibt der Schalter in Schritt 2 ausgegraut.</string>
     <string name="enable_step2">Schritt 2: Bedienungshilfe aktivieren</string>
     <string name="enable_step2_note">Öffnet die Bedienungshilfen. Dort: „SideKeys Tastenbelegung" einschalten.</string>
+    <string name="restart_service">Dienst neu starten</string>
+    <string name="restart_service_note">Nimm das, wenn der Dienst lief und nach dem „Schließen" im Prozessmanager gestoppt wurde. Wird nur angezeigt, weil SideKeys die nötige Berechtigung hat.</string>
+    <string name="restart_service_ok">✓ Dienst läuft wieder</string>
+    <string name="restart_service_failed">Neustart hat nicht geklappt — bitte über Schritt 2 SideKeys aus- und einschalten.</string>
     <string name="add_key">+ Taste zuordnen</string>
     <string name="no_mappings_hint">Noch keine Taste belegt. Tippe auf „Taste zuordnen" und drücke dann eine der Seitentasten deines HiBreak Pro.</string>
     <string name="delete">Löschen</string>

@@ -3,6 +3,7 @@ package com.sidekeys.hibreak.feature.home
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -39,6 +40,8 @@ import com.sidekeys.hibreak.core.designsystem.EInkHeader
 import com.sidekeys.hibreak.core.designsystem.EInkOutlinedButton
 import com.sidekeys.hibreak.core.designsystem.MappingCard
 import com.sidekeys.hibreak.core.model.KeyMapping
+import com.sidekeys.hibreak.service.AccessibilityEnabler
+import com.sidekeys.hibreak.service.KeyInterceptorService
 
 @Composable
 fun HomeScreen(
@@ -123,6 +126,44 @@ fun HomeScreen(
                         text = stringResource(R.string.enable_step2_note),
                         style = MaterialTheme.typography.bodyMedium,
                     )
+
+                    // Shortcut for the common case: the service was already set
+                    // up, then Bigme's task manager force-stopped it. Only shown
+                    // when we actually hold the rights to do it — and it verifies
+                    // the result instead of claiming success blindly.
+                    if (AccessibilityEnabler.canEnable(context)) {
+                        Spacer(Modifier.height(16.dp))
+                        EInkOutlinedButton(
+                            text = stringResource(R.string.restart_service),
+                            onClick = {
+                                val main = android.os.Handler(android.os.Looper.getMainLooper())
+                                Thread {
+                                    AccessibilityEnabler.enable(context)
+                                    // Give Android a moment to rebind, then check.
+                                    var running = false
+                                    repeat(12) {
+                                        if (KeyInterceptorService.isRunning) {
+                                            running = true
+                                            return@repeat
+                                        }
+                                        Thread.sleep(250)
+                                    }
+                                    val msg = if (running) {
+                                        R.string.restart_service_ok
+                                    } else {
+                                        R.string.restart_service_failed
+                                    }
+                                    main.post { Toast.makeText(context, msg, Toast.LENGTH_LONG).show() }
+                                }.start()
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = stringResource(R.string.restart_service_note),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
                 }
             }
 

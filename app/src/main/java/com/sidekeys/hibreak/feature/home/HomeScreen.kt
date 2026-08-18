@@ -94,16 +94,19 @@ fun HomeScreen(
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     Spacer(Modifier.height(12.dp))
-                    // Android 13+ blocks the accessibility toggle for sideloaded
-                    // apps until "Allow restricted settings" is confirmed in the
-                    // app info screen, so that has to come first.
+                    // The real order matters: Android only offers "Allow
+                    // restricted settings" in the app info screen *after* an
+                    // attempt to switch the service on has been blocked. Telling
+                    // people to do it the other way round leaves them stuck.
+                    val openAccessibility = {
+                        runCatching {
+                            context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                        }
+                        Unit
+                    }
                     EInkButton(
                         text = stringResource(R.string.enable_step1),
-                        onClick = {
-                            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                                .setData(Uri.fromParts("package", context.packageName, null))
-                            runCatching { context.startActivity(intent) }
-                        },
+                        onClick = openAccessibility,
                         modifier = Modifier.fillMaxWidth(),
                     )
                     Spacer(Modifier.height(4.dp))
@@ -115,15 +118,26 @@ fun HomeScreen(
                     EInkButton(
                         text = stringResource(R.string.enable_step2),
                         onClick = {
-                            runCatching {
-                                context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
-                            }
+                            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                                .setData(Uri.fromParts("package", context.packageName, null))
+                            runCatching { context.startActivity(intent) }
                         },
                         modifier = Modifier.fillMaxWidth(),
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
                         text = stringResource(R.string.enable_step2_note),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    EInkButton(
+                        text = stringResource(R.string.enable_step3),
+                        onClick = openAccessibility,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(R.string.enable_step3_note),
                         style = MaterialTheme.typography.bodyMedium,
                     )
 

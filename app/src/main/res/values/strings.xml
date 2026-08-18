@@ -8,11 +8,11 @@
     <!-- Home -->
     <string name="service_active">✓ Service active — keys are intercepted</string>
     <string name="service_inactive">Service not active</string>
-    <string name="service_inactive_hint">To remap the side keys, SideKeys must be enabled as an accessibility service. Android needs two steps for apps installed from an APK:</string>
-    <string name="enable_step1">Step 1: Allow restricted settings</string>
-    <string name="enable_step1_note">Opens the app info screen. There: menu (⋮) top right → "Allow restricted settings". Without this, Android keeps the switch in step 2 greyed out.</string>
-    <string name="enable_step2">Step 2: Enable accessibility service</string>
-    <string name="enable_step2_note">Opens the accessibility settings. There: switch on "SideKeys Button Mapper".</string>
+    <string name="service_inactive_hint">To remap the side keys, SideKeys must be enabled as an accessibility service. For apps installed from an APK, Android takes three steps — in this order, because the permission to unblock only appears *after* a blocked attempt:</string>
+    <string name="enable_step1">Step 1: Try to switch it on</string>
+    <string name="enable_step1_note">Opens accessibility settings. Tap "SideKeys Button Mapper" and try the switch — Android will refuse with "Restricted setting". That refusal is what unlocks step 2, so it is expected.</string>
+    <string name="enable_step2">Step 2: Allow restricted settings</string>
+    <string name="enable_step2_note">Opens the app info screen. There: menu (⋮) top right → "Allow restricted settings". This entry only exists once step 1 has been refused.</string>
     <string name="restart_service">Restart service</string>
     <string name="restart_service_note">Use this if the service was working and stopped after the app was "closed" in the task manager. Only shown because SideKeys holds the permission to do it.</string>
     <string name="restart_service_ok">✓ Service is running again</string>
@@ -175,4 +175,6 @@
     <string name="qs_tile_move_front">Move SideKeys tile to the front</string>
     <string name="qs_tile_move_stock">Move the built-in Battery Saver tile to the front</string>
     <string name="qs_tile_msg_stock_moved">Moved. Pull the shade down twice — "Battery Saver" should now be on the first page.</string>
+    <string name="enable_step3">Step 3: Switch it on for real</string>
+    <string name="enable_step3_note">Back to accessibility settings — the switch for "SideKeys Button Mapper" now works.</string>
 </resources>

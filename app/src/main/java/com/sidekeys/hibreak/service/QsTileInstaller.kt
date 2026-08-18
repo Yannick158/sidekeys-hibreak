@@ -166,32 +166,33 @@ object QsTileInstaller {
 
     fun diagnostics(context: Context): String {
         if (!shellReady()) return "(Shizuku not running)"
+        // The settings namespaces have been searched exhaustively and hold no
+        // vendor tile list. The remaining candidate is the vendor's own
+        // ContentProvider, so probe that.
         val script = """
-            echo '### A. Values that look like a list (>=2 commas) — a tile list would look like this:'
-            for ns in secure system global; do
-              settings list ${'$'}ns 2>/dev/null | awk -v NS="${'$'}ns" -F'=' '{
-                v=${'$'}0; sub(/^[^=]*=/,"",v); n=gsub(/,/,"",v);
-                if (n>=2) print NS": "${'$'}0
-              }' | cut -c1-200
+            echo '### 1. Vendor ControlProvider — root and likely paths:'
+            for u in content://com.xrz.sys.control.provider \
+                     content://com.xrz.sys.control.provider/settings \
+                     content://com.xrz.sys.control.provider/config \
+                     content://com.xrz.sys.control.provider/tile \
+                     content://com.xrz.sys.control.provider/tiles \
+                     content://com.xrz.sys.control.provider/quicksettings \
+                     content://com.xrz.sys.control.provider/statusbar \
+                     content://com.xrz.sys.control.provider/switch; do
+              echo "-- ${'$'}u"
+              content query --uri "${'$'}u" 2>&1 | head -6
             done
             echo
-            echo '### B. Every settings key name (no values):'
-            for ns in secure system global; do
-              settings list ${'$'}ns 2>/dev/null | cut -d= -f1 | sed "s/^/${'$'}ns: /"
-            done | sort
+            echo '### 2. Is the provider exported / what protects it?'
+            dumpsys package com.xrz.sys.control 2>/dev/null | grep -A6 -iE 'ControlProvider' | head -20
             echo
-            echo '### C. How many keys per namespace (so nothing is silently cut):'
-            for ns in secure system global; do
-              printf "%s: " ${'$'}ns; settings list ${'$'}ns 2>/dev/null | wc -l
-            done
+            echo '### 3. Files the control app keeps (names only, no contents):'
+            ls -la /data/data/com.xrz.sys.control/shared_prefs/ 2>&1 | head -15
             echo
-            echo '### D. Bigme system-control app:'
-            dumpsys package com.xrz.sys.control 2>/dev/null | grep -iE 'versionName|codePath|Provider|Activity Resolver|android.permission' | head -20
-            echo
-            echo '### E. Does any Bigme app expose a settings provider?'
-            pm list packages 2>/dev/null | sed 's/package://' | grep -iE '^com\.(xrz|b300)' | while read pkg; do
-              n=${'$'}(dumpsys package "${'$'}pkg" 2>/dev/null | grep -ciE 'ContentProvider|Provider:')
-              [ "${'$'}n" -gt 0 ] && echo "${'$'}pkg: ${'$'}n provider entries"
+            echo '### 4. Which app owns the visible tiles? (search for their labels)'
+            for w in "E Ink Center" "Power Management" "Full refresh"; do
+              echo "-- ${'$'}w"
+              dumpsys activity service com.android.systemui 2>/dev/null | grep -i "${'$'}w" | head -3
             done
         """.trimIndent()
         val r = ShizukuShell.run(script)

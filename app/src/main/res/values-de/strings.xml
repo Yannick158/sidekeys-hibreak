@@ -8,11 +8,11 @@
     <!-- Home -->
     <string name="service_active">✓ Dienst aktiv — Tasten werden abgefangen</string>
     <string name="service_inactive">Dienst nicht aktiv</string>
-    <string name="service_inactive_hint">Damit die Seitentasten belegt werden können, muss SideKeys als Bedienungshilfe aktiviert werden. Bei per APK installierten Apps verlangt Android dafür zwei Schritte:</string>
-    <string name="enable_step1">Schritt 1: Eingeschränkte Einstellungen zulassen</string>
-    <string name="enable_step1_note">Öffnet die App-Info. Dort: Menü (⋮) oben rechts → „Eingeschränkte Einstellungen zulassen". Ohne das bleibt der Schalter in Schritt 2 ausgegraut.</string>
-    <string name="enable_step2">Schritt 2: Bedienungshilfe aktivieren</string>
-    <string name="enable_step2_note">Öffnet die Bedienungshilfen. Dort: „SideKeys Tastenbelegung" einschalten.</string>
+    <string name="service_inactive_hint">Damit die Seitentasten belegt werden können, muss SideKeys als Bedienungshilfe aktiviert werden. Bei per APK installierten Apps verlangt Android drei Schritte — in dieser Reihenfolge, weil die Freigabe erst *nach* einem abgelehnten Versuch erscheint:</string>
+    <string name="enable_step1">Schritt 1: Einschalten versuchen</string>
+    <string name="enable_step1_note">Öffnet die Bedienungshilfen. Tippe auf „SideKeys Tastenbelegung" und versuche den Schalter — Android lehnt mit „Eingeschränkte Einstellung" ab. Genau diese Ablehnung schaltet Schritt 2 frei, sie gehört also dazu.</string>
+    <string name="enable_step2">Schritt 2: Eingeschränkte Einstellungen zulassen</string>
+    <string name="enable_step2_note">Öffnet die App-Info. Dort: Menü (⋮) oben rechts → „Eingeschränkte Einstellungen zulassen". Dieser Eintrag existiert erst, wenn Schritt 1 abgelehnt wurde.</string>
     <string name="restart_service">Dienst neu starten</string>
     <string name="restart_service_note">Nimm das, wenn der Dienst lief und nach dem „Schließen" im Prozessmanager gestoppt wurde. Wird nur angezeigt, weil SideKeys die nötige Berechtigung hat.</string>
     <string name="restart_service_ok">✓ Dienst läuft wieder</string>
@@ -175,4 +175,6 @@
     <string name="qs_tile_move_front">SideKeys-Kachel nach vorne sortieren</string>
     <string name="qs_tile_move_stock">Eingebaute Energiesparmodus-Kachel nach vorne sortieren</string>
     <string name="qs_tile_msg_stock_moved">Sortiert. Zieh die Leiste zweimal herunter — „Energiesparmodus" sollte jetzt auf der ersten Seite stehen.</string>
+    <string name="enable_step3">Schritt 3: Jetzt wirklich einschalten</string>
+    <string name="enable_step3_note">Zurück in die Bedienungshilfen — der Schalter für „SideKeys Tastenbelegung" funktioniert jetzt.</string>
 </resources>

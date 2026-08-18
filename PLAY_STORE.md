@@ -137,3 +137,67 @@ Accessibility apps get a stricter review than average, so expect the first revie
 to take longer than the usual few days. Start with the **internal testing** track
 (as in phase 3) — it reviews faster and lets you fix findings before going to
 production.
+
+---
+
+## Anhang — Antworten für die Deklarationen in der Play Console
+
+Alle Angaben unten sind auf den [Haftungsausschluss](DISCLAIMER.md) und die
+[Datenschutzerklärung](PRIVACY.md) abgestimmt. Widersprüche zwischen Formular und
+veröffentlichten Dokumenten sind das, was bei einer Prüfung auffällt — deshalb
+bitte nicht abweichen.
+
+### Policy → App-Inhalte
+
+| Frage | Antwort | Warum |
+|---|---|---|
+| Datenschutzerklärung | URL zu `PRIVACY.md` | siehe Phase 4a |
+| **Werbung:** Enthält die App Werbung? | **Nein** | kein Werbe-SDK enthalten |
+| **App-Zugriff:** Sind Teile eingeschränkt? | **Alle Funktionen ohne besonderen Zugriff verfügbar** | kein Login, kein Konto, keine Bezahlschranke |
+| **Inhaltseinstufung** | Fragebogen: überall „Nein" | Werkzeug ohne Gewalt, Sexualität, Drogen, Glücksspiel, Nutzerinhalte → USK 0 / PEGI 3 |
+| **Zielgruppe** | **18 Jahre und älter** | hält die App aus den „Designed for Families"-Vorgaben und den strengeren Kinderdatenschutz-Regeln heraus |
+| Spricht die App Kinder an? | **Nein** | Gestaltung und Zweck richten sich an Erwachsene |
+| Nachrichten-App | Nein | |
+| Gesundheits-App | Nein | |
+| Finanzprodukte | Nein | |
+| Behörden-App | Nein | |
+
+### Data safety (Datensicherheit)
+
+| Frage | Antwort |
+|---|---|
+| Erhebt oder teilt die App Nutzerdaten? | **Nein** |
+| Werden Daten bei der Übertragung verschlüsselt? | entfällt (keine Übertragung) |
+| Können Nutzer Löschung verlangen? | entfällt — alle Daten liegen lokal und werden mit der Deinstallation gelöscht |
+
+> Begründung, falls nachgefragt wird: Google definiert „erhoben" als *vom Gerät
+> übertragen*. SideKeys speichert Tastenbelegungen ausschließlich im privaten
+> App-Speicher und besitzt keine `INTERNET`-Berechtigung, kann also technisch
+> nichts übertragen.
+
+### Sensible Berechtigungen
+
+Erwähne von dir aus, ohne dass gefragt wird — verschweigen ist das einzige, was
+hier schadet:
+
+- **AccessibilityService** — Deklaration wie in Phase 4c
+- **`WRITE_SECURE_SETTINGS`** — wird von der App nie selbst angefordert. Nutzer
+  können sie optional per adb oder Shizuku erteilen, um zwei Komfortfunktionen
+  freizuschalten (Energiesparmodus-Schalter, Neustart des Dienstes). Ohne sie
+  funktioniert die App vollständig; die betroffenen Aktionen öffnen dann nur die
+  jeweilige Einstellungsseite. Gleiches Vorgehen wie bei Key Mapper und
+  Button Mapper.
+
+### Store-Eintrag
+
+| Feld | Wert |
+|---|---|
+| Kategorie | **Tools / Extras** |
+| Kostenlos oder kostenpflichtig | **Kostenlos** (nachträglich nicht auf „kostenpflichtig" änderbar) |
+| In-App-Käufe | **Nein** |
+| Kontakt-E-Mail | dieselbe Adresse wie im Impressum |
+
+> Kostenlos und werbefrei zu bleiben ist nicht nur eine Produktentscheidung: Es
+> ist die Voraussetzung dafür, dass die Ausnahmen der EU-Produkthaftungs-
+> richtlinie und des Cyber Resilience Act für nicht-kommerzielle freie Software
+> greifen. Siehe [DISCLAIMER.md](DISCLAIMER.md).

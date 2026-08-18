@@ -150,24 +150,6 @@ object QsTileInstaller {
      * every settings key that smells like a tile list, plus SystemUI's own view
      * of its tile host. Blocking; shell only.
      */
-    fun diagnostics(context: Context): String {
-        if (!shellReady()) return "(Shizuku not running)"
-        val script = """
-            echo '# settings keys mentioning tiles/qs:'
-            for ns in secure system global; do
-              settings list ${'$'}ns 2>/dev/null | grep -iE 'tile|qs_|quick' | sed "s/^/${'$'}ns: /"
-            done
-            echo
-            echo '# SystemUI tile host:'
-            dumpsys activity service com.android.systemui/.SystemUIService QSTileHost 2>/dev/null | grep -iE 'tile|spec' | head -60
-            echo
-            echo '# statusbar shell command available:'
-            cmd statusbar 2>&1 | head -3
-        """.trimIndent()
-        val r = ShizukuShell.run(script)
-        return (r.stdout + if (r.stderr.isNotBlank()) "\n" + r.stderr else "").trim().ifBlank { "(no output)" }
-    }
-
     private fun write(context: Context, tiles: List<String>): ShellResult {
         val value = tiles.joinToString(",")
         // Writing works with the granted permission; only reading is blocked on
@@ -181,4 +163,29 @@ object QsTileInstaller {
         val ok = ShizukuShell.run("settings put secure $QS_TILES '$value'").ok
         return if (ok) ShellResult.OK else ShellResult.WRITE_FAILED
     }
+
+    fun diagnostics(context: Context): String {
+        if (!shellReady()) return "(Shizuku not running)"
+        val script = """
+            echo '### 1. Who draws the shade?'
+            dumpsys window windows 2>/dev/null | grep -iE 'NotificationShade|StatusBar|QuickSettings|Package=' | grep -iE 'shade|statusbar|quick' | head -10
+            echo
+            echo '### 2. Bigme / OEM system packages:'
+            pm list packages 2>/dev/null | grep -iE 'bigme|onyx|eink|e_ink|xrz' | head -25
+            echo
+            echo '### 3. Settings keys mentioning the OEM or a panel:'
+            for ns in secure system global; do
+              settings list ${'$'}ns 2>/dev/null | grep -iE 'bigme|eink|e_ink|xrz|panel|shortcut|switch|toggle|shade|statusbar' | head -20 | sed "s/^/${'$'}ns: /"
+            done
+            echo
+            echo '### 4. Standard tile list (for comparison):'
+            settings get secure sysui_qs_tiles 2>/dev/null
+            echo
+            echo '### 5. Overlays active on SystemUI:'
+            cmd overlay list 2>/dev/null | grep -iE 'systemui|bigme' | head -15
+        """.trimIndent()
+        val r = ShizukuShell.run(script)
+        return (r.stdout + if (r.stderr.isNotBlank()) "\n" + r.stderr else "").trim().ifBlank { "(no output)" }
+    }
+
 }

@@ -24,9 +24,8 @@ or any hardware key — separately for single press, double press and long press
 - **Per-app key profiles**: different actions while a chosen app is in the
   foreground; empty slots fall back to the global mapping
 - **E-ink full refresh** (experimental)
-- **No helper app needed any more**: Shizuku support was removed. The two
-  features that need elevated rights use a one-time `adb pm grant` instead, shown
-  ready to copy inside the app.
+- **`adb pm grant` as a setup route** for the features that need elevated
+  rights, shown ready to copy inside the app (see 1.5.x for the Shizuku route).
 
 ### Earlier
 - Keys survive Bigme's task manager: SideKeys hides itself from recent apps by

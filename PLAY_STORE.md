@@ -9,18 +9,18 @@ Work through the phases in order. Phase 0 is already finished.
 
 ## Phase 0 — Ready to upload ✅
 
-- Signed **App Bundle** built: `SideKeys-v1.5.2.aab` (version code 15)
+- Signed **App Bundle** built: `SideKeys-v1.7.0.aab` (version code 21, targets API 36)
 - [Privacy policy](PRIVACY.md) written — declares that no data is collected
 - Release notes per language in `distribution/whatsnew/`
 - Automated upload workflow: [.github/workflows/play-release.yml](.github/workflows/play-release.yml)
 
-## Phase 1 — Developer account (~15 min + waiting)
+## Phase 1 — Developer account ✅ done
 
-1. Go to <https://play.google.com/console> and register
-2. Pay the **one-time 25 USD** fee
-3. Complete identity verification — Google may take a few days to approve
+Account registered and identity verified.
 
-Nothing else can happen until this is done.
+> **Target API level:** Google requires **API 36 (Android 16)** for new apps from
+> 31 August 2026; before that the floor is API 35. SideKeys targets **36**, so it
+> satisfies the requirement either side of that date.
 
 ## Phase 2 — Create the app
 
@@ -43,7 +43,7 @@ bundle goes up by hand:
 
 1. **Testing → Internal testing → Create new release**
 2. Accept **Play App Signing** when prompted (see the note below)
-3. Upload `SideKeys-v1.5.2.aab`
+3. Upload `SideKeys-v1.7.0.aab`
 4. Paste the text from `distribution/whatsnew/whatsnew-en-US` as the release notes
 5. Save → Review release → **Start rollout to internal testing**
 

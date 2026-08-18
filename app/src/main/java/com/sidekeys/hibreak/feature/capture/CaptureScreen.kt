@@ -95,7 +95,7 @@ fun CaptureScreen(
                     )
                     Spacer(Modifier.height(12.dp))
                     EInkButton(
-                        text = stringResource(R.string.enable_service),
+                        text = stringResource(R.string.enable_step2),
                         onClick = {
                             context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
                         },

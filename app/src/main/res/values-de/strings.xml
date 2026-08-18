@@ -8,11 +8,11 @@
     <!-- Home -->
     <string name="service_active">✓ Dienst aktiv — Tasten werden abgefangen</string>
     <string name="service_inactive">Dienst nicht aktiv</string>
-    <string name="service_inactive_hint">Damit die Seitentasten belegt werden können, muss SideKeys als Bedienungshilfe aktiviert werden. Tippe unten und aktiviere „SideKeys Tastenbelegung".\n\nFalls der Schalter gesperrt ist („Eingeschränkte Einstellung"): App-Info von SideKeys öffnen → Menü (⋮) → „Eingeschränkte Einstellungen zulassen" — das verlangt Android bei per APK installierten Apps.</string>
-    <string name="enable_service">Manuell aktivieren (Einstellungen)</string>
-    <string name="enable_service_one_tap">In einem Tipp aktivieren</string>
-    <string name="enable_service_failed">Dienst konnte nicht automatisch aktiviert werden.</string>
-    <string name="enable_service_needs_setup">Benötigt die einmalige ADB-Einrichtung — siehe „Akku &amp; Ladewecker".</string>
+    <string name="service_inactive_hint">Damit die Seitentasten belegt werden können, muss SideKeys als Bedienungshilfe aktiviert werden. Bei per APK installierten Apps verlangt Android dafür zwei Schritte:</string>
+    <string name="enable_step1">Schritt 1: Eingeschränkte Einstellungen zulassen</string>
+    <string name="enable_step1_note">Öffnet die App-Info. Dort: Menü (⋮) oben rechts → „Eingeschränkte Einstellungen zulassen". Ohne das bleibt der Schalter in Schritt 2 ausgegraut.</string>
+    <string name="enable_step2">Schritt 2: Bedienungshilfe aktivieren</string>
+    <string name="enable_step2_note">Öffnet die Bedienungshilfen. Dort: „SideKeys Tastenbelegung" einschalten.</string>
     <string name="add_key">+ Taste zuordnen</string>
     <string name="no_mappings_hint">Noch keine Taste belegt. Tippe auf „Taste zuordnen" und drücke dann eine der Seitentasten deines HiBreak Pro.</string>
     <string name="delete">Löschen</string>
@@ -88,7 +88,7 @@
     <string name="setting_hide_recents">Aus „Letzte Apps" ausblenden</string>
     <string name="hide_recents_note">Auf dem HiBreak Pro empfohlen: Der Bigme-Prozessmanager beendet weggewischte/„geschlossene" Apps per Force-Stop — dabei stirbt auch der Tasten-Dienst, bis er neu eingeschaltet wird. Ausgeblendet lässt sich SideKeys dort nicht schließen. Öffne die App stattdessen über den App-Drawer.</string>
     <string name="tips_title">Tipps für das HiBreak Pro</string>
-    <string name="tips_text">• Tasten gehen nach dem „Schließen" der App nicht mehr? Der Bigme-Prozessmanager stoppt die App per Force-Stop und damit den Tasten-Dienst. Abhilfe: Auf der Startseite „In einem Tipp aktivieren" (startet den Dienst neu) oder SideKeys in den Bedienungshilfen aus- und einschalten. „Aus ‚Letzte Apps\' ausblenden" eingeschaltet lassen, um das zu verhindern.\n\n• Falls eine Seitentaste nicht ankommt: In den Bigme-Einstellungen unter „Benutzerdefinierte Taste" die Belegung auf „Keine" stellen, damit SideKeys sie erhält.\n\n• Bigme/MediaTek „DuraSpeed" beendet Hintergrund-Apps aggressiv. Sollte der Dienst stoppen, DuraSpeed deaktivieren (per ADB: settings put global setting.duraspeed.enabled 0) und SideKeys von der Akku-Optimierung ausnehmen.</string>
+    <string name="tips_text">• Tasten gehen nach dem „Schließen" der App nicht mehr? Der Bigme-Prozessmanager stoppt die App per Force-Stop und damit den Tasten-Dienst. Abhilfe: SideKeys in den Bedienungshilfen aus- und wieder einschalten. „Aus ‚Letzte Apps\' ausblenden" eingeschaltet lassen, um das zu verhindern.\n\n• Falls eine Seitentaste nicht ankommt: In den Bigme-Einstellungen unter „Benutzerdefinierte Taste" die Belegung auf „Keine" stellen, damit SideKeys sie erhält.\n\n• Bigme/MediaTek „DuraSpeed" beendet Hintergrund-Apps aggressiv. Sollte der Dienst stoppen, DuraSpeed deaktivieren (per ADB: settings put global setting.duraspeed.enabled 0) und SideKeys von der Akku-Optimierung ausnehmen.</string>
 
     <!-- App picker -->
     <string name="app_picker_title">App wählen</string>

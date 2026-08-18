@@ -1,8 +1,8 @@
 package com.sidekeys.hibreak.feature.home
 
 import android.content.Intent
+import android.net.Uri
 import android.provider.Settings
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -39,7 +39,6 @@ import com.sidekeys.hibreak.core.designsystem.EInkHeader
 import com.sidekeys.hibreak.core.designsystem.EInkOutlinedButton
 import com.sidekeys.hibreak.core.designsystem.MappingCard
 import com.sidekeys.hibreak.core.model.KeyMapping
-import com.sidekeys.hibreak.service.AccessibilityEnabler
 
 @Composable
 fun HomeScreen(
@@ -92,33 +91,37 @@ fun HomeScreen(
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     Spacer(Modifier.height(12.dp))
-                    // One-tap enable via WRITE_SECURE_SETTINGS (granted once via adb) — skips the
-                    // "Allow restricted settings" dance that Android re-arms on every update.
+                    // Android 13+ blocks the accessibility toggle for sideloaded
+                    // apps until "Allow restricted settings" is confirmed in the
+                    // app info screen, so that has to come first.
                     EInkButton(
-                        text = stringResource(R.string.enable_service_one_tap),
+                        text = stringResource(R.string.enable_step1),
                         onClick = {
-                            if (AccessibilityEnabler.canEnable(context)) {
-                                Thread {
-                                    val ok = AccessibilityEnabler.enable(context)
-                                    if (!ok) {
-                                        android.os.Handler(android.os.Looper.getMainLooper()).post {
-                                            Toast.makeText(context, R.string.enable_service_failed, Toast.LENGTH_SHORT).show()
-                                        }
-                                    }
-                                }.start()
-                            } else {
-                                Toast.makeText(context, R.string.enable_service_needs_setup, Toast.LENGTH_LONG).show()
+                            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                                .setData(Uri.fromParts("package", context.packageName, null))
+                            runCatching { context.startActivity(intent) }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(R.string.enable_step1_note),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    EInkButton(
+                        text = stringResource(R.string.enable_step2),
+                        onClick = {
+                            runCatching {
+                                context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
                     )
-                    Spacer(Modifier.height(8.dp))
-                    EInkOutlinedButton(
-                        text = stringResource(R.string.enable_service),
-                        onClick = {
-                            context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
-                        },
-                        modifier = Modifier.fillMaxWidth(),
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(R.string.enable_step2_note),
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 }
             }

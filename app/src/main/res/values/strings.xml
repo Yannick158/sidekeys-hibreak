@@ -8,11 +8,11 @@
     <!-- Home -->
     <string name="service_active">✓ Service active — keys are intercepted</string>
     <string name="service_inactive">Service not active</string>
-    <string name="service_inactive_hint">To remap the side keys, SideKeys must be enabled as an accessibility service. Tap below and enable "SideKeys Button Mapper".\n\nIf the toggle is blocked ("Restricted setting"): open SideKeys app info → menu (⋮) → "Allow restricted settings" — Android requires this for sideloaded apps.</string>
-    <string name="enable_service">Enable manually (settings)</string>
-    <string name="enable_service_one_tap">Enable in one tap</string>
-    <string name="enable_service_failed">Could not enable the service automatically.</string>
-    <string name="enable_service_needs_setup">Needs the one-time adb setup — see Battery &amp; charge alarm.</string>
+    <string name="service_inactive_hint">To remap the side keys, SideKeys must be enabled as an accessibility service. Android needs two steps for apps installed from an APK:</string>
+    <string name="enable_step1">Step 1: Allow restricted settings</string>
+    <string name="enable_step1_note">Opens the app info screen. There: menu (⋮) top right → "Allow restricted settings". Without this, Android keeps the switch in step 2 greyed out.</string>
+    <string name="enable_step2">Step 2: Enable accessibility service</string>
+    <string name="enable_step2_note">Opens the accessibility settings. There: switch on "SideKeys Button Mapper".</string>
     <string name="add_key">+ Assign key</string>
     <string name="no_mappings_hint">No key assigned yet. Tap "Assign key" and then press one of the side keys of your HiBreak Pro.</string>
     <string name="delete">Delete</string>
@@ -88,7 +88,7 @@
     <string name="setting_hide_recents">Hide from recent apps</string>
     <string name="hide_recents_note">Recommended on the HiBreak Pro: Bigme\'s task manager force-stops apps that are swiped away or "closed", which kills the key service until it is toggled again. Hidden from recents, SideKeys can\'t be closed that way. Open it from the app drawer instead.</string>
     <string name="tips_title">Tips for the HiBreak Pro</string>
-    <string name="tips_text">• Keys stopped working after "closing" the app? Bigme\'s task manager force-stops the app and with it the key service. Fix: tap "Enable in one tap" on the start screen (restarts the service), or toggle SideKeys off/on in Accessibility settings. Keep "Hide from recent apps" on to prevent it.\n\n• If a side key never arrives: set its assignment to "None" in Bigme settings under "Custom key" so SideKeys receives it.\n\n• Bigme/MediaTek "DuraSpeed" aggressively kills background apps. If the service stops, disable DuraSpeed (via ADB: settings put global setting.duraspeed.enabled 0) and exempt SideKeys from battery optimization.</string>
+    <string name="tips_text">• Keys stopped working after "closing" the app? Bigme\'s task manager force-stops the app and with it the key service. Fix: toggle SideKeys off and on again in Accessibility settings. Keep "Hide from recent apps" on to prevent it.\n\n• If a side key never arrives: set its assignment to "None" in Bigme settings under "Custom key" so SideKeys receives it.\n\n• Bigme/MediaTek "DuraSpeed" aggressively kills background apps. If the service stops, disable DuraSpeed (via ADB: settings put global setting.duraspeed.enabled 0) and exempt SideKeys from battery optimization.</string>
 
     <!-- App picker -->
     <string name="app_picker_title">Choose app</string>

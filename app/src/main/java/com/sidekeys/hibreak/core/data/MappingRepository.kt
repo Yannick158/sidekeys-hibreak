@@ -24,7 +24,7 @@ interface MappingRepository {
     val settings: Flow<KeySettings>
     val chargeSettings: Flow<ChargeSettings>
     suspend fun saveMapping(mapping: KeyMapping)
-    suspend fun deleteMapping(keyCode: Int)
+    suspend fun deleteMapping(keyCode: Int, packageName: String? = null)
     suspend fun saveSettings(settings: KeySettings)
     suspend fun saveChargeSettings(settings: ChargeSettings)
 }
@@ -78,17 +78,25 @@ class DataStoreMappingRepository(context: Context) : MappingRepository {
             val current = prefs[mappingsKey]?.let { raw ->
                 runCatching { json.decodeFromString(mappingListSerializer, raw) }.getOrDefault(emptyList())
             } ?: emptyList()
-            val updated = current.filterNot { it.keyCode == mapping.keyCode } + mapping
-            prefs[mappingsKey] = json.encodeToString(mappingListSerializer, updated.sortedBy { it.keyCode })
+            val updated = current.filterNot {
+                it.keyCode == mapping.keyCode && it.packageName == mapping.packageName
+            } + mapping
+            prefs[mappingsKey] = json.encodeToString(
+                mappingListSerializer,
+                updated.sortedWith(compareBy({ it.packageName ?: "" }, { it.keyCode })),
+            )
         }
     }
 
-    override suspend fun deleteMapping(keyCode: Int) {
+    override suspend fun deleteMapping(keyCode: Int, packageName: String?) {
         safeEdit { prefs ->
             val current = prefs[mappingsKey]?.let { raw ->
                 runCatching { json.decodeFromString(mappingListSerializer, raw) }.getOrDefault(emptyList())
             } ?: emptyList()
-            prefs[mappingsKey] = json.encodeToString(mappingListSerializer, current.filterNot { it.keyCode == keyCode })
+            prefs[mappingsKey] = json.encodeToString(
+                mappingListSerializer,
+                current.filterNot { it.keyCode == keyCode && it.packageName == packageName },
+            )
         }
     }
 

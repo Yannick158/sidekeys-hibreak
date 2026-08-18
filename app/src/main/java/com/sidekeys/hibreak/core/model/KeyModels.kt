@@ -9,6 +9,10 @@ enum class ActionType {
     ASSISTANT,
     WALLET,
     LAUNCH_APP,
+    LAUNCH_ACTIVITY,
+    SCROLL_UP,
+    SCROLL_DOWN,
+    EINK_REFRESH,
     HOME,
     BACK,
     RECENTS,
@@ -59,15 +63,33 @@ data class CustomIntentSpec(
 /** Which press gesture triggered an action. */
 enum class PressType { SINGLE, DOUBLE, LONG }
 
-/** Full configuration of one physical key. */
+/**
+ * Full configuration of one physical key.
+ *
+ * [packageName] == null is the global mapping; otherwise it's an app-specific
+ * profile that applies while that app is in the foreground. Slots left NONE in
+ * a profile fall back to the global mapping.
+ */
 @Serializable
 data class KeyMapping(
     val keyCode: Int,
     val keyName: String,
+    val packageName: String? = null,
+    val appLabel: String? = null,
     val singlePress: KeyAction = KeyAction(),
     val doublePress: KeyAction = KeyAction(),
     val longPress: KeyAction = KeyAction(),
 ) {
+    /** Merges an app profile over a global mapping slot by slot. */
+    fun mergedOver(global: KeyMapping?): KeyMapping {
+        if (global == null) return this
+        return copy(
+            singlePress = if (singlePress.type == ActionType.NONE) global.singlePress else singlePress,
+            doublePress = if (doublePress.type == ActionType.NONE) global.doublePress else doublePress,
+            longPress = if (longPress.type == ActionType.NONE) global.longPress else longPress,
+        )
+    }
+
     val isEmpty: Boolean
         get() = singlePress.type == ActionType.NONE &&
             doublePress.type == ActionType.NONE &&

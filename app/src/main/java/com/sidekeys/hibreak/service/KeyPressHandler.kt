@@ -1,6 +1,5 @@
 package com.sidekeys.hibreak.service
 
-import android.os.Handler
 import com.sidekeys.hibreak.core.model.ActionType
 import com.sidekeys.hibreak.core.model.KeyAction
 import com.sidekeys.hibreak.core.model.KeyMapping
@@ -24,9 +23,9 @@ import com.sidekeys.hibreak.core.model.KeySettings
  *    long press) simply continues. Real ultra-short taps are only delayed by
  *    debounceMs, never lost.
  *
- * All calls must happen on the thread backing [handler] (the main thread).
+ * All calls must happen on one thread (the main thread in production).
  */
-class KeyPressHandler(private val handler: Handler) {
+class KeyPressHandler(private val scheduler: Scheduler) {
 
     private var longPressFired = false
     private var awaitingSecondTap = false
@@ -52,13 +51,15 @@ class KeyPressHandler(private val handler: Handler) {
         // make-bounce. Cancel the pending release and let the gesture continue
         // (a scheduled long press stays armed).
         pendingRelease?.let {
-            handler.removeCallbacks(it)
+            scheduler.cancel(it)
             pendingRelease = null
             return true
         }
 
         // Break bounce: swallow presses arriving too fast after a release.
-        if (settings.debounceMs > 0 && eventTime - lastUpTime < settings.debounceMs) {
+        // Only meaningful once a release was actually seen (lastUpTime > 0),
+        // otherwise the very first press would be mistaken for a bounce.
+        if (settings.debounceMs > 0 && lastUpTime > 0L && eventTime - lastUpTime < settings.debounceMs) {
             bouncing = true
             return true
         }
@@ -68,7 +69,7 @@ class KeyPressHandler(private val handler: Handler) {
         longPressFired = false
 
         if (awaitingSecondTap) {
-            pendingSingle?.let(handler::removeCallbacks)
+            pendingSingle?.let(scheduler::cancel)
             pendingSingle = null
             awaitingSecondTap = false
             isSecondTap = true
@@ -81,7 +82,7 @@ class KeyPressHandler(private val handler: Handler) {
                 execute(mapping.longPress)
             }
             pendingLong = runnable
-            handler.postDelayed(runnable, settings.longPressMs)
+            scheduler.postDelayed(runnable, settings.longPressMs)
         }
         return true
     }
@@ -113,7 +114,7 @@ class KeyPressHandler(private val handler: Handler) {
                 commitRelease(mapping, settings, execute)
             }
             pendingRelease = runnable
-            handler.postDelayed(runnable, settings.debounceMs)
+            scheduler.postDelayed(runnable, settings.debounceMs)
             return true
         }
 
@@ -128,7 +129,7 @@ class KeyPressHandler(private val handler: Handler) {
         execute: (KeyAction) -> Unit,
     ) {
         isPressed = false
-        pendingLong?.let(handler::removeCallbacks)
+        pendingLong?.let(scheduler::cancel)
         pendingLong = null
 
         if (longPressFired) {
@@ -151,7 +152,7 @@ class KeyPressHandler(private val handler: Handler) {
                 if (mapping.singlePress.type != ActionType.NONE) execute(mapping.singlePress)
             }
             pendingSingle = runnable
-            handler.postDelayed(runnable, settings.doublePressMs)
+            scheduler.postDelayed(runnable, settings.doublePressMs)
         } else if (mapping.singlePress.type != ActionType.NONE) {
             execute(mapping.singlePress)
         }
@@ -163,9 +164,9 @@ class KeyPressHandler(private val handler: Handler) {
             pendingSingle != null || pendingLong != null || pendingRelease != null
 
     fun reset() {
-        pendingSingle?.let(handler::removeCallbacks)
-        pendingLong?.let(handler::removeCallbacks)
-        pendingRelease?.let(handler::removeCallbacks)
+        pendingSingle?.let(scheduler::cancel)
+        pendingLong?.let(scheduler::cancel)
+        pendingRelease?.let(scheduler::cancel)
         pendingSingle = null
         pendingLong = null
         pendingRelease = null

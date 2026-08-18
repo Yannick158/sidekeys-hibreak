@@ -50,18 +50,21 @@ import com.sidekeys.hibreak.core.model.ActionType
 import com.sidekeys.hibreak.core.model.KeyAction
 import com.sidekeys.hibreak.core.model.PressType
 import com.sidekeys.hibreak.service.KeyInterceptorService
+import com.sidekeys.hibreak.ui.PICKED_ACTIVITY_RESULT_KEY
 import com.sidekeys.hibreak.ui.PICKED_APP_RESULT_KEY
 import com.sidekeys.hibreak.ui.Routes
 
 @Composable
 fun MappingScreen(
     keyCode: Int,
+    packageName: String?,
+    appLabel: String?,
     navController: NavController,
     backStackEntry: NavBackStackEntry,
 ) {
     val context = LocalContext.current
     val viewModel: MappingViewModel = viewModel(
-        factory = MappingViewModel.factory(context.applicationContext, keyCode),
+        factory = MappingViewModel.factory(context.applicationContext, keyCode, packageName, appLabel),
     )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var pickerSlot by rememberSaveable { mutableStateOf<PressType?>(null) }
@@ -73,16 +76,36 @@ fun MappingScreen(
         handle.getStateFlow(PICKED_APP_RESULT_KEY, "").collect { value ->
             if (value.isNotBlank()) {
                 val parts = value.split("\n", limit = 2)
-                val packageName = parts[0]
-                val label = parts.getOrElse(1) { packageName }
+                val pickedPackage = parts[0]
+                val label = parts.getOrElse(1) { pickedPackage }
                 viewModel.pendingSlot?.let { slot ->
                     viewModel.setAction(
                         slot,
-                        KeyAction(ActionType.LAUNCH_APP, data = packageName, label = label),
+                        KeyAction(ActionType.LAUNCH_APP, data = pickedPackage, label = label),
                     )
                 }
                 viewModel.pendingSlot = null
                 handle[PICKED_APP_RESULT_KEY] = ""
+            }
+        }
+    }
+
+    // Receive the activity chosen in the activity picker.
+    LaunchedEffect(backStackEntry) {
+        val handle = backStackEntry.savedStateHandle
+        handle.getStateFlow(PICKED_ACTIVITY_RESULT_KEY, "").collect { value ->
+            if (value.isNotBlank()) {
+                val parts = value.split("\n", limit = 2)
+                val component = parts[0]
+                val label = parts.getOrElse(1) { component.substringAfterLast('.') }
+                viewModel.pendingSlot?.let { slot ->
+                    viewModel.setAction(
+                        slot,
+                        KeyAction(ActionType.LAUNCH_ACTIVITY, data = component, label = label),
+                    )
+                }
+                viewModel.pendingSlot = null
+                handle[PICKED_ACTIVITY_RESULT_KEY] = ""
             }
         }
     }
@@ -144,7 +167,11 @@ fun MappingScreen(
                 when (type) {
                     ActionType.LAUNCH_APP -> {
                         viewModel.pendingSlot = slot
-                        navController.navigate(Routes.APP_PICKER)
+                        navController.navigate(Routes.appPicker(Routes.PURPOSE_LAUNCH_APP))
+                    }
+                    ActionType.LAUNCH_ACTIVITY -> {
+                        viewModel.pendingSlot = slot
+                        navController.navigate(Routes.appPicker(Routes.PURPOSE_ACTIVITY))
                     }
                     ActionType.CUSTOM_INTENT -> customIntentSlot = slot
                     else -> viewModel.setAction(slot, KeyAction(type))

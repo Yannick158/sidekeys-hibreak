@@ -81,8 +81,16 @@ class KeyInterceptorService : AccessibilityService() {
 
     private var executor: ActionExecutor? = null
 
+    /** All mappings (global + per-app), grouped by key code. */
     @Volatile
-    private var mappings: Map<Int, KeyMapping> = emptyMap()
+    private var mappingsByKey: Map<Int, List<KeyMapping>> = emptyMap()
+
+    /** Package of the foreground activity, tracked via window-state events. */
+    @Volatile
+    private var foregroundPackage: String? = null
+
+    /** Cache: is (package, class) an Activity? Avoids repeated PackageManager lookups. */
+    private val activityClassCache = mutableMapOf<String, Boolean>()
 
     @Volatile
     private var settings: KeySettings = KeySettings()
@@ -121,11 +129,11 @@ class KeyInterceptorService : AccessibilityService() {
         val repository = Graph.mappingRepository(this)
         scope.launch {
             repository.mappings.collect { list ->
-                mappings = list.associateBy { it.keyCode }
+                mappingsByKey = list.groupBy { it.keyCode }
                 // Cancel in-flight gestures of keys whose mapping was removed or
                 // emptied, so no stale long-press timer fires later.
                 pressHandlers.forEach { (keyCode, pressHandler) ->
-                    val mapping = mappings[keyCode]
+                    val mapping = resolveMapping(keyCode)
                     if (mapping == null || mapping.isEmpty) pressHandler.reset()
                 }
             }
@@ -136,6 +144,18 @@ class KeyInterceptorService : AccessibilityService() {
         scope.launch {
             repository.chargeSettings.collect { chargeSettings = it }
         }
+    }
+
+    /**
+     * Effective mapping for [keyCode]: the foreground app's profile (if any)
+     * merged slot-by-slot over the global mapping; null if neither exists.
+     */
+    private fun resolveMapping(keyCode: Int): KeyMapping? {
+        val candidates = mappingsByKey[keyCode] ?: return null
+        val global = candidates.firstOrNull { it.packageName == null }
+        val fg = foregroundPackage
+        val perApp = if (fg != null) candidates.firstOrNull { it.packageName == fg } else null
+        return perApp?.mergedOver(global) ?: global
     }
 
     /**
@@ -188,7 +208,7 @@ class KeyInterceptorService : AccessibilityService() {
             return true
         }
 
-        val mapping = mappings[event.keyCode]
+        val mapping = resolveMapping(event.keyCode)
         if (mapping == null || mapping.isEmpty) {
             // Orphaned UP after we consumed the DOWN (mapping deleted mid-press,
             // capture transition, ...): consume it for symmetry and reset.
@@ -200,7 +220,7 @@ class KeyInterceptorService : AccessibilityService() {
             return false
         }
 
-        val pressHandler = pressHandlers.getOrPut(event.keyCode) { KeyPressHandler(mainHandler) }
+        val pressHandler = pressHandlers.getOrPut(event.keyCode) { KeyPressHandler(HandlerScheduler(mainHandler)) }
         return when (event.action) {
             KeyEvent.ACTION_DOWN ->
                 pressHandler.onDown(mapping, settings, event.repeatCount, event.eventTime, ::runMappedAction)
@@ -230,7 +250,25 @@ class KeyInterceptorService : AccessibilityService() {
         executor?.execute(action)
     }
 
-    override fun onAccessibilityEvent(event: AccessibilityEvent?) = Unit
+    /**
+     * Tracks the foreground app for per-app profiles. Only the package name of
+     * window-state changes is used — no screen content is read. IME/popup
+     * windows are ignored by checking that the class is an Activity.
+     */
+    override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+        if (event?.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
+        val pkg = event.packageName?.toString() ?: return
+        val cls = event.className?.toString() ?: return
+        if (pkg == packageName) return
+        val key = "$pkg/$cls"
+        val isActivity = activityClassCache.getOrPut(key) {
+            runCatching {
+                packageManager.getActivityInfo(android.content.ComponentName(pkg, cls), 0)
+                true
+            }.getOrDefault(false)
+        }
+        if (isActivity) foregroundPackage = pkg
+    }
 
     override fun onInterrupt() = Unit
 

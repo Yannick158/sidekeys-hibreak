@@ -44,6 +44,10 @@
     <string name="action_assistant">Google Assistant starten</string>
     <string name="action_wallet">Google Wallet öffnen</string>
     <string name="action_launch_app">App starten</string>
+    <string name="action_launch_activity">Bestimmten App-Bildschirm starten (Activity)</string>
+    <string name="action_scroll_up">Nach oben scrollen</string>
+    <string name="action_scroll_down">Nach unten scrollen</string>
+    <string name="action_eink_refresh">E-Ink-Vollrefresh (experimentell)</string>
     <string name="action_home">Startbildschirm</string>
     <string name="action_back">Zurück</string>
     <string name="action_recents">Letzte Apps</string>
@@ -89,6 +93,26 @@
     <!-- App picker -->
     <string name="app_picker_title">App wählen</string>
     <string name="search">Suchen</string>
+
+    <!-- Activity picker -->
+    <string name="activity_picker_title">Bildschirm wählen</string>
+    <string name="activity_picker_hint">Wähle einen Bildschirm (Activity) der App oder tippe unten eine Komponente ein — z. B. com.openai.chatgpt/com.openai.voice.VoiceModeActivity. Nicht exportierte Bildschirme brauchen Shizuku zum Starten.</string>
+    <string name="activity_manual_label">Komponente (paket/.Klasse)</string>
+    <string name="activity_manual_use">Diese Komponente verwenden</string>
+    <string name="activity_not_exported">nicht exportiert — braucht Shizuku</string>
+    <string name="error_activity_invalid">Ungültige Komponente — erwartet paket/.Klasse.</string>
+    <string name="error_activity_failed">Bildschirm konnte nicht gestartet werden. Nicht exportierte Bildschirme brauchen laufendes Shizuku.</string>
+    <string name="error_gesture_failed">Geste konnte nicht ausgeführt werden.</string>
+
+    <!-- App-Profile -->
+    <string name="profiles_menu">Tasten pro App belegen</string>
+    <string name="profiles_title">Belegung pro App</string>
+    <string name="profiles_intro">Gib Tasten andere Aktionen, solange eine bestimmte App im Vordergrund ist. Leer gelassene Slots nutzen die globale Belegung.</string>
+    <string name="profiles_empty">Noch keine App-Profile. Tippe auf „+ App hinzufügen" und wähle die App.</string>
+    <string name="profiles_add_app">+ App hinzufügen</string>
+    <string name="profile_keys_empty">Für diese App ist noch keine Taste belegt.</string>
+    <string name="profile_delete_app">Alle Belegungen dieser App entfernen</string>
+    <string name="mapping_for_app">für %1$s</string>
 
     <!-- Batterie-Sparmodus / Quick-Settings-Kachel -->
     <string name="tile_battery_saver">Energiesparmodus</string>

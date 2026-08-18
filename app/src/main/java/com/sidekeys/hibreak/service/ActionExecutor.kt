@@ -1,7 +1,9 @@
 package com.sidekeys.hibreak.service
 
 import android.accessibilityservice.AccessibilityService
+import android.accessibilityservice.GestureDescription
 import android.app.NotificationManager
+import android.graphics.Path
 import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Context
@@ -68,6 +70,10 @@ class ActionExecutor(private val service: AccessibilityService) {
             ActionType.ASSISTANT -> launchAssistant()
             ActionType.WALLET -> launchWallet()
             ActionType.LAUNCH_APP -> launchApp(action.data)
+            ActionType.LAUNCH_ACTIVITY -> launchActivity(action.data)
+            ActionType.SCROLL_UP -> scroll(up = true)
+            ActionType.SCROLL_DOWN -> scroll(up = false)
+            ActionType.EINK_REFRESH -> einkRefresh()
             ActionType.HOME -> service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME)
             ActionType.BACK -> service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK)
             ActionType.RECENTS -> service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_RECENTS)
@@ -144,6 +150,79 @@ class ActionExecutor(private val service: AccessibilityService) {
         val intent = service.packageManager.getLaunchIntentForPackage(packageName)
         if (intent == null || !startActivitySafely(intent)) {
             toast(R.string.error_app_not_found)
+        }
+    }
+
+    /**
+     * Starts a specific activity ("pkg/.Class"). Non-exported activities (e.g.
+     * ChatGPT's voice mode) can't be started by a normal app; if Shizuku is
+     * available we fall back to `am start -n`, which can.
+     */
+    private fun launchActivity(flattened: String?) {
+        val component = flattened?.let { ComponentName.unflattenFromString(it) }
+        if (component == null) {
+            toast(R.string.error_activity_invalid)
+            return
+        }
+        val intent = Intent().setComponent(component).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        if (startActivitySafely(intent)) return
+        if (ShizukuShell.isAvailable() && ShizukuShell.isPermissionGranted()) {
+            Thread {
+                val ok = ShizukuShell.run("am start -n '${component.flattenToString()}'").ok
+                if (!ok) mainHandler.post { toast(R.string.error_activity_failed) }
+            }.start()
+            return
+        }
+        toast(R.string.error_activity_failed)
+    }
+
+    /** Dispatches a straight-line swipe. Returns false if gestures aren't available. */
+    private fun swipe(x1: Float, y1: Float, x2: Float, y2: Float, durationMs: Long): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return false
+        val path = Path().apply {
+            moveTo(x1, y1)
+            lineTo(x2, y2)
+        }
+        val gesture = GestureDescription.Builder()
+            .addStroke(GestureDescription.StrokeDescription(path, 0, durationMs))
+            .build()
+        return runCatching { service.dispatchGesture(gesture, null, null) }.getOrDefault(false)
+    }
+
+    /** Scrolls the foreground app by roughly half a screen via a swipe gesture. */
+    private fun scroll(up: Boolean) {
+        val dm = service.resources.displayMetrics
+        val x = dm.widthPixels / 2f
+        val yTop = dm.heightPixels * 0.30f
+        val yBottom = dm.heightPixels * 0.75f
+        val ok = if (up) {
+            swipe(x, yTop, x, yBottom, 220) // finger moves down -> content scrolls up
+        } else {
+            swipe(x, yBottom, x, yTop, 220) // finger moves up -> content scrolls down
+        }
+        if (!ok) toast(R.string.error_gesture_failed)
+    }
+
+    /**
+     * E-ink full refresh (experimental). Tries the kernel debug node via Shizuku
+     * first, then replays Bigme's own system gesture: swipe up from the
+     * bottom-right edge.
+     */
+    private fun einkRefresh() {
+        val dm = service.resources.displayMetrics
+        val doGesture = {
+            val x = dm.widthPixels * 0.92f
+            swipe(x, dm.heightPixels - 2f, x, dm.heightPixels * 0.55f, 250)
+        }
+        if (ShizukuShell.isAvailable() && ShizukuShell.isPermissionGranted()) {
+            Thread {
+                val ok = ShizukuShell.run(
+                    "echo 1 > /sys/kernel/debug/eink_debug/manual_refresh 2>/dev/null && echo ok || echo fail",
+                ).stdout == "ok"
+                if (!ok) mainHandler.post { doGesture() }
+            }.start()
+        } else {
+            doGesture()
         }
     }
 

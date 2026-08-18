@@ -44,6 +44,10 @@
     <string name="action_assistant">Launch Google Assistant</string>
     <string name="action_wallet">Open Google Wallet</string>
     <string name="action_launch_app">Launch app</string>
+    <string name="action_launch_activity">Launch specific app screen (activity)</string>
+    <string name="action_scroll_up">Scroll up</string>
+    <string name="action_scroll_down">Scroll down</string>
+    <string name="action_eink_refresh">E-ink full refresh (experimental)</string>
     <string name="action_home">Home screen</string>
     <string name="action_back">Back</string>
     <string name="action_recents">Recent apps</string>
@@ -89,6 +93,26 @@
     <!-- App picker -->
     <string name="app_picker_title">Choose app</string>
     <string name="search">Search</string>
+
+    <!-- Activity picker -->
+    <string name="activity_picker_title">Choose screen</string>
+    <string name="activity_picker_hint">Pick one of the app\'s screens (activities), or type a component below — e.g. com.openai.chatgpt/com.openai.voice.VoiceModeActivity. Non-exported screens need Shizuku to launch.</string>
+    <string name="activity_manual_label">Component (package/.Class)</string>
+    <string name="activity_manual_use">Use this component</string>
+    <string name="activity_not_exported">not exported — needs Shizuku</string>
+    <string name="error_activity_invalid">Invalid component — expected package/.Class.</string>
+    <string name="error_activity_failed">Could not start that screen. Non-exported screens need Shizuku running.</string>
+    <string name="error_gesture_failed">Gesture could not be performed.</string>
+
+    <!-- Per-app profiles -->
+    <string name="profiles_menu">Per-app key mappings</string>
+    <string name="profiles_title">Per-app mappings</string>
+    <string name="profiles_intro">Give keys different actions while a specific app is in the foreground. Slots you leave empty fall back to the global mapping.</string>
+    <string name="profiles_empty">No app profiles yet. Tap "+ Add app" and pick the app.</string>
+    <string name="profiles_add_app">+ Add app</string>
+    <string name="profile_keys_empty">No keys assigned for this app yet.</string>
+    <string name="profile_delete_app">Remove all mappings for this app</string>
+    <string name="mapping_for_app">for %1$s</string>
 
     <!-- Battery saver / Quick Settings tile -->
     <string name="tile_battery_saver">Battery Saver</string>

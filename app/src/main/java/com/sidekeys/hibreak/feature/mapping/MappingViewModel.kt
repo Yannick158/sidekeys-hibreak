@@ -39,6 +39,8 @@ data class MappingUiState(
 class MappingViewModel(
     private val keyCode: Int,
     initialKeyName: String,
+    private val packageName: String?,
+    private val appLabel: String?,
     private val repository: MappingRepository,
     private val savedState: SavedStateHandle,
 ) : ViewModel() {
@@ -61,7 +63,8 @@ class MappingViewModel(
 
     init {
         viewModelScope.launch {
-            val existing = repository.mappings.first().find { it.keyCode == keyCode }
+            val existing = repository.mappings.first()
+                .find { it.keyCode == keyCode && it.packageName == packageName }
             _uiState.update { state ->
                 if (existing != null) {
                     state.copy(
@@ -95,6 +98,8 @@ class MappingViewModel(
                 KeyMapping(
                     keyCode = state.keyCode,
                     keyName = state.keyName,
+                    packageName = packageName,
+                    appLabel = appLabel,
                     singlePress = state.singlePress,
                     doublePress = state.doublePress,
                     longPress = state.longPress,
@@ -107,11 +112,18 @@ class MappingViewModel(
     companion object {
         private const val KEY_PENDING_SLOT = "pendingSlot"
 
-        fun factory(context: Context, keyCode: Int): ViewModelProvider.Factory = viewModelFactory {
+        fun factory(
+            context: Context,
+            keyCode: Int,
+            packageName: String? = null,
+            appLabel: String? = null,
+        ): ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 MappingViewModel(
                     keyCode = keyCode,
                     initialKeyName = KeyCodeNames.prettyName(context, keyCode),
+                    packageName = packageName,
+                    appLabel = appLabel,
                     repository = Graph.mappingRepository(context),
                     savedState = createSavedStateHandle(),
                 )

@@ -5,7 +5,6 @@ import android.provider.Settings
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -26,7 +24,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -35,12 +32,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sidekeys.hibreak.R
-import com.sidekeys.hibreak.core.common.displayLabel
 import com.sidekeys.hibreak.core.common.rememberServiceRunningState
 import com.sidekeys.hibreak.core.designsystem.EInkButton
 import com.sidekeys.hibreak.core.designsystem.EInkCard
 import com.sidekeys.hibreak.core.designsystem.EInkHeader
 import com.sidekeys.hibreak.core.designsystem.EInkOutlinedButton
+import com.sidekeys.hibreak.core.designsystem.MappingCard
 import com.sidekeys.hibreak.core.model.KeyMapping
 import com.sidekeys.hibreak.service.AccessibilityEnabler
 
@@ -50,6 +47,7 @@ fun HomeScreen(
     onEditKey: (Int) -> Unit,
     onOpenSettings: () -> Unit,
     onOpenChargeLimit: () -> Unit,
+    onOpenProfiles: () -> Unit,
 ) {
     val context = LocalContext.current
     val viewModel: HomeViewModel =
@@ -156,6 +154,11 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxWidth(),
             )
             EInkOutlinedButton(
+                text = stringResource(R.string.profiles_menu),
+                onClick = onOpenProfiles,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            EInkOutlinedButton(
                 text = stringResource(R.string.charge_limit_menu),
                 onClick = onOpenChargeLimit,
                 modifier = Modifier.fillMaxWidth(),
@@ -187,47 +190,6 @@ fun HomeScreen(
             containerColor = Color.White,
             titleContentColor = Color.Black,
             textContentColor = Color.Black,
-        )
-    }
-}
-
-@Composable
-private fun MappingCard(
-    mapping: KeyMapping,
-    onClick: () -> Unit,
-    onDelete: () -> Unit,
-) {
-    val context = LocalContext.current
-    EInkCard(onClick = onClick) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = mapping.keyName,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.weight(1f),
-            )
-            IconButton(onClick = onDelete) {
-                Icon(
-                    imageVector = Icons.Outlined.Delete,
-                    contentDescription = stringResource(R.string.delete),
-                    tint = Color.Black,
-                )
-            }
-        }
-        Spacer(Modifier.height(4.dp))
-        Text(
-            text = stringResource(R.string.single_press) + ": " +
-                mapping.singlePress.displayLabel(context),
-            style = MaterialTheme.typography.bodyMedium,
-        )
-        Text(
-            text = stringResource(R.string.double_press) + ": " +
-                mapping.doublePress.displayLabel(context),
-            style = MaterialTheme.typography.bodyMedium,
-        )
-        Text(
-            text = stringResource(R.string.long_press) + ": " +
-                mapping.longPress.displayLabel(context),
-            style = MaterialTheme.typography.bodyMedium,
         )
     }
 }

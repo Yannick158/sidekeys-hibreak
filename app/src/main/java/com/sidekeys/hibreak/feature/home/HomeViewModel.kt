@@ -22,8 +22,11 @@ sealed interface HomeUiState {
 
 class HomeViewModel(private val repository: MappingRepository) : ViewModel() {
 
+    /** Home shows the global mappings only; per-app profiles live in their own screen. */
     val uiState: StateFlow<HomeUiState> = repository.mappings
-        .map<List<KeyMapping>, HomeUiState> { HomeUiState.Loaded(it) }
+        .map<List<KeyMapping>, HomeUiState> { list ->
+            HomeUiState.Loaded(list.filter { it.packageName == null })
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
@@ -31,7 +34,7 @@ class HomeViewModel(private val repository: MappingRepository) : ViewModel() {
         )
 
     fun deleteMapping(keyCode: Int) {
-        viewModelScope.launch { repository.deleteMapping(keyCode) }
+        viewModelScope.launch { repository.deleteMapping(keyCode, null) }
     }
 
     companion object {

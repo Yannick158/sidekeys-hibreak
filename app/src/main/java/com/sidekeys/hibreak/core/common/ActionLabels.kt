@@ -12,6 +12,10 @@ fun ActionType.labelRes(): Int = when (this) {
     ActionType.ASSISTANT -> R.string.action_assistant
     ActionType.WALLET -> R.string.action_wallet
     ActionType.LAUNCH_APP -> R.string.action_launch_app
+    ActionType.LAUNCH_ACTIVITY -> R.string.action_launch_activity
+    ActionType.SCROLL_UP -> R.string.action_scroll_up
+    ActionType.SCROLL_DOWN -> R.string.action_scroll_down
+    ActionType.EINK_REFRESH -> R.string.action_eink_refresh
     ActionType.HOME -> R.string.action_home
     ActionType.BACK -> R.string.action_back
     ActionType.RECENTS -> R.string.action_recents

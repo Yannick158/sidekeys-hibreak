@@ -1,6 +1,11 @@
-- Map the side keys (and volume keys) to actions: launch apps, Assistant, Wallet, system actions
+Give your phone's side keys and volume keys any function you want.
+
+- Launch any app, Google Assistant or Google Wallet with a key press
 - Separate actions for single press, double press and long press
-- Scroll up/down in any app
-- Launch a specific app screen (activity)
-- Per-app key profiles
-- Charge alarm and Battery Saver quick tile
+- Scroll up and down in any app
+- System actions: Home, Back, Recents, screenshot, lock, flashlight, media
+- Battery Saver on a key press — handy where the quick settings panel won't let
+  you add tiles
+- Per-app profiles: different actions while a chosen app is in the foreground
+- Charge alarm at a level you pick
+- Built for E-Ink: pure black and white, no animations, key debounce

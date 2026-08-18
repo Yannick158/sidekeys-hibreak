@@ -1,14 +1,27 @@
-## SideKeys v1.5.2
+## SideKeys v1.8.0
 
 A button mapper for **E-Ink phones**: freely remap the extra side keys, the volume
 keys or almost any hardware key — separately for single press, double press and
 long press. Developed and tested on the Bigme HiBreak Pro.
 
+### New in 1.8.0
+- **Setup now follows the order Android actually requires.** For sideloaded apps
+  the "Allow restricted settings" entry only appears *after* a blocked attempt,
+  so the screen walks three steps — try, allow, switch on — and says that the
+  refusal in step 1 is expected.
+- **Targets Android 16 (API 36).**
+- Fixes to the Quick Settings tile handling, and honest wording about firmwares
+  whose panel ignores app tiles entirely (see below).
+
+> **Quick Settings tiles:** some firmwares — Bigme's among them — ship a modified
+> SystemUI whose panel draws a fixed set of tiles and never reads the system tile
+> list. No app can add a tile there. **Map Battery Saver to a side key or volume
+> key instead** — that path works regardless of the panel, and is arguably faster
+> than opening the shade anyway.
+
 ### New in 1.5.x
-- **Enabling the service is now two clear steps** — "Allow restricted settings"
-  (opens the app info screen) and "Enable accessibility service", each with a
-  note saying what to tap there. The old one-tap button is gone: it could never
-  work on a fresh install.
+- Guided setup for the accessibility service, replacing a one-tap button that
+  could never work on a fresh install (superseded by the three-step flow in 1.8.0).
 - **"Restart service"** for when Bigme's task manager force-stops the app. Only
   shown when the app actually holds the rights to do it, and it verifies the
   result instead of claiming success.

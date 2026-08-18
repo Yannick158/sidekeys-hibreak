@@ -1,6 +1,12 @@
-- Seitentasten (und Lautstärketasten) frei belegen: Apps starten, Assistant, Wallet, Systemaktionen
+Belege die Seitentasten und Lautstärketasten deines Handys frei.
+
+- App, Google Assistant oder Google Wallet per Tastendruck starten
 - Getrennte Aktionen für Einfach-, Doppel- und langen Druck
-- In jeder App nach oben/unten scrollen
-- Bestimmten App-Bildschirm starten
-- Tastenbelegung pro App
-- Ladewecker und Energiesparmodus-Kachel
+- In jeder App nach oben und unten scrollen
+- Systemaktionen: Startbildschirm, Zurück, Letzte Apps, Screenshot, Sperren,
+  Taschenlampe, Medien
+- Energiesparmodus per Tastendruck — praktisch, wenn sich in den
+  Schnelleinstellungen keine Kacheln hinzufügen lassen
+- Profile pro App: andere Aktionen, solange eine bestimmte App vorn ist
+- Ladewecker bei einem Stand deiner Wahl
+- Für E-Ink gebaut: reines Schwarz-Weiß, keine Animationen, Tasten-Entprellung

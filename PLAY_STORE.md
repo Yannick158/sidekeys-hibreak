@@ -85,9 +85,52 @@ Fill in the questionnaire — a utility with no ads or user content rates as
 
 **Store presence → Main store listing.** Required:
 
-- Short description (max 80 chars), e.g.
-  *"Button mapper for E-Ink phones: give your side keys any function you want."*
-- Full description — reuse the feature list from [README.md](README.md)
+**Short description** (max 80 chars), ready to paste:
+
+```
+Button mapper for E-Ink phones: give your side keys any function you want.
+```
+
+**Full description**, ready to paste:
+
+```
+SideKeys lets you decide what your phone's hardware keys do.
+
+E-Ink phones usually have one or two extra side keys, but their firmware only
+offers a fixed list of actions — and typically cannot launch apps at all.
+SideKeys fills that gap: assign any action you like to each key, separately for
+single press, double press and long press.
+
+WHAT A KEY CAN DO
+• Launch any installed app
+• Start Google Assistant, open Google Wallet
+• Home, Back, Recent apps, notifications, quick settings, power menu, lock
+• Take a screenshot
+• Scroll up and down in any app
+• Flashlight, media controls, volume up/down/mute, Do Not Disturb
+• Toggle Battery Saver — useful on phones whose quick settings panel does not
+  let you add tiles: a key press reaches it either way
+• Custom intents for power users
+
+BUILT FOR E-INK
+Pure black and white, no animations, no ghosting. Keys are captured at runtime —
+just press the button you want to assign. Built-in debounce filters the ghost
+presses that bouncy side keys produce.
+
+MORE
+• Per-app profiles: different actions while a chosen app is in the foreground
+• Charge alarm: a sound, vibration and notification at a level you pick, so you
+  can unplug in time
+
+PRIVACY
+No internet permission, so the app cannot send anything anywhere. It does not
+read screen content. Your key mappings stay on the device and are deleted when
+you uninstall. Open source under the MIT licence.
+
+SETUP
+SideKeys needs the accessibility permission — that is the only way an Android app
+can receive hardware key presses. The app walks you through the steps.
+```
 - **App icon** 512×512 PNG
 - **Feature graphic** 1024×500 PNG
 - **At least 2 phone screenshots** — home screen and the mapping screen work well

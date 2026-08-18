@@ -1,90 +1,114 @@
-# Publishing SideKeys to Google Play — checklist
+# Publishing SideKeys to Google Play — step by step
 
-Everything in this repo is prepared. What remains needs **your** Google account,
-identity and payment details, so it cannot be automated.
+Everything that can be prepared is done. What remains needs **your** Google
+account, identity and payment details, so it cannot be automated.
 
----
-
-## ⚠️ Read this first: real rejection risks
-
-SideKeys is an **AccessibilityService app**, which Google reviews strictly.
-Two things are genuinely risky:
-
-### 1. `WRITE_SECURE_SETTINGS` — recommended to remove for the Play build
-
-The app declares this permission; the user grants it themselves via adb. It is a
-`signature|privileged` permission that a normal app can never hold through the
-Play install flow. To a Play reviewer this can look like circumventing the
-permission model, and it is the single most likely reason for rejection.
-
-**Affected features if removed:** the Battery Saver key action and the quick tile
-would only open the Battery Saver settings page, and "Enable in one tap" would
-fall back to the manual accessibility settings route. Everything else is
-unaffected.
-
-### 2. Accessibility API declaration
-
-Google requires apps that use the Accessibility API without being an
-accessibility tool to declare a *narrow, clearly understood purpose* and show a
-**prominent disclosure** ([policy](https://support.google.com/googleplay/android-developer/answer/10964491)).
-Key Mapper and Button Mapper are on Play, so this is achievable — but you must:
-
-- Fill in the **Accessibility API declaration** in Play Console → Policy → App content
-- State the purpose as: *"Receives hardware key presses so the user can assign
-  their own actions to physical buttons."*
-- Confirm the app does not read screen content (it does not — see [PRIVACY.md](PRIVACY.md))
-
-> If you would rather avoid all of this, GitHub Releases (current setup) or
-> F-Droid are perfectly good distribution channels for a device-specific tool
-> like this one.
+Work through the phases in order. Phase 0 is already finished.
 
 ---
 
-## Step 1 — Google Play Developer account (only you)
+## Phase 0 — Ready to upload ✅
 
-1. Register at <https://play.google.com/console> — **one-time 25 USD fee**
-2. Complete identity verification (can take a few days)
+- Signed **App Bundle** built: `SideKeys-v1.5.2.aab` (version code 15)
+- [Privacy policy](PRIVACY.md) written — declares that no data is collected
+- Release notes per language in `distribution/whatsnew/`
+- Automated upload workflow: [.github/workflows/play-release.yml](.github/workflows/play-release.yml)
 
-## Step 2 — Create the app and upload the first release manually
+## Phase 1 — Developer account (~15 min + waiting)
 
-The GitHub action can only **update** an app that already exists. The very first
-upload must be done by hand:
+1. Go to <https://play.google.com/console> and register
+2. Pay the **one-time 25 USD** fee
+3. Complete identity verification — Google may take a few days to approve
 
-1. Play Console → **Create app** → package name `com.sidekeys.hibreak`
-2. Build the bundle locally:
-   ```bash
-   export SIDEKEYS_KEYSTORE_DIR=~/.android-keys/sidekeys
-   ./gradlew bundleRelease
-   ```
-3. Upload `app/build/outputs/bundle/release/app-release.aab` to the **Internal
-   testing** track
-4. Complete: store listing, screenshots, content rating questionnaire,
-   **Data safety** form (declare: no data collected), privacy policy URL
+Nothing else can happen until this is done.
 
-**Privacy policy URL** — use the raw link to [PRIVACY.md](PRIVACY.md), e.g.
+## Phase 2 — Create the app
+
+Play Console → **Create app**
+
+| Field | Value |
+|---|---|
+| App name | SideKeys |
+| Default language | English (or German) |
+| App or game | App |
+| Free or paid | Free |
+
+The package name `com.sidekeys.hibreak` is taken from the bundle on first upload
+and can never be changed afterwards.
+
+## Phase 3 — First upload (must be manual)
+
+The GitHub workflow can only **update** an app that already exists, so the first
+bundle goes up by hand:
+
+1. **Testing → Internal testing → Create new release**
+2. Accept **Play App Signing** when prompted (see the note below)
+3. Upload `SideKeys-v1.5.2.aab`
+4. Paste the text from `distribution/whatsnew/whatsnew-en-US` as the release notes
+5. Save → Review release → **Start rollout to internal testing**
+
+> **Play App Signing:** Google then holds the real signing key and your local
+> keystore becomes the *upload* key. Consequence: APKs installed from Play have a
+> **different signature** than the GitHub-release APKs, so you cannot update from
+> one channel to the other — users have to uninstall first. That is normal and
+> unavoidable if you want Play distribution.
+
+## Phase 4 — The forms (this is where care pays off)
+
+Play Console → **Policy → App content**. Four items matter:
+
+### 4a. Privacy policy
+Paste the raw URL of [PRIVACY.md](PRIVACY.md), e.g.
 `https://github.com/Yannick158/sidekeys-hibreak/blob/main/PRIVACY.md`
 
-## Step 3 — Play App Signing
+### 4b. Data safety
+Answer **"No"** to data collection and sharing — it is accurate: the app has no
+`INTERNET` permission and therefore cannot transmit anything.
 
-Accept **Play App Signing** when prompted. Google then holds the app signing key
-and your local keystore becomes the *upload* key only. Note: APKs from Play will
-have a **different signature** than the GitHub-release APKs, so users cannot
-update across the two channels.
+### 4c. Accessibility API declaration ← the important one
+You will be asked why the app uses the AccessibilityService. Suggested wording:
 
-## Step 4 — Service account for automated uploads
+> SideKeys receives hardware key presses so users can assign their own actions to
+> the physical side keys of their device. The service uses only the key-event
+> filter and performs the actions the user configured (e.g. launching an app,
+> Home, Back, scrolling). It does not read screen content — the service does not
+> declare `canRetrieveWindowContent`. The foreground app's package name is read
+> only for the optional per-app profiles feature.
+
+That last sentence is your strongest argument, and it is verifiably true.
+
+### 4d. Content rating
+Fill in the questionnaire — a utility with no ads or user content rates as
+"Everyone" everywhere.
+
+## Phase 5 — Store listing
+
+**Store presence → Main store listing.** Required:
+
+- Short description (max 80 chars), e.g.
+  *"Give your phone's side keys and volume keys any function you want."*
+- Full description — reuse the feature list from [README.md](README.md)
+- **App icon** 512×512 PNG
+- **Feature graphic** 1024×500 PNG
+- **At least 2 phone screenshots** — home screen and the mapping screen work well
+
+Screenshots and graphics are the only assets still missing; everything else is
+written.
+
+## Phase 6 — Automated releases from here on
+
+Once the app exists in the Console, further versions go out from GitHub.
 
 1. Play Console → **Users and permissions** → invite a service account
 2. Google Cloud → IAM → **Create service account**, grant it **no project roles**
 3. Create a **JSON key**
-4. Back in Play Console, grant it access **only to this app**, with the
-   *Release manager* permission
+4. Back in Play Console, give it access **only to this app**, permission
+   *Release manager*
 
-> Do **not** grant "Owner" on the Cloud project — that recommendation circulates
-> widely and is [excessive and unsafe](https://github.com/r0adkll/upload-google-play/issues/224).
+> Do **not** grant "Owner" on the Cloud project — that advice circulates widely
+> and is [excessive and unsafe](https://github.com/r0adkll/upload-google-play/issues/224).
 
-## Step 5 — GitHub secrets
-
-Repository → Settings → Secrets and variables → Actions:
+Then add these repository secrets (Settings → Secrets and variables → Actions):
 
 | Secret | Value |
 |---|---|
@@ -93,26 +117,23 @@ Repository → Settings → Secrets and variables → Actions:
 | `SIDEKEYS_STORE_PASSWORD` | your keystore password |
 | `SIDEKEYS_KEY_PASSWORD` | your key password |
 
-Also create an **environment** named `play-store` (Settings → Environments) and
-add yourself as a required reviewer, so no upload happens without approval.
+Create an **environment** named `play-store` (Settings → Environments) with
+yourself as a required reviewer, so no upload happens unattended.
 
-## Step 6 — Automated releases
-
-Afterwards: Actions → **Play Store release** → *Run workflow*, pick the track.
-The workflow ([.github/workflows/play-release.yml](.github/workflows/play-release.yml))
-runs the unit tests, builds a signed AAB and uploads it.
-
-Security properties of the workflow, deliberately:
-
-- Manual trigger only (`workflow_dispatch`) — **never** on `pull_request`, so a
-  fork PR can never reach the secrets
-- All third-party actions **pinned to commit SHAs**, not moving tags
-- `permissions: contents: read` — minimal token scope
-- Keystore is shredded from the runner in an `always()` step
+Afterwards: Actions → **Play Store release** → *Run workflow*.
 
 ---
 
-## Release notes
+## Notes on review risk
 
-Per-language notes for each upload live in `distribution/whatsnew/`
-(`whatsnew-en-US`, `whatsnew-de-DE`). Update them before running the workflow.
+SideKeys declares `WRITE_SECURE_SETTINGS`, which users grant themselves via adb
+or Shizuku. This is **established practice** for this category — both
+[Key Mapper](https://docs.keymapper.club/user-guide/adb-permissions/) and
+[Button Mapper](https://setup.buttonmapper.app/) are on Play and do exactly the
+same. Do not hide it: describe it plainly in the listing as an optional setup
+step for two convenience features.
+
+Accessibility apps get a stricter review than average, so expect the first review
+to take longer than the usual few days. Start with the **internal testing** track
+(as in phase 3) — it reviews faster and lets you fix findings before going to
+production.

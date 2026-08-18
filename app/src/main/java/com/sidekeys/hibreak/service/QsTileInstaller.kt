@@ -164,6 +164,26 @@ object QsTileInstaller {
         return if (ok) ShellResult.OK else ShellResult.WRITE_FAILED
     }
 
+    /**
+     * OEM flag found on Bigme firmware (`xrz` = the vendor prefix). Its exact
+     * effect is undocumented; it lives in Settings.System and is reversible, so
+     * it can be tried safely. Reading needs no permission; writing Settings.System
+     * needs WRITE_SETTINGS, which apps cannot self-grant, so it goes via shell.
+     */
+    const val OEM_STATUSBAR_FLAG = "xrz.statusbar.enable"
+
+    /** Current value of a Settings.System flag, or null if unset/unreadable. */
+    fun readSystemFlag(context: Context, key: String): String? = runCatching {
+        Settings.System.getString(context.contentResolver, key)
+    }.getOrNull()
+
+    /** Writes a Settings.System flag through the shell. Blocking. */
+    fun writeSystemFlag(key: String, value: String): ShellResult {
+        if (!shellReady()) return ShellResult.NO_SHELL
+        val ok = ShizukuShell.run("settings put system $key $value").ok
+        return if (ok) ShellResult.OK else ShellResult.WRITE_FAILED
+    }
+
     fun diagnostics(context: Context): String {
         if (!shellReady()) return "(Shizuku not running)"
         val script = """

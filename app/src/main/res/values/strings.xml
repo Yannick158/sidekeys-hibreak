@@ -175,4 +175,9 @@
     <string name="qs_tile_move_front">Move SideKeys tile to the front</string>
     <string name="qs_tile_move_stock">Move the built-in Battery Saver tile to the front</string>
     <string name="qs_tile_msg_stock_moved">Moved. Pull the shade down twice — "Battery Saver" should now be on the first page.</string>
+    <string name="oem_flag_title">Experiment: vendor status-bar flag</string>
+    <string name="oem_flag_intro">This firmware has an undocumented vendor setting for the status bar. It may be what keeps the Quick Settings panel from showing app tiles — or it may do something else entirely. Trying it is reversible.</string>
+    <string name="oem_flag_try">Set to 1 (try it)</string>
+    <string name="oem_flag_reset">Reset to 0</string>
+    <string name="oem_flag_note">If the status bar looks wrong afterwards, tap Reset — or reboot. Nothing here touches system files.</string>
 </resources>

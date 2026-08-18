@@ -481,6 +481,65 @@ fun ChargeLimitScreen(onBack: () -> Unit) {
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
+            // Experiment: an undocumented vendor flag found on this firmware.
+            // Reversible, so it is offered as a labelled experiment rather than
+            // hidden — it might be what constrains the Quick Settings panel.
+            var oemFlag by remember {
+                mutableStateOf(QsTileInstaller.readSystemFlag(context, QsTileInstaller.OEM_STATUSBAR_FLAG))
+            }
+            if (oemFlag != null) {
+                EInkCard {
+                    Text(
+                        text = stringResource(R.string.oem_flag_title),
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(R.string.oem_flag_intro),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = "${QsTileInstaller.OEM_STATUSBAR_FLAG} = ${oemFlag ?: "?"}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 11.sp,
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    val setFlag: (String) -> Unit = { value ->
+                        tileBusy = true
+                        Thread {
+                            runCatching {
+                                QsTileInstaller.writeSystemFlag(QsTileInstaller.OEM_STATUSBAR_FLAG, value)
+                            }
+                            val now = QsTileInstaller.readSystemFlag(context, QsTileInstaller.OEM_STATUSBAR_FLAG)
+                            android.os.Handler(android.os.Looper.getMainLooper()).post {
+                                oemFlag = now
+                                tileBusy = false
+                            }
+                        }.start()
+                    }
+                    EInkButton(
+                        text = stringResource(R.string.oem_flag_try),
+                        enabled = shizukuReady && !tileBusy,
+                        onClick = { setFlag("1") },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    EInkOutlinedButton(
+                        text = stringResource(R.string.oem_flag_reset),
+                        enabled = shizukuReady && !tileBusy,
+                        onClick = { setFlag("0") },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(R.string.oem_flag_note),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
+            }
+
             Spacer(Modifier.height(8.dp))
         }
     }

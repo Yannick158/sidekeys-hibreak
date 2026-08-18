@@ -248,16 +248,22 @@ fun ChargeLimitScreen(onBack: () -> Unit) {
             var tileMsg by remember { mutableIntStateOf(0) }
             var tileBusy by remember { mutableStateOf(false) }
             var tileDiag by remember { mutableStateOf<String?>(null) }
+            var tilePos by remember { mutableStateOf<Int?>(null) }
             LaunchedEffect(shizukuReady) {
-                tileListed = withContext(Dispatchers.IO) {
-                    runCatching { QsTileInstaller.isListed(context) }.getOrNull()
+                withContext(Dispatchers.IO) {
+                    tileListed = runCatching { QsTileInstaller.isListed(context) }.getOrNull()
+                    tilePos = runCatching { QsTileInstaller.positionOf(context, QsTileInstaller.spec(context)) }.getOrNull()
                 }
             }
             val refreshTile: () -> Unit = {
                 tileAdded = BatterySaverTile.isAdded(context)
                 Thread {
                     val listed = runCatching { QsTileInstaller.isListed(context) }.getOrNull()
-                    android.os.Handler(android.os.Looper.getMainLooper()).post { tileListed = listed }
+                    val pos = runCatching { QsTileInstaller.positionOf(context, QsTileInstaller.spec(context)) }.getOrNull()
+                    android.os.Handler(android.os.Looper.getMainLooper()).post {
+                        tileListed = listed
+                        tilePos = pos
+                    }
                 }.start()
             }
             EInkCard {
@@ -394,6 +400,49 @@ fun ChargeLimitScreen(onBack: () -> Unit) {
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
+                tilePos?.let { pos ->
+                    if (pos > 0) {
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = stringResource(R.string.qs_tile_position, pos + 1),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        EInkButton(
+                            text = stringResource(R.string.qs_tile_move_front),
+                            enabled = (hasSecure || shizukuReady) && !tileBusy,
+                            onClick = {
+                                tileBusy = true
+                                Thread {
+                                    runCatching { QsTileInstaller.moveToFront(context, QsTileInstaller.spec(context)) }
+                                    android.os.Handler(android.os.Looper.getMainLooper()).post {
+                                        tileBusy = false
+                                        refreshTile()
+                                    }
+                                }.start()
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                }
+                Spacer(Modifier.height(8.dp))
+                EInkOutlinedButton(
+                    text = stringResource(R.string.qs_tile_move_stock),
+                    enabled = (hasSecure || shizukuReady) && !tileBusy,
+                    onClick = {
+                        tileBusy = true
+                        Thread {
+                            runCatching {
+                                QsTileInstaller.moveToFront(context, QsTileInstaller.STOCK_BATTERY_SAVER)
+                            }
+                            android.os.Handler(android.os.Looper.getMainLooper()).post {
+                                tileBusy = false
+                                tileMsg = R.string.qs_tile_msg_stock_moved
+                            }
+                        }.start()
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                )
                 Spacer(Modifier.height(8.dp))
                 EInkOutlinedButton(
                     text = stringResource(R.string.qs_tile_diagnose),

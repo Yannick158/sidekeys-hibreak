@@ -110,16 +110,29 @@ object QsTileInstaller {
      */
     fun addViaShell(context: Context): ShellResult {
         val comp = component(context).flattenToString()
-        val viaCmd = if (shellReady()) ShizukuShell.run("cmd statusbar add-tile $comp").ok else false
-        val tiles = currentTiles(context)
-        if (tiles == null && !viaCmd) return ShellResult.NO_SHELL
-        val viaList = when {
-            tiles == null -> false
-            spec(context) in tiles -> true
-            else -> write(context, listOf(spec(context)) + tiles) == ShellResult.OK
-        }
-        return if (viaCmd || viaList) ShellResult.OK else ShellResult.WRITE_FAILED
+        // `cmd statusbar add-tile` appends; the list is then reordered below so
+        // the tile lands on the first page of the panel.
+        if (shellReady()) ShizukuShell.run("cmd statusbar add-tile $comp")
+        return moveToFront(context, spec(context))
     }
+
+    /** The stock Battery Saver tile, present on most firmwares. */
+    const val STOCK_BATTERY_SAVER = "battery"
+
+    /**
+     * Moves [tileSpec] to the front of the tile list, so it appears on the first
+     * page of the Quick Settings panel instead of several swipes in. Blocking.
+     */
+    fun moveToFront(context: Context, tileSpec: String): ShellResult {
+        val tiles = currentTiles(context) ?: return ShellResult.NO_SHELL
+        if (tiles.firstOrNull() == tileSpec) return ShellResult.OK
+        val reordered = listOf(tileSpec) + tiles.filterNot { it == tileSpec }
+        return write(context, reordered)
+    }
+
+    /** True when the given tile is present but not on the first page. */
+    fun positionOf(context: Context, tileSpec: String): Int? =
+        currentTiles(context)?.indexOf(tileSpec)?.takeIf { it >= 0 }
 
     fun removeViaShell(context: Context): ShellResult {
         val comp = component(context).flattenToString()
@@ -146,7 +159,7 @@ object QsTileInstaller {
             done
             echo
             echo '# SystemUI tile host:'
-            dumpsys activity service com.android.systemui/.SystemUIService QSTileHost 2>/dev/null | grep -iE 'tile|spec' | head -25
+            dumpsys activity service com.android.systemui/.SystemUIService QSTileHost 2>/dev/null | grep -iE 'tile|spec' | head -60
             echo
             echo '# statusbar shell command available:'
             cmd statusbar 2>&1 | head -3

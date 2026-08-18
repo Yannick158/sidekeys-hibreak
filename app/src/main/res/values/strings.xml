@@ -171,4 +171,8 @@
     <string name="qs_tile_msg_written_unconfirmed">Written to the tile list, but the system did not confirm adding it. Pull the shade down twice — if the tile isn\'t there, this panel does not read the list.</string>
     <string name="qs_tile_working">Adding…</string>
     <string name="qs_tile_diagnose">Run diagnostics</string>
+    <string name="qs_tile_position">The tile is in the list at position %1$d — that is likely on a later page of the panel. Swipe sideways in the tile area, or move it to the front:</string>
+    <string name="qs_tile_move_front">Move SideKeys tile to the front</string>
+    <string name="qs_tile_move_stock">Move the built-in Battery Saver tile to the front</string>
+    <string name="qs_tile_msg_stock_moved">Moved. Pull the shade down twice — "Battery Saver" should now be on the first page.</string>
 </resources>

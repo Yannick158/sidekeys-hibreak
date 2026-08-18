@@ -171,4 +171,8 @@
     <string name="qs_tile_msg_written_unconfirmed">In die Kachelliste geschrieben, aber das System hat das Hinzufügen nicht bestätigt. Zieh die Leiste zweimal herunter — fehlt die Kachel, liest dieses Panel die Liste nicht.</string>
     <string name="qs_tile_working">Wird hinzugefügt…</string>
     <string name="qs_tile_diagnose">Diagnose ausführen</string>
+    <string name="qs_tile_position">Die Kachel steht an Position %1$d der Liste — damit vermutlich auf einer späteren Seite des Panels. Wisch im Kachelbereich seitwärts, oder sortiere sie nach vorne:</string>
+    <string name="qs_tile_move_front">SideKeys-Kachel nach vorne sortieren</string>
+    <string name="qs_tile_move_stock">Eingebaute Energiesparmodus-Kachel nach vorne sortieren</string>
+    <string name="qs_tile_msg_stock_moved">Sortiert. Zieh die Leiste zweimal herunter — „Energiesparmodus" sollte jetzt auf der ersten Seite stehen.</string>
 </resources>

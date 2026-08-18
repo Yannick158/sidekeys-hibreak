@@ -109,24 +109,23 @@ object QsTileInstaller {
      * Blocking.
      */
     fun addViaShell(context: Context): ShellResult {
-        if (!shellReady()) return ShellResult.NO_SHELL
         val comp = component(context).flattenToString()
-        val viaCmd = ShizukuShell.run("cmd statusbar add-tile $comp").ok
+        val viaCmd = if (shellReady()) ShizukuShell.run("cmd statusbar add-tile $comp").ok else false
         val tiles = currentTiles(context)
+        if (tiles == null && !viaCmd) return ShellResult.NO_SHELL
         val viaList = when {
             tiles == null -> false
             spec(context) in tiles -> true
-            else -> write(listOf(spec(context)) + tiles) == ShellResult.OK
+            else -> write(context, listOf(spec(context)) + tiles) == ShellResult.OK
         }
         return if (viaCmd || viaList) ShellResult.OK else ShellResult.WRITE_FAILED
     }
 
     fun removeViaShell(context: Context): ShellResult {
-        if (!shellReady()) return ShellResult.NO_SHELL
         val comp = component(context).flattenToString()
-        ShizukuShell.run("cmd statusbar remove-tile $comp")
-        val tiles = currentTiles(context)
-        val ok = if (tiles == null || spec(context) !in tiles) true else write(tiles - spec(context)) == ShellResult.OK
+        if (shellReady()) ShizukuShell.run("cmd statusbar remove-tile $comp")
+        val tiles = currentTiles(context) ?: return ShellResult.NO_SHELL
+        val ok = if (spec(context) !in tiles) true else write(context, tiles - spec(context)) == ShellResult.OK
         // SystemUI only reports onTileRemoved for removals made through its own
         // editor, so clear our "added" flag ourselves.
         if (ok) BatterySaverTile.markRemoved(context)
@@ -156,8 +155,16 @@ object QsTileInstaller {
         return (r.stdout + if (r.stderr.isNotBlank()) "\n" + r.stderr else "").trim().ifBlank { "(no output)" }
     }
 
-    private fun write(tiles: List<String>): ShellResult {
+    private fun write(context: Context, tiles: List<String>): ShellResult {
         val value = tiles.joinToString(",")
+        // Writing works with the granted permission; only reading is blocked on
+        // API 34+. Use it when we have it, and fall back to the shell.
+        if (PowerSaver.hasWriteSecureSettings(context)) {
+            val ok = runCatching { Settings.Secure.putString(context.contentResolver, QS_TILES, value) }
+                .getOrDefault(false)
+            if (ok) return ShellResult.OK
+        }
+        if (!shellReady()) return ShellResult.NO_SHELL
         val ok = ShizukuShell.run("settings put secure $QS_TILES '$value'").ok
         return if (ok) ShellResult.OK else ShellResult.WRITE_FAILED
     }

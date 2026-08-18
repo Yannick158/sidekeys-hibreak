@@ -289,8 +289,31 @@ fun ChargeLimitScreen(onBack: () -> Unit) {
                             tileBusy = true
                             tileMsg = 0
                             val main = android.os.Handler(android.os.Looper.getMainLooper())
+                            // Some firmwares accept the add-tile request but never
+                            // call back, which would leave the button stuck.
+                            val answered = java.util.concurrent.atomic.AtomicBoolean(false)
+                            val fallback = Runnable {
+                                if (answered.compareAndSet(false, true)) {
+                                    Thread {
+                                        val res = runCatching { QsTileInstaller.addViaShell(context) }
+                                            .getOrDefault(QsTileInstaller.ShellResult.WRITE_FAILED)
+                                        main.post {
+                                            tileMsg = when (res) {
+                                                QsTileInstaller.ShellResult.NO_SHELL -> R.string.qs_tile_msg_need_shell
+                                                QsTileInstaller.ShellResult.WRITE_FAILED -> R.string.qs_tile_msg_write_failed
+                                                QsTileInstaller.ShellResult.OK -> R.string.qs_tile_msg_written_unconfirmed
+                                            }
+                                            tileBusy = false
+                                            refreshTile()
+                                        }
+                                    }.start()
+                                }
+                            }
+                            main.postDelayed(fallback, 4000)
                             // Route 1: system dialog.
                             QsTileInstaller.requestViaSystemDialog(context, { it.run() }) { result ->
+                                if (!answered.compareAndSet(false, true)) return@requestViaSystemDialog
+                                main.removeCallbacks(fallback)
                                 main.post {
                                     when (result) {
                                         QsTileInstaller.DialogResult.ADDED,
@@ -358,7 +381,7 @@ fun ChargeLimitScreen(onBack: () -> Unit) {
                     Spacer(Modifier.height(8.dp))
                     EInkOutlinedButton(
                         text = stringResource(R.string.qs_tile_remove),
-                        enabled = shizukuReady && !tileBusy,
+                        enabled = (hasSecure || shizukuReady) && !tileBusy,
                         onClick = {
                             Thread {
                                 runCatching { QsTileInstaller.removeViaShell(context) }
@@ -374,7 +397,7 @@ fun ChargeLimitScreen(onBack: () -> Unit) {
                 Spacer(Modifier.height(8.dp))
                 EInkOutlinedButton(
                     text = stringResource(R.string.qs_tile_diagnose),
-                    enabled = shizukuReady && !tileBusy,
+                    enabled = (hasSecure || shizukuReady) && !tileBusy,
                     onClick = {
                         tileBusy = true
                         Thread {

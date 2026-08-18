@@ -20,6 +20,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -38,10 +39,15 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sidekeys.hibreak.R
+import com.sidekeys.hibreak.core.designsystem.EInkButton
 import com.sidekeys.hibreak.core.designsystem.EInkCard
 import com.sidekeys.hibreak.core.designsystem.EInkHeader
 import com.sidekeys.hibreak.core.designsystem.EInkOutlinedButton
 import com.sidekeys.hibreak.service.PowerSaver
+import com.sidekeys.hibreak.service.ShizukuShell
+import rikka.shizuku.Shizuku
+
+private const val SHIZUKU_REQUEST_CODE = 4213
 
 @Composable
 fun ChargeLimitScreen(onBack: () -> Unit) {
@@ -49,7 +55,33 @@ fun ChargeLimitScreen(onBack: () -> Unit) {
     val clipboard = LocalClipboardManager.current
     val viewModel: ChargeViewModel = viewModel(factory = ChargeViewModel.factory(context.applicationContext))
     val settings by viewModel.settings.collectAsStateWithLifecycle()
-    val hasSecure = remember { PowerSaver.hasWriteSecureSettings(context) }
+    var hasSecure by remember { mutableStateOf(PowerSaver.hasWriteSecureSettings(context)) }
+
+    // Shizuku can connect or die at any time; track it so the UI stays truthful.
+    var shizukuReady by remember {
+        mutableStateOf(ShizukuShell.isAvailable() && ShizukuShell.isPermissionGranted())
+    }
+    DisposableEffect(Unit) {
+        val onPermission = Shizuku.OnRequestPermissionResultListener { _, _ ->
+            shizukuReady = ShizukuShell.isAvailable() && ShizukuShell.isPermissionGranted()
+        }
+        val onBinder = Shizuku.OnBinderReceivedListener {
+            shizukuReady = ShizukuShell.isAvailable() && ShizukuShell.isPermissionGranted()
+        }
+        val onDead = Shizuku.OnBinderDeadListener { shizukuReady = false }
+        runCatching {
+            Shizuku.addRequestPermissionResultListener(onPermission)
+            Shizuku.addBinderReceivedListener(onBinder)
+            Shizuku.addBinderDeadListener(onDead)
+        }
+        onDispose {
+            runCatching {
+                Shizuku.removeRequestPermissionResultListener(onPermission)
+                Shizuku.removeBinderReceivedListener(onBinder)
+                Shizuku.removeBinderDeadListener(onDead)
+            }
+        }
+    }
 
     val blackSlider = SliderDefaults.colors(
         thumbColor = Color.Black,
@@ -119,8 +151,9 @@ fun ChargeLimitScreen(onBack: () -> Unit) {
                 )
             }
 
-            // One-time adb setup that unlocks the Battery Saver toggle and the
-            // one-tap accessibility enable. No root, no helper app.
+            // Setup for the Battery Saver toggle and the one-tap accessibility
+            // enable. Two equivalent routes: adb from a PC, or Shizuku from the
+            // phone. Neither reads screen content.
             EInkCard {
                 Text(
                     text = stringResource(R.string.adb_setup_title),
@@ -138,6 +171,48 @@ fun ChargeLimitScreen(onBack: () -> Unit) {
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     Spacer(Modifier.height(8.dp))
+
+                    // Route 1: Shizuku (no PC needed).
+                    Text(
+                        text = stringResource(R.string.setup_route_shizuku),
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    if (shizukuReady) {
+                        EInkButton(
+                            text = stringResource(R.string.battery_saver_perm_grant),
+                            onClick = {
+                                Thread {
+                                    PowerSaver.grantPermanentAccess(context)
+                                    val granted = PowerSaver.hasWriteSecureSettings(context)
+                                    android.os.Handler(android.os.Looper.getMainLooper()).post {
+                                        hasSecure = granted
+                                    }
+                                }.start()
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    } else if (ShizukuShell.isAvailable()) {
+                        EInkOutlinedButton(
+                            text = stringResource(R.string.charge_shizuku_grant),
+                            onClick = { ShizukuShell.requestPermission(SHIZUKU_REQUEST_CODE) },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(R.string.setup_shizuku_missing),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
+
+                    Spacer(Modifier.height(12.dp))
+
+                    // Route 2: adb from a computer (permanent, no helper app).
+                    Text(
+                        text = stringResource(R.string.setup_route_adb),
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Spacer(Modifier.height(4.dp))
                     Text(
                         text = PowerSaver.GRANT_COMMAND,
                         style = MaterialTheme.typography.bodyMedium,

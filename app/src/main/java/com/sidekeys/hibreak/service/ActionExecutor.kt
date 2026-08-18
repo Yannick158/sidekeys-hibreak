@@ -154,8 +154,9 @@ class ActionExecutor(private val service: AccessibilityService) {
     }
 
     /**
-     * Starts a specific activity ("pkg/.Class"). Only activities the target app
-     * exports can be started — Android blocks everything else by design.
+     * Starts a specific activity ("pkg/.Class"). Android only lets a normal app
+     * start activities the target app exports; internal ones (e.g. ChatGPT's
+     * voice mode) can be reached via Shizuku's `am start`, if it is running.
      */
     private fun launchActivity(flattened: String?) {
         val component = flattened?.let { ComponentName.unflattenFromString(it) }
@@ -164,7 +165,15 @@ class ActionExecutor(private val service: AccessibilityService) {
             return
         }
         val intent = Intent().setComponent(component).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        if (!startActivitySafely(intent)) toast(R.string.error_activity_failed)
+        if (startActivitySafely(intent)) return
+        if (ShizukuShell.isAvailable() && ShizukuShell.isPermissionGranted()) {
+            Thread {
+                val ok = ShizukuShell.run("am start -n '${component.flattenToString()}'").ok
+                if (!ok) mainHandler.post { toast(R.string.error_activity_failed) }
+            }.start()
+            return
+        }
+        toast(R.string.error_activity_failed)
     }
 
     /** Dispatches a straight-line swipe. Returns false if gestures aren't available. */
@@ -263,7 +272,7 @@ class ActionExecutor(private val service: AccessibilityService) {
     }
 
     private fun toggleBatterySaver() {
-        // Direct toggle via WRITE_SECURE_SETTINGS (granted once via adb).
+        // Fast path: permission held -> instant, safe on the main thread.
         if (PowerSaver.hasWriteSecureSettings(service)) {
             val target = !PowerSaver.isEnabled(service)
             val ok = PowerSaver.setEnabled(service, target)
@@ -276,7 +285,21 @@ class ActionExecutor(private val service: AccessibilityService) {
             )
             return
         }
-        // Not granted: open the Battery Saver settings page instead.
+        // Shizuku path blocks -> off the main thread, toast back on it.
+        if (PowerSaver.canToggle(service)) {
+            Thread {
+                val result = PowerSaver.toggle(service)
+                mainHandler.post {
+                    when (result) {
+                        true -> toast(R.string.battery_saver_on)
+                        false -> toast(R.string.battery_saver_off)
+                        null -> toast(R.string.error_action_failed)
+                    }
+                }
+            }.start()
+            return
+        }
+        // Neither available: open the Battery Saver settings page instead.
         if (startActivitySafely(Intent(Settings.ACTION_BATTERY_SAVER_SETTINGS))) {
             toast(R.string.battery_saver_manual)
         } else {

@@ -19,8 +19,8 @@ object AccessibilityEnabler {
     fun component(context: Context): String =
         ComponentName(context, KeyInterceptorService::class.java).flattenToString()
 
-    /** True if we hold the permission needed to do this. */
-    fun canEnable(context: Context): Boolean = PowerSaver.hasWriteSecureSettings(context)
+    /** True if we can do this right now — natively or through running Shizuku. */
+    fun canEnable(context: Context): Boolean = PowerSaver.canToggle(context)
 
     /**
      * Enables — or, if already listed, RESTARTS — the service. Returns true on success.
@@ -31,19 +31,39 @@ object AccessibilityEnabler {
      * the same value would be a no-op, so we remove and re-add ourselves.
      */
     fun enable(context: Context): Boolean {
-        if (!canEnable(context)) return false
         val comp = component(context)
-        return runCatching {
-            val resolver = context.contentResolver
-            val current = Settings.Secure.getString(resolver, ENABLED_SERVICES).orEmpty()
-            val without = withoutService(current, comp)
-            if (without != current) {
-                Settings.Secure.putString(resolver, ENABLED_SERVICES, without)
-            }
-            Settings.Secure.putString(resolver, ENABLED_SERVICES, mergeService(without, comp))
-            Settings.Secure.putInt(resolver, ACCESSIBILITY_ON, 1)
-            true
-        }.getOrDefault(false)
+        if (PowerSaver.hasWriteSecureSettings(context)) {
+            val ok = runCatching {
+                val resolver = context.contentResolver
+                val current = Settings.Secure.getString(resolver, ENABLED_SERVICES).orEmpty()
+                val without = withoutService(current, comp)
+                if (without != current) {
+                    Settings.Secure.putString(resolver, ENABLED_SERVICES, without)
+                }
+                Settings.Secure.putString(resolver, ENABLED_SERVICES, mergeService(without, comp))
+                Settings.Secure.putInt(resolver, ACCESSIBILITY_ON, 1)
+                true
+            }.getOrDefault(false)
+            if (ok) return true
+        }
+        // Shizuku path: same off→on toggle, run as shell.
+        if (ShizukuShell.isAvailable() && ShizukuShell.isPermissionGranted()) {
+            val script = """
+                cur=${'$'}(settings get secure $ENABLED_SERVICES)
+                comp='$comp'
+                [ "${'$'}cur" = "null" ] && cur=""
+                without=${'$'}(echo "${'$'}cur" | tr ':' '\n' | grep -v -x -F "${'$'}comp" | grep -v '^${'$'}' | paste -sd: -)
+                if [ "${'$'}without" != "${'$'}cur" ]; then
+                  settings put secure $ENABLED_SERVICES "${'$'}without"
+                fi
+                if [ -z "${'$'}without" ]; then new="${'$'}comp"; else new="${'$'}without:${'$'}comp"; fi
+                settings put secure $ENABLED_SERVICES "${'$'}new"
+                settings put secure $ACCESSIBILITY_ON 1
+                echo ok
+            """.trimIndent()
+            return ShizukuShell.run(script).stdout.trim().endsWith("ok")
+        }
+        return false
     }
 
     private fun withoutService(current: String, comp: String): String {

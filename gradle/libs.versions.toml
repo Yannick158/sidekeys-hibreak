@@ -18,6 +18,9 @@ androidxComposeBom = "2024.06.00"
 androidxComposeCompiler = "1.5.14"
 androidxDataStore = "1.1.1"
 
+# Shizuku (optional: ADB-level privileges without root)
+shizuku = "13.1.5"
+
 # Build
 androidGradlePlugin = "8.5.2"
 
@@ -52,6 +55,10 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 
 # DataStore
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "androidxDataStore" }
+
+# Shizuku (optional)
+shizuku-api = { group = "dev.rikka.shizuku", name = "api", version.ref = "shizuku" }
+shizuku-provider = { group = "dev.rikka.shizuku", name = "provider", version.ref = "shizuku" }
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }

@@ -122,9 +122,14 @@
 
     <!-- One-time adb setup -->
     <string name="adb_setup_title">Battery Saver toggle &amp; one-tap enable</string>
-    <string name="adb_setup_intro">These two extras need one permission that Android only grants from a computer. Connect the phone via USB with USB debugging on, then run this command once:</string>
+    <string name="adb_setup_intro">Android has no API for this, so these two extras need one permission that only a privileged shell can grant. Pick either route — both are one-time, local, and read no screen content.</string>
+    <string name="setup_route_shizuku">Route 1 — with Shizuku (no PC)</string>
+    <string name="charge_shizuku_grant">Allow SideKeys in Shizuku</string>
+    <string name="setup_route_adb">Route 2 — from a computer</string>
+    <string name="setup_shizuku_missing">Shizuku is not running. Install and start the Shizuku app, or use route 2 below.</string>
+    <string name="battery_saver_perm_grant">Grant permanently via Shizuku</string>
     <string name="adb_setup_copy">Copy command</string>
-    <string name="adb_setup_note">It stays granted until you uninstall the app. Everything else in SideKeys works without it.</string>
+    <string name="adb_setup_note">Once granted it stays until you uninstall the app — and then it also works when Shizuku is not running. Everything else in SideKeys works without it.</string>
     <string name="adb_setup_granted">✓ Set up — the Battery Saver key action, the quick tile and the one-tap enable are active.</string>
     <string name="error_permission_required">Needs the one-time adb setup — see Battery &amp; charge alarm.</string>
 

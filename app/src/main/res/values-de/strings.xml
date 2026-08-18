@@ -122,9 +122,14 @@
 
     <!-- Einmalige ADB-Einrichtung -->
     <string name="adb_setup_title">Energiesparmodus-Schalter &amp; Ein-Tipp-Aktivierung</string>
-    <string name="adb_setup_intro">Diese beiden Extras brauchen eine Berechtigung, die Android nur vom Computer aus erteilt. Handy per USB anschließen, USB-Debugging aktivieren und diesen Befehl einmal ausführen:</string>
+    <string name="adb_setup_intro">Android bietet dafür keine API — diese beiden Extras brauchen eine Berechtigung, die nur eine privilegierte Shell erteilen kann. Wähle einen der Wege; beide sind einmalig, lokal und lesen keine Bildschirminhalte.</string>
+    <string name="setup_route_shizuku">Weg 1 — mit Shizuku (ohne PC)</string>
+    <string name="charge_shizuku_grant">SideKeys in Shizuku erlauben</string>
+    <string name="setup_route_adb">Weg 2 — vom Computer</string>
+    <string name="setup_shizuku_missing">Shizuku läuft nicht. Installiere und starte die Shizuku-App — oder nutze Weg 2 unten.</string>
+    <string name="battery_saver_perm_grant">Dauerhaft per Shizuku erteilen</string>
     <string name="adb_setup_copy">Befehl kopieren</string>
-    <string name="adb_setup_note">Die Berechtigung bleibt erhalten, bis du die App deinstallierst. Alles andere in SideKeys funktioniert auch ohne.</string>
+    <string name="adb_setup_note">Einmal erteilt bleibt sie bis zur Deinstallation — und funktioniert dann auch, wenn Shizuku nicht läuft. Alles andere in SideKeys funktioniert ohnehin ohne.</string>
     <string name="adb_setup_granted">✓ Eingerichtet — Energiesparmodus-Aktion, Kachel und Ein-Tipp-Aktivierung sind aktiv.</string>
     <string name="error_permission_required">Benötigt die einmalige ADB-Einrichtung — siehe „Akku &amp; Ladewecker".</string>
 

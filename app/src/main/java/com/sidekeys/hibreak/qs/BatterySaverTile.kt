@@ -3,6 +3,8 @@ package com.sidekeys.hibreak.qs
 import android.app.PendingIntent
 import android.content.Intent
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
@@ -24,14 +26,25 @@ class BatterySaverTile : TileService() {
 
     override fun onClick() {
         super.onClick()
-        if (!PowerSaver.canToggle(this)) {
-            openSettings()
+        // Native path: instant, safe on the main thread.
+        if (PowerSaver.hasWriteSecureSettings(this)) {
+            val target = !PowerSaver.isEnabled(this)
+            PowerSaver.setEnabled(this, target)
+            // Reflect the intended state immediately; isPowerSaveMode can lag the write.
+            applyState(ready = true, on = target)
             return
         }
-        val target = !PowerSaver.isEnabled(this)
-        PowerSaver.setEnabled(this, target)
-        // Reflect the intended state immediately; isPowerSaveMode can lag the write.
-        applyState(ready = true, on = target)
+        // Shizuku path blocks: run it off the main thread, then refresh.
+        if (PowerSaver.canToggle(this)) {
+            Thread {
+                val newState = PowerSaver.toggle(this)
+                Handler(Looper.getMainLooper()).post {
+                    if (newState != null) applyState(ready = true, on = newState) else refresh()
+                }
+            }.start()
+            return
+        }
+        openSettings()
     }
 
     private fun openSettings() {

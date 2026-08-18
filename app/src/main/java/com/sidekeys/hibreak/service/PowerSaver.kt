@@ -9,13 +9,16 @@ import android.provider.Settings
 /**
  * Toggles Android's Battery Saver.
  *
- * Requires [Manifest.permission.WRITE_SECURE_SETTINGS], which a normal app can
- * never request at runtime — it is granted once from a computer:
+ * Android offers no API for this to normal apps (`setPowerSaveModeEnabled` needs
+ * DEVICE_POWER, `setDynamicPowerSaveHint` needs POWER_SAVER — both signature
+ * permissions), so it goes through [Manifest.permission.WRITE_SECURE_SETTINGS].
+ * There are two ways to obtain it, both one-time and both entirely local:
  *
- *     adb shell pm grant com.sidekeys.hibreak android.permission.WRITE_SECURE_SETTINGS
+ *  1. From a computer:  [GRANT_COMMAND]
+ *  2. From the phone:   via Shizuku, see [grantPermanentAccess]
  *
- * Once granted it is permanent (until the app is uninstalled). Without it the
- * UI falls back to opening the Battery Saver settings page.
+ * If the permission is missing but Shizuku is running, the write is routed
+ * through Shizuku directly. Nothing here reads screen content.
  */
 object PowerSaver {
 
@@ -32,20 +35,44 @@ object PowerSaver {
         context.checkSelfPermission(Manifest.permission.WRITE_SECURE_SETTINGS) ==
             PackageManager.PERMISSION_GRANTED
 
-    /** Whether Battery Saver can actually be toggled right now. */
-    fun canToggle(context: Context): Boolean = hasWriteSecureSettings(context)
+    private fun shizukuReady(): Boolean =
+        ShizukuShell.isAvailable() && ShizukuShell.isPermissionGranted()
 
-    /** Returns true if the new state was applied. */
+    /** Whether Battery Saver can actually be toggled right now. */
+    fun canToggle(context: Context): Boolean = hasWriteSecureSettings(context) || shizukuReady()
+
+    /**
+     * Returns true if the new state was applied. The native path is instant and
+     * safe on the main thread; the Shizuku path blocks and must not be.
+     */
     fun setEnabled(context: Context, enabled: Boolean): Boolean {
-        if (!hasWriteSecureSettings(context)) return false
-        return runCatching {
-            Settings.Global.putInt(context.contentResolver, "low_power", if (enabled) 1 else 0)
-        }.getOrDefault(false)
+        if (hasWriteSecureSettings(context)) {
+            val ok = runCatching {
+                Settings.Global.putInt(context.contentResolver, "low_power", if (enabled) 1 else 0)
+            }.getOrDefault(false)
+            if (ok) return true
+        }
+        if (shizukuReady()) {
+            return ShizukuShell.run("settings put global low_power ${if (enabled) 1 else 0}").ok
+        }
+        return false
     }
 
     /** Toggles Battery Saver; returns the new state, or null if it failed. */
     fun toggle(context: Context): Boolean? {
         val target = !isEnabled(context)
         return if (setEnabled(context, target)) target else null
+    }
+
+    /**
+     * One-time, via Shizuku: grant ourselves WRITE_SECURE_SETTINGS so the toggle
+     * keeps working even when Shizuku is not running (it needs restarting after
+     * every reboot). Blocking — call off the main thread.
+     */
+    fun grantPermanentAccess(context: Context): Boolean {
+        if (hasWriteSecureSettings(context)) return true
+        if (!shizukuReady()) return false
+        ShizukuShell.run("pm grant ${context.packageName} android.permission.WRITE_SECURE_SETTINGS")
+        return hasWriteSecureSettings(context)
     }
 }

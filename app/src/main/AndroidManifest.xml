@@ -5,6 +5,8 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Optional: Shizuku lets the user grant the permission below from the phone itself -->
+    <uses-permission android:name="moe.shizuku.manager.permission.API_V23" />
     <!-- Granted once from a computer via adb; enables the Battery Saver toggle
          and the one-tap accessibility enable. Cannot be requested at runtime. -->
     <uses-permission
@@ -68,5 +70,14 @@
             </intent-filter>
         </service>
 
+
+        <!-- Optional Shizuku integration -->
+        <provider
+            android:name="rikka.shizuku.ShizukuProvider"
+            android:authorities="${applicationId}.shizuku"
+            android:multiprocess="false"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
     </application>
 </manifest>

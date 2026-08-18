@@ -158,7 +158,7 @@
 
     <!-- Quick Settings tile installer -->
     <string name="qs_tile_title">Battery Saver tile in Quick Settings</string>
-    <string name="qs_tile_intro">SideKeys can register its tile even where the panel hides the "edit tiles" button. Note for Bigme devices: their panel draws its own fixed set of tiles and ignores the system tile list entirely, so a tile added here will not become visible — confirmed on the HiBreak Pro. Map Battery Saver to a key instead.</string>
+    <string name="qs_tile_intro">SideKeys can register its tile even where the panel hides the "edit tiles" button. Note for Bigme devices: they ship a modified SystemUI whose panel draws its own fixed set of tiles (Power Management, E Ink Center, Full refresh) and never reads the system tile list, so a tile added here cannot become visible — confirmed on the HiBreak Pro. Map Battery Saver to a key instead.</string>
     <string name="qs_tile_state_listed">The tile is in the panel\'s tile list. Pull the shade down twice to check — if it isn\'t visible, this firmware ignores the list.</string>
     <string name="qs_tile_state_registered">✓ The system registered the tile. If it still does not appear in the panel, this firmware draws its own fixed set of tiles and ignores registered ones — nothing an app can change. Use the key action instead.</string>
     <string name="qs_tile_add">Add tile to Quick Settings</string>
@@ -175,9 +175,4 @@
     <string name="qs_tile_move_front">Move SideKeys tile to the front</string>
     <string name="qs_tile_move_stock">Move the built-in Battery Saver tile to the front</string>
     <string name="qs_tile_msg_stock_moved">Moved. Pull the shade down twice — "Battery Saver" should now be on the first page.</string>
-    <string name="oem_flag_title">Experiment: vendor status-bar flag</string>
-    <string name="oem_flag_intro">This firmware has an undocumented vendor setting for the status bar. It may be what keeps the Quick Settings panel from showing app tiles — or it may do something else entirely. Trying it is reversible.</string>
-    <string name="oem_flag_try">Set to 1 (try it)</string>
-    <string name="oem_flag_reset">Reset to 0</string>
-    <string name="oem_flag_note">If the status bar looks wrong afterwards, tap Reset — or reboot. Nothing here touches system files.</string>
 </resources>

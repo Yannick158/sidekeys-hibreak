@@ -117,13 +117,15 @@ Good to know:
   (e.g. page turn / E Ink Center) interferes — long press works because usually
   no Bigme action sits there. Fix: in the Bigme settings under "Custom key" set
   **both Single Tap and Long Press to "None"** for both keys.
-- **Quick Settings tiles from apps never appear.** Not a bug in the app: Bigme's
-  panel draws its own fixed set of tiles and ignores the system tile list. The
-  tile *is* registered — AOSP's SystemUI loads it, and Google's own tiles sit
-  unused in that list too — but the visible panel never reads it, and Bigme's
-  "Power Management" tile is not in that list at all. Verified by moving the
-  stock Battery Saver tile to position 1: still invisible. Map Battery Saver to
-  a key instead.
+- **Quick Settings tiles from apps never appear.** Not a bug in the app. Bigme
+  ships a modified SystemUI: the shade windows are named as in AOSP, and the tile
+  host still instantiates every registered tile (Google's "Quick Share" and
+  "Security & privacy" sit unused in that list too), but the panel you see draws
+  its own fixed set — Power Management, E Ink Center, Full refresh — none of
+  which appear in `sysui_qs_tiles`. Verified by moving the stock Battery Saver
+  tile to position 1 of that list: still invisible. No app, adb command or
+  settings flag can change this; only a different ROM could. Map Battery Saver
+  to a key instead.
 - **Disable DuraSpeed:** the MediaTek "DuraSpeed" feature aggressively kills
   background apps and can hit the SideKeys service too. Turn it off via ADB:
 

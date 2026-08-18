@@ -158,7 +158,7 @@
 
     <!-- Quick-Settings-Kachel einrichten -->
     <string name="qs_tile_title">Energiesparmodus-Kachel in den Schnelleinstellungen</string>
-    <string name="qs_tile_intro">SideKeys kann seine Kachel auch dort eintragen, wo das Panel den „Kacheln bearbeiten"-Knopf ausblendet. Hinweis für Bigme-Geräte: Deren Panel zeichnet einen eigenen festen Kachelsatz und ignoriert die System-Kachelliste komplett — eine hier hinzugefügte Kachel wird dort also nicht sichtbar (auf dem HiBreak Pro bestätigt). Leg den Energiesparmodus stattdessen auf eine Taste.</string>
+    <string name="qs_tile_intro">SideKeys kann seine Kachel auch dort eintragen, wo das Panel den „Kacheln bearbeiten"-Knopf ausblendet. Hinweis für Bigme-Geräte: Dort läuft eine angepasste SystemUI, deren Panel einen eigenen festen Kachelsatz zeichnet (Power Management, E Ink Center, Vollrefresh) und die System-Kachelliste nie liest — eine hier hinzugefügte Kachel kann dort also nicht sichtbar werden (auf dem HiBreak Pro bestätigt). Leg den Energiesparmodus stattdessen auf eine Taste.</string>
     <string name="qs_tile_state_listed">Die Kachel steht in der Kachelliste des Panels. Zieh die Leiste zweimal herunter — ist sie nicht zu sehen, ignoriert diese Firmware die Liste.</string>
     <string name="qs_tile_state_registered">✓ Das System hat die Kachel registriert. Erscheint sie trotzdem nicht im Panel, zeichnet diese Firmware nur ihren eigenen festen Kachelsatz und ignoriert registrierte — daran kann keine App etwas ändern. Nutze dann die Tastenaktion.</string>
     <string name="qs_tile_add">Kachel zu den Schnelleinstellungen hinzufügen</string>
@@ -175,9 +175,4 @@
     <string name="qs_tile_move_front">SideKeys-Kachel nach vorne sortieren</string>
     <string name="qs_tile_move_stock">Eingebaute Energiesparmodus-Kachel nach vorne sortieren</string>
     <string name="qs_tile_msg_stock_moved">Sortiert. Zieh die Leiste zweimal herunter — „Energiesparmodus" sollte jetzt auf der ersten Seite stehen.</string>
-    <string name="oem_flag_title">Experiment: Hersteller-Schalter für die Statusleiste</string>
-    <string name="oem_flag_intro">Diese Firmware hat eine undokumentierte Hersteller-Einstellung für die Statusleiste. Möglicherweise verhindert sie, dass App-Kacheln im Panel erscheinen — vielleicht macht sie aber auch etwas ganz anderes. Der Versuch ist umkehrbar.</string>
-    <string name="oem_flag_try">Auf 1 setzen (ausprobieren)</string>
-    <string name="oem_flag_reset">Zurück auf 0</string>
-    <string name="oem_flag_note">Sieht die Statusleiste danach seltsam aus, tippe auf Zurücksetzen — oder starte neu. Hier werden keine Systemdateien angefasst.</string>
 </resources>

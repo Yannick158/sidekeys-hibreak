@@ -154,9 +154,8 @@ class ActionExecutor(private val service: AccessibilityService) {
     }
 
     /**
-     * Starts a specific activity ("pkg/.Class"). Non-exported activities (e.g.
-     * ChatGPT's voice mode) can't be started by a normal app; if Shizuku is
-     * available we fall back to `am start -n`, which can.
+     * Starts a specific activity ("pkg/.Class"). Only activities the target app
+     * exports can be started — Android blocks everything else by design.
      */
     private fun launchActivity(flattened: String?) {
         val component = flattened?.let { ComponentName.unflattenFromString(it) }
@@ -165,15 +164,7 @@ class ActionExecutor(private val service: AccessibilityService) {
             return
         }
         val intent = Intent().setComponent(component).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        if (startActivitySafely(intent)) return
-        if (ShizukuShell.isAvailable() && ShizukuShell.isPermissionGranted()) {
-            Thread {
-                val ok = ShizukuShell.run("am start -n '${component.flattenToString()}'").ok
-                if (!ok) mainHandler.post { toast(R.string.error_activity_failed) }
-            }.start()
-            return
-        }
-        toast(R.string.error_activity_failed)
+        if (!startActivitySafely(intent)) toast(R.string.error_activity_failed)
     }
 
     /** Dispatches a straight-line swipe. Returns false if gestures aren't available. */
@@ -204,25 +195,14 @@ class ActionExecutor(private val service: AccessibilityService) {
     }
 
     /**
-     * E-ink full refresh (experimental). Tries the kernel debug node via Shizuku
-     * first, then replays Bigme's own system gesture: swipe up from the
-     * bottom-right edge.
+     * E-ink full refresh (experimental): replays Bigme's own system gesture —
+     * a swipe up from the bottom-right edge.
      */
     private fun einkRefresh() {
         val dm = service.resources.displayMetrics
-        val doGesture = {
-            val x = dm.widthPixels * 0.92f
-            swipe(x, dm.heightPixels - 2f, x, dm.heightPixels * 0.55f, 250)
-        }
-        if (ShizukuShell.isAvailable() && ShizukuShell.isPermissionGranted()) {
-            Thread {
-                val ok = ShizukuShell.run(
-                    "echo 1 > /sys/kernel/debug/eink_debug/manual_refresh 2>/dev/null && echo ok || echo fail",
-                ).stdout == "ok"
-                if (!ok) mainHandler.post { doGesture() }
-            }.start()
-        } else {
-            doGesture()
+        val x = dm.widthPixels * 0.92f
+        if (!swipe(x, dm.heightPixels - 2f, x, dm.heightPixels * 0.55f, 250)) {
+            toast(R.string.error_gesture_failed)
         }
     }
 
@@ -283,32 +263,24 @@ class ActionExecutor(private val service: AccessibilityService) {
     }
 
     private fun toggleBatterySaver() {
-        // Native path (WRITE_SECURE_SETTINGS held): fast, no Shizuku, main thread ok.
+        // Direct toggle via WRITE_SECURE_SETTINGS (granted once via adb).
         if (PowerSaver.hasWriteSecureSettings(service)) {
             val target = !PowerSaver.isEnabled(service)
             val ok = PowerSaver.setEnabled(service, target)
-            toast(if (!ok) R.string.error_action_failed else if (target) R.string.battery_saver_on else R.string.battery_saver_off)
+            toast(
+                when {
+                    !ok -> R.string.error_action_failed
+                    target -> R.string.battery_saver_on
+                    else -> R.string.battery_saver_off
+                },
+            )
             return
         }
-        // Live Shizuku path: blocks, so run off the main thread.
-        if (ShizukuShell.isAvailable() && ShizukuShell.isPermissionGranted()) {
-            Thread {
-                val result = PowerSaver.toggle(service)
-                mainHandler.post {
-                    when (result) {
-                        true -> toast(R.string.battery_saver_on)
-                        false -> toast(R.string.battery_saver_off)
-                        null -> toast(R.string.error_action_failed)
-                    }
-                }
-            }.start()
-            return
-        }
-        // No privilege at all: open the Battery Saver settings page as a fallback.
+        // Not granted: open the Battery Saver settings page instead.
         if (startActivitySafely(Intent(Settings.ACTION_BATTERY_SAVER_SETTINGS))) {
             toast(R.string.battery_saver_manual)
         } else {
-            toast(R.string.error_shizuku_required)
+            toast(R.string.error_permission_required)
         }
     }
 

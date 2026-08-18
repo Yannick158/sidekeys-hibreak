@@ -16,7 +16,7 @@ import com.sidekeys.hibreak.R
 /**
  * Fires the charge alarm: a short vibration, a notification sound and a
  * heads-up notification telling the user to unplug. All best-effort — none of
- * the pieces require Shizuku or root.
+ * the pieces require root or an extra permission.
  */
 object ChargeAlarm {
 

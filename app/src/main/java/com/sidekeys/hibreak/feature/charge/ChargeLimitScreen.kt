@@ -20,7 +20,6 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -29,50 +28,28 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sidekeys.hibreak.R
-import com.sidekeys.hibreak.core.designsystem.EInkButton
 import com.sidekeys.hibreak.core.designsystem.EInkCard
 import com.sidekeys.hibreak.core.designsystem.EInkHeader
 import com.sidekeys.hibreak.core.designsystem.EInkOutlinedButton
 import com.sidekeys.hibreak.service.PowerSaver
-import com.sidekeys.hibreak.service.ShizukuShell
-import rikka.shizuku.Shizuku
-
-private const val SHIZUKU_REQUEST_CODE = 4213
 
 @Composable
 fun ChargeLimitScreen(onBack: () -> Unit) {
     val context = LocalContext.current
+    val clipboard = LocalClipboardManager.current
     val viewModel: ChargeViewModel = viewModel(factory = ChargeViewModel.factory(context.applicationContext))
     val settings by viewModel.settings.collectAsStateWithLifecycle()
-
-    var shizukuReady by remember { mutableStateOf(ShizukuShell.isAvailable() && ShizukuShell.isPermissionGranted()) }
-    DisposableEffect(Unit) {
-        val permListener = Shizuku.OnRequestPermissionResultListener { _, _ ->
-            shizukuReady = ShizukuShell.isAvailable() && ShizukuShell.isPermissionGranted()
-        }
-        val binderReceived = Shizuku.OnBinderReceivedListener {
-            shizukuReady = ShizukuShell.isAvailable() && ShizukuShell.isPermissionGranted()
-        }
-        val binderDead = Shizuku.OnBinderDeadListener { shizukuReady = false }
-        runCatching {
-            Shizuku.addRequestPermissionResultListener(permListener)
-            Shizuku.addBinderReceivedListener(binderReceived)
-            Shizuku.addBinderDeadListener(binderDead)
-        }
-        onDispose {
-            runCatching {
-                Shizuku.removeRequestPermissionResultListener(permListener)
-                Shizuku.removeBinderReceivedListener(binderReceived)
-                Shizuku.removeBinderDeadListener(binderDead)
-            }
-        }
-    }
+    val hasSecure = remember { PowerSaver.hasWriteSecureSettings(context) }
 
     val blackSlider = SliderDefaults.colors(
         thumbColor = Color.Black,
@@ -92,7 +69,7 @@ fun ChargeLimitScreen(onBack: () -> Unit) {
                 .padding(horizontal = 16.dp, vertical = 4.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            // Charge alarm — works on any device, no Shizuku/root needed.
+            // Charge alarm — works on any device, no extra permission needed.
             val notifLauncher = rememberLauncherForActivityResult(
                 ActivityResultContracts.RequestPermission(),
             ) { /* result ignored: sound/vibration fire regardless */ }
@@ -142,50 +119,40 @@ fun ChargeLimitScreen(onBack: () -> Unit) {
                 )
             }
 
-            // Battery Saver: grant WRITE_SECURE_SETTINGS once for Shizuku-free toggling.
-            var hasSecure by remember { mutableStateOf(PowerSaver.hasWriteSecureSettings(context)) }
+            // One-time adb setup that unlocks the Battery Saver toggle and the
+            // one-tap accessibility enable. No root, no helper app.
             EInkCard {
                 Text(
-                    text = stringResource(R.string.battery_saver_perm_title),
+                    text = stringResource(R.string.adb_setup_title),
                     style = MaterialTheme.typography.titleMedium,
                 )
                 Spacer(Modifier.height(4.dp))
                 if (hasSecure) {
                     Text(
-                        text = stringResource(R.string.battery_saver_perm_granted),
+                        text = stringResource(R.string.adb_setup_granted),
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 } else {
                     Text(
-                        text = stringResource(R.string.battery_saver_perm_intro),
+                        text = stringResource(R.string.adb_setup_intro),
                         style = MaterialTheme.typography.bodyMedium,
                     )
-                    Spacer(Modifier.height(12.dp))
-                    if (!shizukuReady && ShizukuShell.isAvailable()) {
-                        EInkOutlinedButton(
-                            text = stringResource(R.string.charge_shizuku_grant),
-                            onClick = { ShizukuShell.requestPermission(SHIZUKU_REQUEST_CODE) },
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                        Spacer(Modifier.height(8.dp))
-                    }
-                    EInkButton(
-                        text = stringResource(R.string.battery_saver_perm_grant),
-                        onClick = {
-                            Thread {
-                                PowerSaver.grantPermanentAccess(context)
-                                val granted = PowerSaver.hasWriteSecureSettings(context)
-                                android.os.Handler(android.os.Looper.getMainLooper()).post {
-                                    hasSecure = granted
-                                }
-                            }.start()
-                        },
-                        enabled = shizukuReady,
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = PowerSaver.GRANT_COMMAND,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 11.sp,
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    EInkOutlinedButton(
+                        text = stringResource(R.string.adb_setup_copy),
+                        onClick = { clipboard.setText(AnnotatedString(PowerSaver.GRANT_COMMAND)) },
                         modifier = Modifier.fillMaxWidth(),
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        text = stringResource(R.string.shizuku_explainer),
+                        text = stringResource(R.string.adb_setup_note),
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }

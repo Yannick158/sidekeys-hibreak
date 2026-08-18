@@ -10,9 +10,9 @@
     <string name="service_inactive">Service not active</string>
     <string name="service_inactive_hint">To remap the side keys, SideKeys must be enabled as an accessibility service. Tap below and enable "SideKeys Button Mapper".\n\nIf the toggle is blocked ("Restricted setting"): open SideKeys app info → menu (⋮) → "Allow restricted settings" — Android requires this for sideloaded apps.</string>
     <string name="enable_service">Enable manually (settings)</string>
-    <string name="enable_service_shizuku">Enable in one tap (Shizuku / permission)</string>
+    <string name="enable_service_one_tap">Enable in one tap</string>
     <string name="enable_service_failed">Could not enable the service automatically.</string>
-    <string name="enable_service_needs_shizuku">Needs Shizuku running, or the permanent access granted once under Charge limit.</string>
+    <string name="enable_service_needs_setup">Needs the one-time adb setup — see Battery &amp; charge alarm.</string>
     <string name="add_key">+ Assign key</string>
     <string name="no_mappings_hint">No key assigned yet. Tap "Assign key" and then press one of the side keys of your HiBreak Pro.</string>
     <string name="delete">Delete</string>
@@ -96,12 +96,12 @@
 
     <!-- Activity picker -->
     <string name="activity_picker_title">Choose screen</string>
-    <string name="activity_picker_hint">Pick one of the app\'s screens (activities), or type a component below — e.g. com.openai.chatgpt/com.openai.voice.VoiceModeActivity. Non-exported screens need Shizuku to launch.</string>
+    <string name="activity_picker_hint">Pick one of the app\'s screens (activities), or type a component below — e.g. com.openai.chatgpt/com.openai.voice.VoiceModeActivity. Screens marked as internal cannot be opened by other apps.</string>
     <string name="activity_manual_label">Component (package/.Class)</string>
     <string name="activity_manual_use">Use this component</string>
-    <string name="activity_not_exported">not exported — needs Shizuku</string>
+    <string name="activity_not_exported">internal — cannot be opened</string>
     <string name="error_activity_invalid">Invalid component — expected package/.Class.</string>
-    <string name="error_activity_failed">Could not start that screen. Non-exported screens need Shizuku running.</string>
+    <string name="error_activity_failed">Could not start that screen. The app does not allow other apps to open it.</string>
     <string name="error_gesture_failed">Gesture could not be performed.</string>
 
     <!-- Per-app profiles -->
@@ -119,25 +119,26 @@
     <string name="battery_saver_on">Battery Saver on</string>
     <string name="battery_saver_off">Battery Saver off</string>
     <string name="battery_saver_manual">Opening Battery Saver settings…</string>
-    <string name="battery_saver_perm_title">Battery Saver without Shizuku</string>
-    <string name="battery_saver_perm_intro">Grant SideKeys the WRITE_SECURE_SETTINGS permission once (via Shizuku). Afterwards the Battery Saver key action and tile work natively — even when Shizuku is not running.</string>
-    <string name="battery_saver_perm_grant">Enable permanent access</string>
-    <string name="battery_saver_perm_granted">✓ Permanent access granted — Battery Saver works without Shizuku.</string>
+
+    <!-- One-time adb setup -->
+    <string name="adb_setup_title">Battery Saver toggle &amp; one-tap enable</string>
+    <string name="adb_setup_intro">These two extras need one permission that Android only grants from a computer. Connect the phone via USB with USB debugging on, then run this command once:</string>
+    <string name="adb_setup_copy">Copy command</string>
+    <string name="adb_setup_note">It stays granted until you uninstall the app. Everything else in SideKeys works without it.</string>
+    <string name="adb_setup_granted">✓ Set up — the Battery Saver key action, the quick tile and the one-tap enable are active.</string>
+    <string name="error_permission_required">Needs the one-time adb setup — see Battery &amp; charge alarm.</string>
 
     <!-- Battery screen / charge alarm -->
     <string name="battery_title">Battery</string>
     <string name="charge_limit_menu">Battery &amp; charge alarm</string>
-    <string name="charge_shizuku_grant">Grant Shizuku access</string>
     <string name="charge_alarm_enable">Charge alarm</string>
     <string name="charge_alarm_percent">Alert at %1$d%%</string>
-    <string name="charge_alarm_desc">Works on any device (no root/Shizuku). When plugged in and this level is reached, SideKeys plays a sound, vibrates and shows a notification so you can unplug.</string>
+    <string name="charge_alarm_desc">Works on any device (no root, no extra permission). When plugged in and this level is reached, SideKeys plays a sound, vibrates and shows a notification so you can unplug.</string>
     <string name="charge_alarm_channel">Charge alarm</string>
     <string name="charge_alarm_title">Time to unplug</string>
     <string name="charge_alarm_text">Battery reached %1$d%% — unplug to protect it.</string>
-    <string name="shizuku_explainer">Shizuku gives apps ADB-level permissions without root. You start it once via Wireless Debugging (no PC needed on Android 11+). SideKeys uses it to toggle Battery Saver.</string>
 
     <!-- Errors -->
-    <string name="error_shizuku_required">Battery Saver toggle needs Shizuku. Set it up under Charge limit.</string>
     <string name="error_assistant_not_available">No assistant found. Is the Google Assistant installed?</string>
     <string name="error_wallet_not_installed">Google Wallet is not installed.</string>
     <string name="error_app_not_found">App not found — has it been uninstalled?</string>

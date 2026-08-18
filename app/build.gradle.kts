@@ -14,8 +14,8 @@ android {
         applicationId = "com.sidekeys.hibreak"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 11
-        versionName = "1.3.0"
+        versionCode = 12
+        versionName = "1.4.0"
     }
 
     // The signing keystore lives OUTSIDE the repo tree so it can never be
@@ -98,9 +98,6 @@ dependencies {
 
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.datastore.preferences)
-
-    implementation(libs.shizuku.api)
-    implementation(libs.shizuku.provider)
 
     testImplementation(libs.junit)
 }

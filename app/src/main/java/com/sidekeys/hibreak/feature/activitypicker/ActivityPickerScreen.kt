@@ -57,7 +57,7 @@ private fun loadActivities(context: Context, packageName: String): List<Activity
 
 /**
  * Lets the user pick a specific screen (activity) of an app, or type a component
- * by hand — e.g. ChatGPT's voice mode, which is not exported and needs Shizuku.
+ * by hand. Screens an app marks as internal cannot be opened by other apps.
  */
 @Composable
 fun ActivityPickerScreen(

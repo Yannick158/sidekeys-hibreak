@@ -1,25 +1,28 @@
-## SideKeys v1.2.2
+## SideKeys v1.4.0
 
 Freely remap the two side keys of the **Bigme HiBreak Pro** — and the volume keys,
 or any hardware key — separately for single press, double press and long press.
 
-### New in 1.2.2 — keys no longer die when the app is "closed"
-Bigme's task manager force-stops apps swiped from recents, which killed the key
-service until it was toggled again (Key Mapper has the same problem). Now:
-- SideKeys **hides itself from the recent-apps list by default** (toggle in
-  Settings), so there is nothing to swipe away — open it from the app drawer.
-- **"Enable in one tap"** now does a real off→on toggle, so a killed service comes
-  straight back without visiting Accessibility settings.
+### New in 1.4.0
+- **Scroll up / down in any app** as key actions
+- **Launch a specific app screen (activity)** — pick from a list or type the
+  component by hand
+- **Per-app key profiles**: different actions while a chosen app is in the
+  foreground; empty slots fall back to the global mapping
+- **E-ink full refresh** (experimental)
+- **No helper app needed any more**: Shizuku support was removed. The two
+  features that need elevated rights use a one-time `adb pm grant` instead, shown
+  ready to copy inside the app.
 
-### New since 1.0
+### Earlier
+- Keys survive Bigme's task manager: SideKeys hides itself from recent apps by
+  default, and "Enable in one tap" restarts a killed service
 - **Volume Up / Down / Mute** and **Battery Saver** as actions
 - **Battery Saver Quick Settings tile** (the one the stock HiBreak Pro is missing)
 - **Charge alarm**: sound + vibration + notification at your chosen level so you
-  can unplug — works on any device, no root, no Shizuku
-- **One-tap accessibility enable** via Shizuku / permission (skips the
-  "Allow restricted settings" dance after updates)
-- **Battery Saver without Shizuku**: grant WRITE_SECURE_SETTINGS once, then the
-  toggle works natively
+  can unplug — works on any device, no root
+- **One-tap accessibility enable** (skips the "Allow restricted settings" dance
+  after updates)
 
 ### Features
 - Launch Google Assistant, open Google Wallet, launch any app

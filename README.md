@@ -30,13 +30,22 @@ launch apps** — exactly the gap SideKeys fills.
 
 - **Charge alarm**: get a sound + vibration + notification when the battery
   reaches a level you pick while plugged in, so you can unplug to protect it.
-  Works on any device — no root, no Shizuku.
+  Works on any device — no root, no helper app.
 - **Battery Saver toggle** — as a key action and as a **Quick Settings tile**
-  (the tile the HiBreak Pro's stock quick settings is missing). Needs
-  [Shizuku](https://shizuku.rikka.app/) once; grant WRITE_SECURE_SETTINGS in the
-  app and it then works natively, even without Shizuku running.
-- **One-tap accessibility enable** (with Shizuku / the granted permission) so you
-  don't have to redo the "Allow restricted settings" dance after every update.
+  (the tile the HiBreak Pro's stock quick settings is missing).
+- **One-tap accessibility enable** so you don't have to redo the
+  "Allow restricted settings" dance after every update.
+
+The last two need one permission that Android only grants from a computer. Run
+this once (USB debugging on), then both work permanently — **no root and no
+helper app such as Shizuku**:
+
+```bash
+adb shell pm grant com.sidekeys.hibreak android.permission.WRITE_SECURE_SETTINGS
+```
+
+The command is also shown, ready to copy, under **Battery & charge alarm** in the
+app. Everything else works without it.
 
 > Note: a true hardware **charge limit** (stop charging at X%) is **not possible
 > on the Bigme HiBreak Pro** — its kernel exposes no writable charging-control
@@ -53,9 +62,9 @@ launch apps** — exactly the gap SideKeys fills.
 4. **Android 13/14, "Restricted setting":** for sideloaded apps Android blocks
    the accessibility toggle at first. Fix: open SideKeys app info →
    menu (⋮) top right → **"Allow restricted settings"** → then enable the
-   accessibility service. (With Shizuku set up, the app's **"Enable in one tap"**
-   button skips this on future updates. Installing updates via `adb install -r`
-   or Shizuku avoids the prompt entirely.)
+   accessibility service. (After the one-time `pm grant` above, the app's
+   **"Enable in one tap"** button skips this on future updates. Installing
+   updates via `adb install -r` avoids the prompt entirely.)
 
 ```bash
 adb install SideKeys-release.apk

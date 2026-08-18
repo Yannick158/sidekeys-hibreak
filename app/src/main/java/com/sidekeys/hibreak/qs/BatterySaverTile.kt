@@ -3,19 +3,17 @@ package com.sidekeys.hibreak.qs
 import android.app.PendingIntent
 import android.content.Intent
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.provider.Settings
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import com.sidekeys.hibreak.service.PowerSaver
-import com.sidekeys.hibreak.service.ShizukuShell
 
 /**
  * A Quick Settings tile that toggles Battery Saver — the tile the HiBreak Pro's
- * stock quick settings is missing. Toggling goes through Shizuku, so if Shizuku
- * isn't set up the tile stays unavailable and points the user to accessibility
- * settings instead of failing silently.
+ * stock quick settings is missing.
+ *
+ * Toggling needs WRITE_SECURE_SETTINGS (granted once via adb). Without it the
+ * tile opens the Battery Saver settings page instead of failing silently.
  */
 class BatterySaverTile : TileService() {
 
@@ -26,25 +24,14 @@ class BatterySaverTile : TileService() {
 
     override fun onClick() {
         super.onClick()
-        // Native path: instant, no Shizuku needed.
-        if (PowerSaver.hasWriteSecureSettings(this)) {
-            val target = !PowerSaver.isEnabled(this)
-            PowerSaver.setEnabled(this, target)
-            applyState(ready = true, on = target)
+        if (!PowerSaver.canToggle(this)) {
+            openSettings()
             return
         }
-        // Live Shizuku path (blocks): run off the main thread.
-        if (ShizukuShell.isAvailable() && ShizukuShell.isPermissionGranted()) {
-            Thread {
-                val newState = PowerSaver.toggle(this)
-                Handler(Looper.getMainLooper()).post {
-                    if (newState != null) applyState(ready = true, on = newState) else refresh()
-                }
-            }.start()
-            return
-        }
-        // No privilege: open Battery Saver settings so the user can toggle it.
-        openSettings()
+        val target = !PowerSaver.isEnabled(this)
+        PowerSaver.setEnabled(this, target)
+        // Reflect the intended state immediately; isPowerSaveMode can lag the write.
+        applyState(ready = true, on = target)
     }
 
     private fun openSettings() {

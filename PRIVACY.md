@@ -43,14 +43,14 @@ The service is used strictly for this narrow purpose:
 The service does **not** read, log, store or transmit screen content, text you
 type, passwords, or any other information from other apps.
 
-## Optional: Shizuku
+## Optional: WRITE_SECURE_SETTINGS
 
-Some optional convenience features (toggling Battery Saver, enabling the
-accessibility service in one tap, launching non-exported app screens) use
-[Shizuku](https://shizuku.rikka.app/), a separate app you install yourself.
-Shizuku lets SideKeys run specific system commands locally on your device.
-No data leaves the device. If you do not install Shizuku, every other feature
-still works.
+Two optional convenience features (toggling Battery Saver and enabling the
+accessibility service in one tap) require the `WRITE_SECURE_SETTINGS`
+permission, which you grant yourself once from a computer via adb. It is used
+solely to write two system settings on your own device (`low_power` and the
+accessibility service list). No data leaves the device, and no third-party
+helper app is involved. Without it, every other feature still works.
 
 ## Permissions
 

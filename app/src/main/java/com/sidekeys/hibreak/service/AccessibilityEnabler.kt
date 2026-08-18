@@ -9,9 +9,7 @@ import android.provider.Settings
  * "Allow restricted settings" → toggle dance that Android 13+ requires for
  * sideloaded apps after every update.
  *
- * Uses the WRITE_SECURE_SETTINGS permission (if granted) or Shizuku to write the
- * accessibility secure settings directly — the same effect the settings UI has,
- * but in one tap and not subject to the restricted-settings UI gate.
+ * Needs WRITE_SECURE_SETTINGS, granted once via adb (see [PowerSaver.GRANT_COMMAND]).
  */
 object AccessibilityEnabler {
 
@@ -21,8 +19,8 @@ object AccessibilityEnabler {
     fun component(context: Context): String =
         ComponentName(context, KeyInterceptorService::class.java).flattenToString()
 
-    /** True if we can do this right now (native permission or live Shizuku). */
-    fun canEnable(context: Context): Boolean = PowerSaver.canToggle(context)
+    /** True if we hold the permission needed to do this. */
+    fun canEnable(context: Context): Boolean = PowerSaver.hasWriteSecureSettings(context)
 
     /**
      * Enables — or, if already listed, RESTARTS — the service. Returns true on success.
@@ -33,41 +31,19 @@ object AccessibilityEnabler {
      * the same value would be a no-op, so we remove and re-add ourselves.
      */
     fun enable(context: Context): Boolean {
+        if (!canEnable(context)) return false
         val comp = component(context)
-        // Native path via WRITE_SECURE_SETTINGS.
-        if (PowerSaver.hasWriteSecureSettings(context)) {
-            return runCatching {
-                val resolver = context.contentResolver
-                val current = Settings.Secure.getString(resolver, ENABLED_SERVICES).orEmpty()
-                val without = withoutService(current, comp)
-                if (without != current) {
-                    Settings.Secure.putString(resolver, ENABLED_SERVICES, without)
-                }
-                Settings.Secure.putString(resolver, ENABLED_SERVICES, mergeService(without, comp))
-                Settings.Secure.putInt(resolver, ACCESSIBILITY_ON, 1)
-                true
-            }.getOrDefault(false)
-        }
-        // Shizuku path: same off→on toggle in shell.
-        if (ShizukuShell.isAvailable() && ShizukuShell.isPermissionGranted()) {
-            val script = """
-                cur=${'$'}(settings get secure $ENABLED_SERVICES)
-                comp='$comp'
-                [ "${'$'}cur" = "null" ] && cur=""
-                # remove ourselves (if present)
-                without=${'$'}(echo "${'$'}cur" | tr ':' '\n' | grep -v -x -F "${'$'}comp" | grep -v '^${'$'}' | paste -sd: -)
-                if [ "${'$'}without" != "${'$'}cur" ]; then
-                  settings put secure $ENABLED_SERVICES "${'$'}without"
-                fi
-                # re-add
-                if [ -z "${'$'}without" ]; then new="${'$'}comp"; else new="${'$'}without:${'$'}comp"; fi
-                settings put secure $ENABLED_SERVICES "${'$'}new"
-                settings put secure $ACCESSIBILITY_ON 1
-                echo ok
-            """.trimIndent()
-            return ShizukuShell.run(script).stdout.trim().endsWith("ok")
-        }
-        return false
+        return runCatching {
+            val resolver = context.contentResolver
+            val current = Settings.Secure.getString(resolver, ENABLED_SERVICES).orEmpty()
+            val without = withoutService(current, comp)
+            if (without != current) {
+                Settings.Secure.putString(resolver, ENABLED_SERVICES, without)
+            }
+            Settings.Secure.putString(resolver, ENABLED_SERVICES, mergeService(without, comp))
+            Settings.Secure.putInt(resolver, ACCESSIBILITY_ON, 1)
+            true
+        }.getOrDefault(false)
     }
 
     private fun withoutService(current: String, comp: String): String {

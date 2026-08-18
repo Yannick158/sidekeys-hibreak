@@ -12,14 +12,15 @@ Two things are genuinely risky:
 
 ### 1. `WRITE_SECURE_SETTINGS` — recommended to remove for the Play build
 
-The app declares this permission and grants it to itself via Shizuku. It is a
-`signature|privileged` permission that a normal app can never legitimately hold.
-To a Play reviewer this looks like circumventing the permission model, and it is
-the single most likely reason for rejection.
+The app declares this permission; the user grants it themselves via adb. It is a
+`signature|privileged` permission that a normal app can never hold through the
+Play install flow. To a Play reviewer this can look like circumventing the
+permission model, and it is the single most likely reason for rejection.
 
-**Affected features if removed:** "Battery Saver without Shizuku" and the
-"Enable in one tap" shortcut still work, but only while Shizuku is actively
-running (they lose the permanent, Shizuku-free mode).
+**Affected features if removed:** the Battery Saver key action and the quick tile
+would only open the Battery Saver settings page, and "Enable in one tap" would
+fall back to the manual accessibility settings route. Everything else is
+unaffected.
 
 ### 2. Accessibility API declaration
 

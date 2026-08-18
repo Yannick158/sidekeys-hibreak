@@ -92,10 +92,10 @@ fun HomeScreen(
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     Spacer(Modifier.height(12.dp))
-                    // One-tap enable via Shizuku / WRITE_SECURE_SETTINGS — skips the
+                    // One-tap enable via WRITE_SECURE_SETTINGS (granted once via adb) — skips the
                     // "Allow restricted settings" dance that Android re-arms on every update.
                     EInkButton(
-                        text = stringResource(R.string.enable_service_shizuku),
+                        text = stringResource(R.string.enable_service_one_tap),
                         onClick = {
                             if (AccessibilityEnabler.canEnable(context)) {
                                 Thread {
@@ -107,7 +107,7 @@ fun HomeScreen(
                                     }
                                 }.start()
                             } else {
-                                Toast.makeText(context, R.string.enable_service_needs_shizuku, Toast.LENGTH_LONG).show()
+                                Toast.makeText(context, R.string.enable_service_needs_setup, Toast.LENGTH_LONG).show()
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),

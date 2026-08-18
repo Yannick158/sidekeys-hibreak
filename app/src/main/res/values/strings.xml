@@ -158,12 +158,12 @@
 
     <!-- Quick Settings tile installer -->
     <string name="qs_tile_title">Battery Saver tile in Quick Settings</string>
-    <string name="qs_tile_intro">Some firmwares (e.g. Bigme\'s) hide the "edit tiles" button, so third-party tiles can never be added by hand. SideKeys can add its tile for you instead: first via Android\'s own add-tile dialog, otherwise by editing the panel\'s tile list through Shizuku (Android 14 allows that only for a privileged shell).</string>
+    <string name="qs_tile_intro">SideKeys can register its tile even where the panel hides the "edit tiles" button. Note for Bigme devices: their panel draws its own fixed set of tiles and ignores the system tile list entirely, so a tile added here will not become visible — confirmed on the HiBreak Pro. Map Battery Saver to a key instead.</string>
     <string name="qs_tile_state_listed">The tile is in the panel\'s tile list. Pull the shade down twice to check — if it isn\'t visible, this firmware ignores the list.</string>
     <string name="qs_tile_state_registered">✓ The system registered the tile. If it still does not appear in the panel, this firmware draws its own fixed set of tiles and ignores registered ones — nothing an app can change. Use the key action instead.</string>
     <string name="qs_tile_add">Add tile to Quick Settings</string>
     <string name="qs_tile_remove">Remove tile again</string>
-    <string name="qs_tile_note">Nothing else in the app depends on the tile — mapping Battery Saver to a key always works.</string>
+    <string name="qs_tile_note">Nothing else in the app depends on the tile — mapping Battery Saver to a key always works, and is the reliable route on firmwares with a custom panel.</string>
     <string name="qs_tile_msg_added">✓ Added.</string>
     <string name="qs_tile_msg_declined">You declined the system dialog. Tap again to retry.</string>
     <string name="qs_tile_msg_need_shell">This firmware has no add-tile dialog, and Android 14 only lets a privileged shell edit the tile list. Start Shizuku and tap again — or run this from a computer:</string>

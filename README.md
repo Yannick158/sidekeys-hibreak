@@ -36,8 +36,8 @@ other devices are welcome.
 - **Charge alarm**: get a sound + vibration + notification when the battery
   reaches a level you pick while plugged in, so you can unplug to protect it.
   Works on any device — no root, no helper app.
-- **Battery Saver toggle** — as a key action and as a **Quick Settings tile**
-  (many E-Ink firmwares, including the HiBreak Pro's, are missing this tile).
+- **Battery Saver toggle** — as a key action (and as a Quick Settings tile on
+  firmwares that use the standard panel; see the device note below).
 - **One-tap accessibility enable** so you don't have to redo the
   "Allow restricted settings" dance after every update.
 
@@ -117,6 +117,13 @@ Good to know:
   (e.g. page turn / E Ink Center) interferes — long press works because usually
   no Bigme action sits there. Fix: in the Bigme settings under "Custom key" set
   **both Single Tap and Long Press to "None"** for both keys.
+- **Quick Settings tiles from apps never appear.** Not a bug in the app: Bigme's
+  panel draws its own fixed set of tiles and ignores the system tile list. The
+  tile *is* registered — AOSP's SystemUI loads it, and Google's own tiles sit
+  unused in that list too — but the visible panel never reads it, and Bigme's
+  "Power Management" tile is not in that list at all. Verified by moving the
+  stock Battery Saver tile to position 1: still invisible. Map Battery Saver to
+  a key instead.
 - **Disable DuraSpeed:** the MediaTek "DuraSpeed" feature aggressively kills
   background apps and can hit the SideKeys service too. Turn it off via ADB:
 

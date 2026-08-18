@@ -16,3 +16,7 @@ keystore/
 
 # Built artifacts
 *.apk
+
+# Personal drafts — not part of the app
+reddit-post.md
+reddit-reply-force-stop.md

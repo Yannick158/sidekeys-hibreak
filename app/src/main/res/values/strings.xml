@@ -158,7 +158,7 @@
 
     <!-- Quick Settings tile installer -->
     <string name="qs_tile_title">Battery Saver tile in Quick Settings</string>
-    <string name="qs_tile_intro">Some firmwares (e.g. Bigme\'s) hide the "edit tiles" button, so third-party tiles can never be added by hand. SideKeys can add its tile for you instead: first via Android\'s own add-tile dialog, otherwise by writing it into the panel\'s tile list directly (needs the permission above).</string>
+    <string name="qs_tile_intro">Some firmwares (e.g. Bigme\'s) hide the "edit tiles" button, so third-party tiles can never be added by hand. SideKeys can add its tile for you instead: first via Android\'s own add-tile dialog, otherwise by editing the panel\'s tile list through Shizuku (Android 14 allows that only for a privileged shell).</string>
     <string name="qs_tile_state_listed">The tile is in the panel\'s tile list. Pull the shade down twice to check — if it isn\'t visible, this firmware ignores the list.</string>
     <string name="qs_tile_state_added">✓ Tile added — the system confirmed it. Pull the shade down to use it.</string>
     <string name="qs_tile_add">Add tile to Quick Settings</string>
@@ -166,7 +166,8 @@
     <string name="qs_tile_note">Nothing else in the app depends on the tile — mapping Battery Saver to a key always works.</string>
     <string name="qs_tile_msg_added">✓ Added.</string>
     <string name="qs_tile_msg_declined">You declined the system dialog. Tap again to retry.</string>
-    <string name="qs_tile_msg_need_permission">This firmware has no add-tile dialog. Set up the permission above (Shizuku or adb), then tap again — SideKeys will write the tile into the panel\'s list itself.</string>
+    <string name="qs_tile_msg_need_shell">This firmware has no add-tile dialog, and Android 14 only lets a privileged shell edit the tile list. Start Shizuku and tap again — or run this from a computer:</string>
     <string name="qs_tile_msg_write_failed">Could not write the tile list.</string>
     <string name="qs_tile_msg_written_unconfirmed">Written to the tile list, but the system did not confirm adding it. Pull the shade down twice — if the tile isn\'t there, this panel does not read the list.</string>
+    <string name="qs_tile_working">Adding…</string>
 </resources>

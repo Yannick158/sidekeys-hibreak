@@ -21,6 +21,7 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -48,6 +49,8 @@ import com.sidekeys.hibreak.qs.BatterySaverTile
 import com.sidekeys.hibreak.service.PowerSaver
 import com.sidekeys.hibreak.service.QsTileInstaller
 import com.sidekeys.hibreak.service.ShizukuShell
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import rikka.shizuku.Shizuku
 
 private const val SHIZUKU_REQUEST_CODE = 4213
@@ -237,13 +240,25 @@ fun ChargeLimitScreen(onBack: () -> Unit) {
             }
             // Quick Settings tile — for panels that hide the "edit tiles" UI
             // (Bigme). Route 1: the official Android 13+ add-tile dialog.
-            // Route 2: write the tile spec into sysui_qs_tiles directly (needs
-            // the same permission as the toggle). Success is confirmed by the
-            // tile's own onTileAdded callback, never assumed.
+            // Route 2: edit sysui_qs_tiles through a shell (Shizuku) — Android 14
+            // forbids apps from even READING that setting, so this must never run
+            // during composition; all state is loaded in a background effect.
             var tileAdded by remember { mutableStateOf(BatterySaverTile.isAdded(context)) }
-            var tileListed by remember { mutableStateOf(QsTileInstaller.isListed(context)) }
+            var tileListed by remember { mutableStateOf<Boolean?>(null) }
             var tileMsg by remember { mutableIntStateOf(0) }
-            val canWrite = hasSecure || shizukuReady
+            var tileBusy by remember { mutableStateOf(false) }
+            LaunchedEffect(shizukuReady) {
+                tileListed = withContext(Dispatchers.IO) {
+                    runCatching { QsTileInstaller.isListed(context) }.getOrNull()
+                }
+            }
+            val refreshTile: () -> Unit = {
+                tileAdded = BatterySaverTile.isAdded(context)
+                Thread {
+                    val listed = runCatching { QsTileInstaller.isListed(context) }.getOrNull()
+                    android.os.Handler(android.os.Looper.getMainLooper()).post { tileListed = listed }
+                }.start()
+            }
             EInkCard {
                 Text(
                     text = stringResource(R.string.qs_tile_title),
@@ -253,7 +268,7 @@ fun ChargeLimitScreen(onBack: () -> Unit) {
                 Text(
                     text = when {
                         tileAdded -> stringResource(R.string.qs_tile_state_added)
-                        tileListed -> stringResource(R.string.qs_tile_state_listed)
+                        tileListed == true -> stringResource(R.string.qs_tile_state_listed)
                         else -> stringResource(R.string.qs_tile_intro)
                     },
                     style = MaterialTheme.typography.bodyMedium,
@@ -265,13 +280,14 @@ fun ChargeLimitScreen(onBack: () -> Unit) {
                 Spacer(Modifier.height(12.dp))
                 if (!tileAdded) {
                     EInkButton(
-                        text = stringResource(R.string.qs_tile_add),
+                        text = stringResource(
+                            if (tileBusy) R.string.qs_tile_working else R.string.qs_tile_add,
+                        ),
+                        enabled = !tileBusy,
                         onClick = {
+                            tileBusy = true
+                            tileMsg = 0
                             val main = android.os.Handler(android.os.Looper.getMainLooper())
-                            val refresh = {
-                                tileAdded = BatterySaverTile.isAdded(context)
-                                tileListed = QsTileInstaller.isListed(context)
-                            }
                             // Route 1: system dialog.
                             QsTileInstaller.requestViaSystemDialog(context, { it.run() }) { result ->
                                 main.post {
@@ -279,39 +295,41 @@ fun ChargeLimitScreen(onBack: () -> Unit) {
                                         QsTileInstaller.DialogResult.ADDED,
                                         QsTileInstaller.DialogResult.ALREADY_ADDED -> {
                                             tileMsg = R.string.qs_tile_msg_added
-                                            refresh()
+                                            tileBusy = false
+                                            refreshTile()
                                         }
                                         QsTileInstaller.DialogResult.DECLINED -> {
                                             tileMsg = R.string.qs_tile_msg_declined
+                                            tileBusy = false
                                         }
                                         QsTileInstaller.DialogResult.UNSUPPORTED -> {
-                                            // Route 2: write the setting ourselves.
-                                            if (!canWrite) {
-                                                tileMsg = R.string.qs_tile_msg_need_permission
-                                            } else {
-                                                Thread {
-                                                    val ok = QsTileInstaller.addViaSecureSettings(context)
+                                            // Route 2: edit the tile list through the shell.
+                                            Thread {
+                                                val res = runCatching { QsTileInstaller.addViaShell(context) }
+                                                    .getOrDefault(QsTileInstaller.ShellResult.WRITE_FAILED)
+                                                var confirmed = false
+                                                if (res == QsTileInstaller.ShellResult.OK) {
                                                     // SystemUI needs a moment to pick the change up.
-                                                    var added = false
-                                                    if (ok) {
-                                                        repeat(12) {
-                                                            if (BatterySaverTile.isAdded(context)) {
-                                                                added = true
-                                                                return@repeat
-                                                            }
-                                                            Thread.sleep(250)
+                                                    repeat(12) {
+                                                        if (BatterySaverTile.isAdded(context)) {
+                                                            confirmed = true
+                                                            return@repeat
                                                         }
+                                                        Thread.sleep(250)
                                                     }
-                                                    main.post {
-                                                        tileMsg = when {
-                                                            !ok -> R.string.qs_tile_msg_write_failed
-                                                            added -> R.string.qs_tile_msg_added
-                                                            else -> R.string.qs_tile_msg_written_unconfirmed
-                                                        }
-                                                        refresh()
+                                                }
+                                                main.post {
+                                                    tileMsg = when (res) {
+                                                        QsTileInstaller.ShellResult.NO_SHELL -> R.string.qs_tile_msg_need_shell
+                                                        QsTileInstaller.ShellResult.WRITE_FAILED -> R.string.qs_tile_msg_write_failed
+                                                        QsTileInstaller.ShellResult.OK ->
+                                                            if (confirmed) R.string.qs_tile_msg_added
+                                                            else R.string.qs_tile_msg_written_unconfirmed
                                                     }
-                                                }.start()
-                                            }
+                                                    tileBusy = false
+                                                    refreshTile()
+                                                }
+                                            }.start()
                                         }
                                     }
                                 }
@@ -319,22 +337,36 @@ fun ChargeLimitScreen(onBack: () -> Unit) {
                         },
                         modifier = Modifier.fillMaxWidth(),
                     )
+                    if (tileMsg == R.string.qs_tile_msg_need_shell) {
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = QsTileInstaller.adbCommand(context),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 11.sp,
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        EInkOutlinedButton(
+                            text = stringResource(R.string.adb_setup_copy),
+                            onClick = { clipboard.setText(AnnotatedString(QsTileInstaller.adbCommand(context))) },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
                 }
-                if (tileAdded || tileListed) {
+                if (tileAdded || tileListed == true) {
                     Spacer(Modifier.height(8.dp))
                     EInkOutlinedButton(
                         text = stringResource(R.string.qs_tile_remove),
+                        enabled = shizukuReady && !tileBusy,
                         onClick = {
                             Thread {
-                                QsTileInstaller.removeViaSecureSettings(context)
+                                runCatching { QsTileInstaller.removeViaShell(context) }
                                 android.os.Handler(android.os.Looper.getMainLooper()).post {
-                                    tileAdded = BatterySaverTile.isAdded(context)
-                                    tileListed = QsTileInstaller.isListed(context)
                                     tileMsg = 0
+                                    refreshTile()
                                 }
                             }.start()
                         },
-                        enabled = canWrite,
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }

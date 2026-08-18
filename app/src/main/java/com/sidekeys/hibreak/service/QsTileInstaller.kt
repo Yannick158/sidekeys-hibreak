@@ -18,10 +18,13 @@ import java.util.concurrent.Executor
  *  1. [requestViaSystemDialog] — the official Android 13+ API. Needs no
  *     permission; the system shows an "Add tile?" dialog. Only works if the
  *     firmware's SystemUI implements it.
- *  2. [addViaSecureSettings] — writes the tile spec straight into the
- *     `sysui_qs_tiles` secure setting, which is where the panel stores its tile
- *     list. Bypasses the edit UI entirely. Needs WRITE_SECURE_SETTINGS (adb or
- *     Shizuku), which SideKeys may already hold.
+ *  2. [addViaShell] — edits the `sysui_qs_tiles` secure setting, where the
+ *     panel stores its tile list. Bypasses the edit UI entirely.
+ *
+ * Android 14 forbids apps targeting SDK 34 from *reading* `sysui_qs_tiles`
+ * (SecurityException), so route 2 goes through a shell (Shizuku) which may.
+ * Every call here is safe to invoke from anywhere — nothing throws — but the
+ * shell calls block and must run off the main thread.
  *
  * Whether the tile actually appears is confirmed by [BatterySaverTile.onTileAdded],
  * not assumed.
@@ -29,11 +32,14 @@ import java.util.concurrent.Executor
 object QsTileInstaller {
 
     private const val QS_TILES = "sysui_qs_tiles"
-    private const val SYSTEMUI = "com.android.systemui"
 
     fun component(context: Context) = ComponentName(context, BatterySaverTile::class.java)
 
     fun spec(context: Context): String = "custom(${component(context).flattenToString()})"
+
+    /** For users who granted rights via adb instead of Shizuku. */
+    fun adbCommand(context: Context): String =
+        "adb shell 'settings put secure $QS_TILES \"${spec(context)},\$(settings get secure $QS_TILES)\"'"
 
     /** Result of the system-dialog route. */
     enum class DialogResult { ADDED, ALREADY_ADDED, DECLINED, UNSUPPORTED }
@@ -67,49 +73,56 @@ object QsTileInstaller {
         }.onFailure { onResult(DialogResult.UNSUPPORTED) }
     }
 
-    /** Current tile list, or SystemUI's built-in default when the setting is unset. */
-    fun currentTiles(context: Context): List<String> {
-        val stored = Settings.Secure.getString(context.contentResolver, QS_TILES)
-        val raw = if (stored.isNullOrBlank()) systemUiDefaultTiles(context) else stored
+    private fun shellReady() = ShizukuShell.isAvailable() && ShizukuShell.isPermissionGranted()
+
+    /**
+     * Current tile list, or null if it cannot be read (Android 14 restriction
+     * and no shell available). Blocking when it has to go through the shell.
+     */
+    fun currentTiles(context: Context): List<String>? {
+        // Direct read: works on Android 13 and below.
+        val direct = runCatching { Settings.Secure.getString(context.contentResolver, QS_TILES) }
+        if (direct.isSuccess) return parse(direct.getOrNull())
+        // Android 14+: only a shell may read it.
+        if (!shellReady()) return null
+        val r = ShizukuShell.run("settings get secure $QS_TILES")
+        if (!r.ok) return null
+        return parse(r.stdout)
+    }
+
+    private fun parse(raw: String?): List<String> {
+        if (raw.isNullOrBlank() || raw.trim() == "null") return emptyList()
         return raw.split(',').map { it.trim() }.filter { it.isNotEmpty() }
     }
 
-    private fun systemUiDefaultTiles(context: Context): String = runCatching {
-        val res = context.packageManager.getResourcesForApplication(SYSTEMUI)
-        val id = res.getIdentifier("quick_settings_tiles_default", "string", SYSTEMUI)
-        if (id != 0) res.getString(id) else ""
-    }.getOrDefault("")
+    /** True/false if known, null if the list cannot be read right now. Blocking. */
+    fun isListed(context: Context): Boolean? = currentTiles(context)?.let { spec(context) in it }
 
-    fun isListed(context: Context): Boolean = spec(context) in currentTiles(context)
+    enum class ShellResult { OK, NO_SHELL, WRITE_FAILED }
 
     /**
      * Prepends our tile to the list (front, so it is visible even in a collapsed
-     * panel that only shows the first row). Returns true if the write succeeded.
+     * panel that only shows the first row). Blocking.
      */
-    fun addViaSecureSettings(context: Context): Boolean {
-        val tiles = currentTiles(context)
+    fun addViaShell(context: Context): ShellResult {
+        if (!shellReady()) return ShellResult.NO_SHELL
+        val tiles = currentTiles(context) ?: return ShellResult.NO_SHELL
         val ours = spec(context)
-        if (ours in tiles) return true
-        return writeTiles(context, listOf(ours) + tiles)
+        if (ours in tiles) return ShellResult.OK
+        return write(listOf(ours) + tiles)
     }
 
-    fun removeViaSecureSettings(context: Context): Boolean {
-        val tiles = currentTiles(context)
+    fun removeViaShell(context: Context): ShellResult {
+        if (!shellReady()) return ShellResult.NO_SHELL
+        val tiles = currentTiles(context) ?: return ShellResult.NO_SHELL
         val ours = spec(context)
-        if (ours !in tiles) return true
-        return writeTiles(context, tiles - ours)
+        if (ours !in tiles) return ShellResult.OK
+        return write(tiles - ours)
     }
 
-    private fun writeTiles(context: Context, tiles: List<String>): Boolean {
+    private fun write(tiles: List<String>): ShellResult {
         val value = tiles.joinToString(",")
-        if (PowerSaver.hasWriteSecureSettings(context)) {
-            val ok = runCatching { Settings.Secure.putString(context.contentResolver, QS_TILES, value) }
-                .getOrDefault(false)
-            if (ok) return true
-        }
-        if (ShizukuShell.isAvailable() && ShizukuShell.isPermissionGranted()) {
-            return ShizukuShell.run("settings put secure $QS_TILES '$value'").ok
-        }
-        return false
+        val ok = ShizukuShell.run("settings put secure $QS_TILES '$value'").ok
+        return if (ok) ShellResult.OK else ShellResult.WRITE_FAILED
     }
 }

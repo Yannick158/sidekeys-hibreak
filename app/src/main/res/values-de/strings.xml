@@ -158,7 +158,7 @@
 
     <!-- Quick-Settings-Kachel einrichten -->
     <string name="qs_tile_title">Energiesparmodus-Kachel in den Schnelleinstellungen</string>
-    <string name="qs_tile_intro">Manche Firmwares (z. B. Bigme) blenden den „Kacheln bearbeiten"-Knopf aus, sodass sich Fremd-Kacheln nie von Hand hinzufügen lassen. SideKeys kann seine Kachel stattdessen selbst eintragen: zuerst über Androids eigenen Hinzufügen-Dialog, sonst direkt in die Kachelliste des Panels (braucht die Berechtigung von oben).</string>
+    <string name="qs_tile_intro">Manche Firmwares (z. B. Bigme) blenden den „Kacheln bearbeiten"-Knopf aus, sodass sich Fremd-Kacheln nie von Hand hinzufügen lassen. SideKeys kann seine Kachel stattdessen selbst eintragen: zuerst über Androids eigenen Hinzufügen-Dialog, sonst über Shizuku in die Kachelliste des Panels (Android 14 erlaubt das nur einer privilegierten Shell).</string>
     <string name="qs_tile_state_listed">Die Kachel steht in der Kachelliste des Panels. Zieh die Leiste zweimal herunter — ist sie nicht zu sehen, ignoriert diese Firmware die Liste.</string>
     <string name="qs_tile_state_added">✓ Kachel hinzugefügt — vom System bestätigt. Zieh die Leiste herunter, um sie zu nutzen.</string>
     <string name="qs_tile_add">Kachel zu den Schnelleinstellungen hinzufügen</string>
@@ -166,7 +166,8 @@
     <string name="qs_tile_note">Nichts sonst in der App hängt an der Kachel — den Energiesparmodus auf eine Taste zu legen funktioniert immer.</string>
     <string name="qs_tile_msg_added">✓ Hinzugefügt.</string>
     <string name="qs_tile_msg_declined">Du hast den System-Dialog abgelehnt. Nochmal tippen zum Wiederholen.</string>
-    <string name="qs_tile_msg_need_permission">Diese Firmware hat keinen Hinzufügen-Dialog. Richte oben die Berechtigung ein (Shizuku oder ADB) und tippe erneut — dann trägt SideKeys die Kachel selbst in die Liste ein.</string>
+    <string name="qs_tile_msg_need_shell">Diese Firmware hat keinen Hinzufügen-Dialog, und Android 14 lässt die Kachelliste nur von einer privilegierten Shell bearbeiten. Starte Shizuku und tippe erneut — oder führe das am Computer aus:</string>
     <string name="qs_tile_msg_write_failed">Kachelliste konnte nicht geschrieben werden.</string>
     <string name="qs_tile_msg_written_unconfirmed">In die Kachelliste geschrieben, aber das System hat das Hinzufügen nicht bestätigt. Zieh die Leiste zweimal herunter — fehlt die Kachel, liest dieses Panel die Liste nicht.</string>
+    <string name="qs_tile_working">Wird hinzugefügt…</string>
 </resources>

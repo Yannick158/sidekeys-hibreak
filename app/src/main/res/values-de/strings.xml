@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">SideKeys</string>
     <string name="service_label">SideKeys Tastenbelegung</string>
-    <string name="service_summary">Belegt die Seitentasten des HiBreak Pro mit eigenen Funktionen</string>
+    <string name="service_summary">Belegt Hardware-Tasten mit eigenen Funktionen</string>
     <string name="service_description">SideKeys fängt die Hardware-Seitentasten ab und führt die von dir gewählten Aktionen aus (z. B. Google Assistant, Google Wallet oder App-Start). Der Dienst liest keine Bildschirminhalte und sammelt keine Daten.</string>
 
     <!-- Home -->
@@ -18,7 +18,7 @@
     <string name="restart_service_ok">✓ Dienst läuft wieder</string>
     <string name="restart_service_failed">Neustart hat nicht geklappt — bitte über Schritt 2 SideKeys aus- und einschalten.</string>
     <string name="add_key">+ Taste zuordnen</string>
-    <string name="no_mappings_hint">Noch keine Taste belegt. Tippe auf „Taste zuordnen" und drücke dann eine der Seitentasten deines HiBreak Pro.</string>
+    <string name="no_mappings_hint">Noch keine Taste belegt. Tippe auf „Taste zuordnen" und drücke dann eine Hardware-Taste deines Handys.</string>
     <string name="delete">Löschen</string>
     <string name="cancel">Abbrechen</string>
     <string name="ok">OK</string>
@@ -30,7 +30,7 @@
     <!-- Capture -->
     <string name="capture_title">Taste erfassen</string>
     <string name="capture_prompt">Drücke jetzt die Seitentaste, die du belegen möchtest</string>
-    <string name="capture_hint">Funktioniert mit beiden Zusatztasten des HiBreak Pro — und auch mit anderen Hardware-Tasten.</string>
+    <string name="capture_hint">Funktioniert mit Zusatz-Seitentasten, Lautstärketasten und den meisten anderen Hardware-Tasten.</string>
     <string name="capture_service_hint">Hinweis: Die Erfassung funktioniert auch jetzt schon. Damit die Taste später systemweit reagiert, muss aber die Bedienungshilfe aktiviert sein.</string>
     <string name="key_generic">Taste %1$d</string>
 
@@ -87,12 +87,12 @@
     <string name="setting_haptic">Vibration bei Tastendruck</string>
     <string name="double_press_note">Hinweis: Ist ein Doppeldruck belegt, wird der einfache Druck erst nach diesem Zeitfenster ausgelöst.</string>
     <string name="setting_debounce">Tasten-Entprellung</string>
-    <string name="debounce_note">Die Seitentasten des HiBreak Pro lösen manchmal doppelt aus. Drücke, die schneller als dieses Intervall aufeinander folgen, werden ignoriert.</string>
+    <string name="debounce_note">Manche Seitentasten prellen und lösen doppelt aus. Drücke, die schneller als dieses Intervall aufeinander folgen, werden ignoriert.</string>
     <string name="milliseconds">%1$d ms</string>
     <string name="setting_hide_recents">Aus „Letzte Apps" ausblenden</string>
-    <string name="hide_recents_note">Auf dem HiBreak Pro empfohlen: Der Bigme-Prozessmanager beendet weggewischte/„geschlossene" Apps per Force-Stop — dabei stirbt auch der Tasten-Dienst, bis er neu eingeschaltet wird. Ausgeblendet lässt sich SideKeys dort nicht schließen. Öffne die App stattdessen über den App-Drawer.</string>
-    <string name="tips_title">Tipps für das HiBreak Pro</string>
-    <string name="tips_text">• Tasten gehen nach dem „Schließen" der App nicht mehr? Der Bigme-Prozessmanager stoppt die App per Force-Stop und damit den Tasten-Dienst. Abhilfe: SideKeys in den Bedienungshilfen aus- und wieder einschalten. „Aus ‚Letzte Apps\' ausblenden" eingeschaltet lassen, um das zu verhindern.\n\n• Falls eine Seitentaste nicht ankommt: In den Bigme-Einstellungen unter „Benutzerdefinierte Taste" die Belegung auf „Keine" stellen, damit SideKeys sie erhält.\n\n• Bigme/MediaTek „DuraSpeed" beendet Hintergrund-Apps aggressiv. Sollte der Dienst stoppen, DuraSpeed deaktivieren (per ADB: settings put global setting.duraspeed.enabled 0) und SideKeys von der Akku-Optimierung ausnehmen.</string>
+    <string name="hide_recents_note">Auf Bigme-Geräten empfohlen: Der Prozessmanager beendet weggewischte/„geschlossene" Apps per Force-Stop — dabei stirbt auch der Tasten-Dienst, bis er neu eingeschaltet wird. Ausgeblendet lässt sich SideKeys dort nicht schließen. Öffne die App stattdessen über den App-Drawer.</string>
+    <string name="tips_title">Tipps für E-Ink-Handys</string>
+    <string name="tips_text">• Tasten gehen nach dem „Schließen" der App nicht mehr? Manche Prozessmanager (z. B. auf Bigme-Geräten) stoppen die App per Force-Stop und damit den Tasten-Dienst. Abhilfe: SideKeys in den Bedienungshilfen aus- und wieder einschalten. „Aus ‚Letzte Apps\' ausblenden" eingeschaltet lassen, um das zu verhindern.\n\n• Kommt eine Seitentaste nicht an, verarbeitet sie womöglich die Firmware selbst. Auf Bigme-Geräten: unter Einstellungen → „Benutzerdefinierte Taste" auf „Keine" stellen, damit SideKeys sie erhält.\n\n• MediaTeks „DuraSpeed" (u. a. auf Bigme-Geräten) beendet Hintergrund-Apps aggressiv. Sollte der Dienst stoppen, DuraSpeed deaktivieren (per ADB: settings put global setting.duraspeed.enabled 0) und SideKeys von der Akku-Optimierung ausnehmen.</string>
 
     <!-- App picker -->
     <string name="app_picker_title">App wählen</string>

@@ -1,13 +1,18 @@
-# SideKeys — button mapper for the Bigme HiBreak Pro
+# SideKeys — button mapper for E-Ink phones
 
-SideKeys lets you freely remap the two extra hardware keys on the side of the
-Bigme HiBreak Pro — and any other hardware key, **including the volume keys** —
-separately for **single press**, **double press** and **long press** per key.
+SideKeys lets you freely remap the hardware keys of your phone — the extra side
+keys that E-Ink devices tend to have, the volume keys, or almost any other
+hardware key — separately for **single press**, **double press** and
+**long press** per key.
 
-The HiBreak Pro runs Android 14. Its stock settings ("Custom key") only offer a
-fixed action list (Home, Back, Screenshot, App switcher, Clear cache, Full
-refresh, E Ink Center, Previous/Next page, Light) and in particular **cannot
-launch apps** — exactly the gap SideKeys fills.
+E-Ink phones usually ship with one or two extra side keys, but their stock
+firmware only offers a fixed action list (page turn, screen refresh, screenshot,
+…) and typically **cannot launch apps**. That is the gap SideKeys fills. Its
+interface is built for E-Ink: pure black and white, no animations, no ghosting.
+
+Developed and tested on the **Bigme HiBreak Pro** (Android 14). It should work on
+any Android 8+ device whose keys reach apps as normal key events — reports from
+other devices are welcome.
 
 ## Features
 
@@ -21,9 +26,9 @@ launch apps** — exactly the gap SideKeys fills.
 - **Custom intent** (expert option): starts arbitrary activities or sends
   broadcasts — so you can wire up even Bigme-specific functions that are
   otherwise only reachable through the Bigme settings
-- **Key debounce**: the HiBreak Pro side keys bounce in hardware (a known issue,
-  e.g. page-skipping in reader apps) — SideKeys filters ghost presses; the
-  interval is adjustable
+- **Key debounce**: some side keys bounce in hardware and fire twice (a known
+  issue on the HiBreak Pro, e.g. page-skipping in reader apps) — SideKeys filters
+  ghost presses; the interval is adjustable
 - E-ink optimized UI: pure black & white, no animations
 
 ### Battery extras
@@ -32,39 +37,43 @@ launch apps** — exactly the gap SideKeys fills.
   reaches a level you pick while plugged in, so you can unplug to protect it.
   Works on any device — no root, no helper app.
 - **Battery Saver toggle** — as a key action and as a **Quick Settings tile**
-  (the tile the HiBreak Pro's stock quick settings is missing).
+  (many E-Ink firmwares, including the HiBreak Pro's, are missing this tile).
 - **One-tap accessibility enable** so you don't have to redo the
   "Allow restricted settings" dance after every update.
 
-The last two need one permission that Android only grants from a computer. Run
-this once (USB debugging on), then both work permanently — **no root and no
-helper app such as Shizuku**:
+The Battery Saver toggle needs one permission that no app can request at
+runtime. There are two one-time routes, both local — pick either:
 
-```bash
-adb shell pm grant com.sidekeys.hibreak android.permission.WRITE_SECURE_SETTINGS
-```
+- **From the phone:** with [Shizuku](https://shizuku.rikka.app/) running, tap
+  *Grant permanently via Shizuku* under **Battery & charge alarm**.
+- **From a computer:** run this once with USB debugging on:
 
-The command is also shown, ready to copy, under **Battery & charge alarm** in the
-app. Everything else works without it.
+  ```bash
+  adb shell pm grant com.sidekeys.hibreak android.permission.WRITE_SECURE_SETTINGS
+  ```
 
-> Note: a true hardware **charge limit** (stop charging at X%) is **not possible
-> on the Bigme HiBreak Pro** — its kernel exposes no writable charging-control
-> node, so no app (even with root) can stop charging. The charge alarm is the
-> honest, working alternative.
+Either way it stays granted until you uninstall, and works even when Shizuku is
+not running. Without it, the action simply opens the Battery Saver settings page.
+Everything else in the app works regardless.
+
+> Note: a true hardware **charge limit** (stop charging at X%) is not possible on
+> every device. On the Bigme HiBreak Pro it is confirmed impossible — the kernel
+> exposes no writable charging-control node, so no app (even with root) can stop
+> charging. The charge alarm is the honest, working alternative.
 
 ## Installation
 
 1. Copy `SideKeys-release.apk` to the phone (or use `adb install`).
 2. Allow installation from unknown sources, tap the APK and install.
-3. Open the app → tap **"Enable accessibility service"** → in settings enable
-   **"SideKeys Button Mapper"**.
-   (Without this step Android cannot deliver hardware keys to the app.)
-4. **Android 13/14, "Restricted setting":** for sideloaded apps Android blocks
-   the accessibility toggle at first. Fix: open SideKeys app info →
-   menu (⋮) top right → **"Allow restricted settings"** → then enable the
-   accessibility service. (After the one-time `pm grant` above, the app's
-   **"Enable in one tap"** button skips this on future updates. Installing
-   updates via `adb install -r` avoids the prompt entirely.)
+3. Open the app. It shows the two steps Android requires for sideloaded apps:
+   - **Step 1: Allow restricted settings** — opens the app info screen; there,
+     menu (⋮) → *Allow restricted settings*. Without this Android keeps the
+     switch in step 2 greyed out.
+   - **Step 2: Enable accessibility service** — opens accessibility settings;
+     switch on *SideKeys Button Mapper*.
+
+   (Installing updates via `adb install -r` avoids the restricted-setting prompt
+   entirely.)
 
 ```bash
 adb install SideKeys-release.apk
@@ -83,15 +92,15 @@ Good to know:
 - If only the single press is assigned, the key reacts immediately. As soon as a
   double press is assigned, the single press waits for the double-press window
   (adjustable in Settings).
-- Deleting a mapping restores the key's original (Bigme) function — the app
+- Deleting a mapping restores the key's original firmware function — the app
   passes unmapped keys straight through, unchanged.
 - Heads-up for **volume keys**: once you map a volume key, that key runs your
   action instead of changing the volume. Delete the mapping to get the volume
   function back.
-- If the Bigme firmware already grabs a key before it reaches apps, set that key
-  to "None" in the Bigme settings so SideKeys receives it.
+- If the firmware grabs a key before it reaches apps, set that key to "None" in
+  its own key settings so SideKeys receives it (see device notes below).
 
-## Notes on the Bigme firmware
+## Device notes (Bigme / MediaTek)
 
 - **Keys stop working after you "close" the app?** Bigme's task manager
   (recent apps → swipe away / "close all") does a **force-stop**, which kills the
@@ -99,10 +108,9 @@ Good to know:
   force-stopped service until it is toggled again. Key Mapper is affected the
   same way. SideKeys therefore **hides itself from the recent-apps list by
   default** (Settings → "Hide from recent apps"), so there is nothing to swipe
-  away; open it from the app drawer. If it does get killed: tap
-  **"Enable in one tap"** on the start screen (it restarts the service) or toggle
-  SideKeys off/on under Accessibility. Alternatively enable the service only from
-  Accessibility settings without ever opening the app.
+  away; open it from the app drawer. If it does get killed and you granted the
+  permission above, the start screen offers **"Restart service"**, which brings it
+  back without a trip to the settings.
 - **Important — set the Bigme key assignment to "None":** the Bigme firmware runs
   its own key handling in parallel with SideKeys. Symptom: after capturing a key
   the mapping screen only shows briefly and disappears, because the Bigme action

@@ -1,7 +1,8 @@
 ## SideKeys v1.5.2
 
-Freely remap the two side keys of the **Bigme HiBreak Pro** — and the volume keys,
-or any hardware key — separately for single press, double press and long press.
+A button mapper for **E-Ink phones**: freely remap the extra side keys, the volume
+keys or almost any hardware key — separately for single press, double press and
+long press. Developed and tested on the Bigme HiBreak Pro.
 
 ### New in 1.5.x
 - **Enabling the service is now two clear steps** — "Allow restricted settings"

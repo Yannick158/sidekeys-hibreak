@@ -86,7 +86,7 @@ Fill in the questionnaire — a utility with no ads or user content rates as
 **Store presence → Main store listing.** Required:
 
 - Short description (max 80 chars), e.g.
-  *"Give your phone's side keys and volume keys any function you want."*
+  *"Button mapper for E-Ink phones: give your side keys any function you want."*
 - Full description — reuse the feature list from [README.md](README.md)
 - **App icon** 512×512 PNG
 - **Feature graphic** 1024×500 PNG

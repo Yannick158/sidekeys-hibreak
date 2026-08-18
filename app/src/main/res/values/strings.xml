@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">SideKeys</string>
     <string name="service_label">SideKeys Button Mapper</string>
-    <string name="service_summary">Maps the HiBreak Pro side keys to custom functions</string>
+    <string name="service_summary">Maps hardware keys to custom functions</string>
     <string name="service_description">SideKeys intercepts the hardware side keys and runs the actions you choose (e.g. Google Assistant, Google Wallet or launching an app). The service does not read screen content and collects no data.</string>
 
     <!-- Home -->
@@ -18,7 +18,7 @@
     <string name="restart_service_ok">✓ Service is running again</string>
     <string name="restart_service_failed">Restart did not work — please use step 2 and toggle SideKeys off and on.</string>
     <string name="add_key">+ Assign key</string>
-    <string name="no_mappings_hint">No key assigned yet. Tap "Assign key" and then press one of the side keys of your HiBreak Pro.</string>
+    <string name="no_mappings_hint">No key assigned yet. Tap "Assign key" and then press one of your phone\'s hardware keys.</string>
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
@@ -30,7 +30,7 @@
     <!-- Capture -->
     <string name="capture_title">Capture key</string>
     <string name="capture_prompt">Now press the side key you want to assign</string>
-    <string name="capture_hint">Works with both extra keys of the HiBreak Pro — and with other hardware keys too.</string>
+    <string name="capture_hint">Works with extra side keys, volume keys and most other hardware keys.</string>
     <string name="capture_service_hint">Note: capturing already works now, but for the key to react system-wide the accessibility service must be enabled.</string>
     <string name="key_generic">Key %1$d</string>
 
@@ -87,12 +87,12 @@
     <string name="setting_haptic">Vibrate on key press</string>
     <string name="double_press_note">Note: if a double press is assigned, the single press only fires after this window has passed.</string>
     <string name="setting_debounce">Key debounce</string>
-    <string name="debounce_note">The HiBreak Pro side keys sometimes fire twice. Presses arriving faster than this interval are ignored.</string>
+    <string name="debounce_note">Some side keys bounce and fire twice. Presses arriving faster than this interval are ignored.</string>
     <string name="milliseconds">%1$d ms</string>
     <string name="setting_hide_recents">Hide from recent apps</string>
-    <string name="hide_recents_note">Recommended on the HiBreak Pro: Bigme\'s task manager force-stops apps that are swiped away or "closed", which kills the key service until it is toggled again. Hidden from recents, SideKeys can\'t be closed that way. Open it from the app drawer instead.</string>
-    <string name="tips_title">Tips for the HiBreak Pro</string>
-    <string name="tips_text">• Keys stopped working after "closing" the app? Bigme\'s task manager force-stops the app and with it the key service. Fix: toggle SideKeys off and on again in Accessibility settings. Keep "Hide from recent apps" on to prevent it.\n\n• If a side key never arrives: set its assignment to "None" in Bigme settings under "Custom key" so SideKeys receives it.\n\n• Bigme/MediaTek "DuraSpeed" aggressively kills background apps. If the service stops, disable DuraSpeed (via ADB: settings put global setting.duraspeed.enabled 0) and exempt SideKeys from battery optimization.</string>
+    <string name="hide_recents_note">Recommended on Bigme devices: the task manager force-stops apps that are swiped away or "closed", which kills the key service until it is toggled again. Hidden from recents, SideKeys can\'t be closed that way. Open it from the app drawer instead.</string>
+    <string name="tips_title">Tips for E-Ink phones</string>
+    <string name="tips_text">• Keys stopped working after "closing" the app? Some task managers (e.g. on Bigme devices) force-stop the app and with it the key service. Fix: toggle SideKeys off and on again in Accessibility settings. Keep "Hide from recent apps" on to prevent it.\n\n• If a side key never arrives, the firmware may be handling it itself. On Bigme devices: set that key to "None" under Settings → "Custom key" so SideKeys receives it.\n\n• MediaTek\'s "DuraSpeed" (found on Bigme and other devices) aggressively kills background apps. If the service stops, disable DuraSpeed (via ADB: settings put global setting.duraspeed.enabled 0) and exempt SideKeys from battery optimization.</string>
 
     <!-- App picker -->
     <string name="app_picker_title">Choose app</string>

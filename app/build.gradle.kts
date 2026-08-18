@@ -14,8 +14,8 @@ android {
         applicationId = "com.sidekeys.hibreak"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 9
-        versionName = "1.2.1"
+        versionCode = 10
+        versionName = "1.2.2"
     }
 
     // The signing keystore lives OUTSIDE the repo tree so it can never be
@@ -84,6 +84,7 @@ dependencies {
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 

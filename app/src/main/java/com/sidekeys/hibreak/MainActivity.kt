@@ -1,14 +1,18 @@
 package com.sidekeys.hibreak
 
+import android.app.ActivityManager
 import android.os.Bundle
 import android.view.KeyEvent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.lifecycle.lifecycleScope
 import com.sidekeys.hibreak.core.common.KeyCodeNames
+import com.sidekeys.hibreak.core.data.Graph
 import com.sidekeys.hibreak.core.designsystem.SideKeysTheme
 import com.sidekeys.hibreak.service.CapturedKey
 import com.sidekeys.hibreak.service.KeyInterceptorService
 import com.sidekeys.hibreak.ui.SideKeysApp
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -18,6 +22,21 @@ class MainActivity : ComponentActivity() {
             SideKeysTheme {
                 SideKeysApp()
             }
+        }
+        // Bigme's task manager force-stops apps swiped from recents, which kills
+        // the accessibility service. Staying out of the recents list (default)
+        // means there is nothing to swipe away.
+        lifecycleScope.launch {
+            Graph.mappingRepository(applicationContext).settings.collect { settings ->
+                applyExcludeFromRecents(settings.hideFromRecents)
+            }
+        }
+    }
+
+    private fun applyExcludeFromRecents(hide: Boolean) {
+        runCatching {
+            val am = getSystemService(ACTIVITY_SERVICE) as ActivityManager
+            am.appTasks.forEach { it.setExcludeFromRecents(hide) }
         }
     }
 

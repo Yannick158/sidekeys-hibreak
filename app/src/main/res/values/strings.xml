@@ -81,8 +81,10 @@
     <string name="setting_debounce">Key debounce</string>
     <string name="debounce_note">The HiBreak Pro side keys sometimes fire twice. Presses arriving faster than this interval are ignored.</string>
     <string name="milliseconds">%1$d ms</string>
+    <string name="setting_hide_recents">Hide from recent apps</string>
+    <string name="hide_recents_note">Recommended on the HiBreak Pro: Bigme\'s task manager force-stops apps that are swiped away or "closed", which kills the key service until it is toggled again. Hidden from recents, SideKeys can\'t be closed that way. Open it from the app drawer instead.</string>
     <string name="tips_title">Tips for the HiBreak Pro</string>
-    <string name="tips_text">• If a side key never arrives: set its assignment to "None" in Bigme settings under "Custom key" so SideKeys receives it.\n\n• Bigme/MediaTek "DuraSpeed" aggressively kills background apps. If the service stops, disable DuraSpeed (via ADB: settings put global setting.duraspeed.enabled 0) and exempt SideKeys from battery optimization.</string>
+    <string name="tips_text">• Keys stopped working after "closing" the app? Bigme\'s task manager force-stops the app and with it the key service. Fix: tap "Enable in one tap" on the start screen (restarts the service), or toggle SideKeys off/on in Accessibility settings. Keep "Hide from recent apps" on to prevent it.\n\n• If a side key never arrives: set its assignment to "None" in Bigme settings under "Custom key" so SideKeys receives it.\n\n• Bigme/MediaTek "DuraSpeed" aggressively kills background apps. If the service stops, disable DuraSpeed (via ADB: settings put global setting.duraspeed.enabled 0) and exempt SideKeys from battery optimization.</string>
 
     <!-- App picker -->
     <string name="app_picker_title">Choose app</string>

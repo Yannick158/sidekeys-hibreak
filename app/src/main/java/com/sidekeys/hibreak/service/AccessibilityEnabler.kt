@@ -24,7 +24,14 @@ object AccessibilityEnabler {
     /** True if we can do this right now (native permission or live Shizuku). */
     fun canEnable(context: Context): Boolean = PowerSaver.canToggle(context)
 
-    /** Enables the service. Returns true on success. */
+    /**
+     * Enables — or, if already listed, RESTARTS — the service. Returns true on success.
+     *
+     * Toggling off→on matters: after Bigme's task manager force-stops the app,
+     * the service still appears "enabled" in Settings but is not running, and
+     * Android does not rebind a stopped service until it is toggled. Rewriting
+     * the same value would be a no-op, so we remove and re-add ourselves.
+     */
     fun enable(context: Context): Boolean {
         val comp = component(context)
         // Native path via WRITE_SECURE_SETTINGS.
@@ -32,21 +39,28 @@ object AccessibilityEnabler {
             return runCatching {
                 val resolver = context.contentResolver
                 val current = Settings.Secure.getString(resolver, ENABLED_SERVICES).orEmpty()
-                val updated = mergeService(current, comp)
-                Settings.Secure.putString(resolver, ENABLED_SERVICES, updated)
+                val without = withoutService(current, comp)
+                if (without != current) {
+                    Settings.Secure.putString(resolver, ENABLED_SERVICES, without)
+                }
+                Settings.Secure.putString(resolver, ENABLED_SERVICES, mergeService(without, comp))
                 Settings.Secure.putInt(resolver, ACCESSIBILITY_ON, 1)
                 true
             }.getOrDefault(false)
         }
-        // Shizuku path.
+        // Shizuku path: same off→on toggle in shell.
         if (ShizukuShell.isAvailable() && ShizukuShell.isPermissionGranted()) {
             val script = """
                 cur=${'$'}(settings get secure $ENABLED_SERVICES)
                 comp='$comp'
-                case ":${'$'}cur:" in
-                  *":${'$'}comp:"*) new="${'$'}cur" ;;
-                  *) if [ "${'$'}cur" = "null" ] || [ -z "${'$'}cur" ]; then new="${'$'}comp"; else new="${'$'}cur:${'$'}comp"; fi ;;
-                esac
+                [ "${'$'}cur" = "null" ] && cur=""
+                # remove ourselves (if present)
+                without=${'$'}(echo "${'$'}cur" | tr ':' '\n' | grep -v -x -F "${'$'}comp" | grep -v '^${'$'}' | paste -sd: -)
+                if [ "${'$'}without" != "${'$'}cur" ]; then
+                  settings put secure $ENABLED_SERVICES "${'$'}without"
+                fi
+                # re-add
+                if [ -z "${'$'}without" ]; then new="${'$'}comp"; else new="${'$'}without:${'$'}comp"; fi
                 settings put secure $ENABLED_SERVICES "${'$'}new"
                 settings put secure $ACCESSIBILITY_ON 1
                 echo ok
@@ -54,6 +68,11 @@ object AccessibilityEnabler {
             return ShizukuShell.run(script).stdout.trim().endsWith("ok")
         }
         return false
+    }
+
+    private fun withoutService(current: String, comp: String): String {
+        if (current.isBlank() || current == "null") return ""
+        return current.split(':').filter { it.isNotBlank() && it != comp }.joinToString(":")
     }
 
     private fun mergeService(current: String, comp: String): String {

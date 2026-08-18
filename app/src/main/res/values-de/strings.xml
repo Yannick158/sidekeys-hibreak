@@ -81,8 +81,10 @@
     <string name="setting_debounce">Tasten-Entprellung</string>
     <string name="debounce_note">Die Seitentasten des HiBreak Pro lösen manchmal doppelt aus. Drücke, die schneller als dieses Intervall aufeinander folgen, werden ignoriert.</string>
     <string name="milliseconds">%1$d ms</string>
+    <string name="setting_hide_recents">Aus „Letzte Apps" ausblenden</string>
+    <string name="hide_recents_note">Auf dem HiBreak Pro empfohlen: Der Bigme-Prozessmanager beendet weggewischte/„geschlossene" Apps per Force-Stop — dabei stirbt auch der Tasten-Dienst, bis er neu eingeschaltet wird. Ausgeblendet lässt sich SideKeys dort nicht schließen. Öffne die App stattdessen über den App-Drawer.</string>
     <string name="tips_title">Tipps für das HiBreak Pro</string>
-    <string name="tips_text">• Falls eine Seitentaste nicht ankommt: In den Bigme-Einstellungen unter „Benutzerdefinierte Taste" die Belegung auf „Keine" stellen, damit SideKeys sie erhält.\n\n• Bigme/MediaTek „DuraSpeed" beendet Hintergrund-Apps aggressiv. Sollte der Dienst stoppen, DuraSpeed deaktivieren (per ADB: settings put global setting.duraspeed.enabled 0) und SideKeys von der Akku-Optimierung ausnehmen.</string>
+    <string name="tips_text">• Tasten gehen nach dem „Schließen" der App nicht mehr? Der Bigme-Prozessmanager stoppt die App per Force-Stop und damit den Tasten-Dienst. Abhilfe: Auf der Startseite „In einem Tipp aktivieren" (startet den Dienst neu) oder SideKeys in den Bedienungshilfen aus- und einschalten. „Aus ‚Letzte Apps\' ausblenden" eingeschaltet lassen, um das zu verhindern.\n\n• Falls eine Seitentaste nicht ankommt: In den Bigme-Einstellungen unter „Benutzerdefinierte Taste" die Belegung auf „Keine" stellen, damit SideKeys sie erhält.\n\n• Bigme/MediaTek „DuraSpeed" beendet Hintergrund-Apps aggressiv. Sollte der Dienst stoppen, DuraSpeed deaktivieren (per ADB: settings put global setting.duraspeed.enabled 0) und SideKeys von der Akku-Optimierung ausnehmen.</string>
 
     <!-- App picker -->
     <string name="app_picker_title">App wählen</string>

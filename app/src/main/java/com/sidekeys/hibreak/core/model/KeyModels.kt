@@ -102,4 +102,11 @@ data class KeySettings(
      * presses; presses arriving faster than this are ignored.
      */
     val debounceMs: Long = 75,
+    /**
+     * Keep SideKeys out of the recent-apps list. Bigme's task manager
+     * force-stops apps that are swiped away / "closed", which kills the
+     * accessibility service until it is toggled again. Hidden = can't be killed
+     * that way.
+     */
+    val hideFromRecents: Boolean = true,
 )

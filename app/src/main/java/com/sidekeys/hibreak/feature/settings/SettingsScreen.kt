@@ -164,6 +164,33 @@ fun SettingsScreen(onBack: () -> Unit) {
             }
 
             EInkCard {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.setting_hide_recents),
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                    }
+                    Switch(
+                        checked = settings.hideFromRecents,
+                        onCheckedChange = { viewModel.setHideFromRecents(it) },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = Color.White,
+                            checkedTrackColor = Color.Black,
+                            uncheckedThumbColor = Color.Black,
+                            uncheckedTrackColor = Color.White,
+                            uncheckedBorderColor = Color.Black,
+                        ),
+                    )
+                }
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.hide_recents_note),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+
+            EInkCard {
                 Text(
                     text = stringResource(R.string.tips_title),
                     style = MaterialTheme.typography.titleMedium,

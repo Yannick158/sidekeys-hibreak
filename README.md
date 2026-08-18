@@ -84,6 +84,16 @@ Good to know:
 
 ## Notes on the Bigme firmware
 
+- **Keys stop working after you "close" the app?** Bigme's task manager
+  (recent apps → swipe away / "close all") does a **force-stop**, which kills the
+  accessibility service — and Android deliberately does not restart a
+  force-stopped service until it is toggled again. Key Mapper is affected the
+  same way. SideKeys therefore **hides itself from the recent-apps list by
+  default** (Settings → "Hide from recent apps"), so there is nothing to swipe
+  away; open it from the app drawer. If it does get killed: tap
+  **"Enable in one tap"** on the start screen (it restarts the service) or toggle
+  SideKeys off/on under Accessibility. Alternatively enable the service only from
+  Accessibility settings without ever opening the app.
 - **Important — set the Bigme key assignment to "None":** the Bigme firmware runs
   its own key handling in parallel with SideKeys. Symptom: after capturing a key
   the mapping screen only shows briefly and disappears, because the Bigme action

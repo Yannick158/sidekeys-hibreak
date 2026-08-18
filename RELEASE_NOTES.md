@@ -1,7 +1,15 @@
-## SideKeys v1.2.1
+## SideKeys v1.2.2
 
 Freely remap the two side keys of the **Bigme HiBreak Pro** — and the volume keys,
 or any hardware key — separately for single press, double press and long press.
+
+### New in 1.2.2 — keys no longer die when the app is "closed"
+Bigme's task manager force-stops apps swiped from recents, which killed the key
+service until it was toggled again (Key Mapper has the same problem). Now:
+- SideKeys **hides itself from the recent-apps list by default** (toggle in
+  Settings), so there is nothing to swipe away — open it from the app drawer.
+- **"Enable in one tap"** now does a real off→on toggle, so a killed service comes
+  straight back without visiting Accessibility settings.
 
 ### New since 1.0
 - **Volume Up / Down / Mute** and **Battery Saver** as actions

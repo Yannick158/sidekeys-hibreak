@@ -167,22 +167,32 @@ object QsTileInstaller {
     fun diagnostics(context: Context): String {
         if (!shellReady()) return "(Shizuku not running)"
         val script = """
-            echo '### 1. Who draws the shade?'
-            dumpsys window windows 2>/dev/null | grep -iE 'NotificationShade|StatusBar|QuickSettings|Package=' | grep -iE 'shade|statusbar|quick' | head -10
-            echo
-            echo '### 2. Bigme / OEM system packages:'
-            pm list packages 2>/dev/null | grep -iE 'bigme|onyx|eink|e_ink|xrz' | head -25
-            echo
-            echo '### 3. Settings keys mentioning the OEM or a panel:'
+            echo '### A. Values that look like a list (>=2 commas) — a tile list would look like this:'
             for ns in secure system global; do
-              settings list ${'$'}ns 2>/dev/null | grep -iE 'bigme|eink|e_ink|xrz|panel|shortcut|switch|toggle|shade|statusbar' | head -20 | sed "s/^/${'$'}ns: /"
+              settings list ${'$'}ns 2>/dev/null | awk -v NS="${'$'}ns" -F'=' '{
+                v=${'$'}0; sub(/^[^=]*=/,"",v); n=gsub(/,/,"",v);
+                if (n>=2) print NS": "${'$'}0
+              }' | cut -c1-200
             done
             echo
-            echo '### 4. Standard tile list (for comparison):'
-            settings get secure sysui_qs_tiles 2>/dev/null
+            echo '### B. Every settings key name (no values):'
+            for ns in secure system global; do
+              settings list ${'$'}ns 2>/dev/null | cut -d= -f1 | sed "s/^/${'$'}ns: /"
+            done | sort
             echo
-            echo '### 5. Overlays active on SystemUI:'
-            cmd overlay list 2>/dev/null | grep -iE 'systemui|bigme' | head -15
+            echo '### C. How many keys per namespace (so nothing is silently cut):'
+            for ns in secure system global; do
+              printf "%s: " ${'$'}ns; settings list ${'$'}ns 2>/dev/null | wc -l
+            done
+            echo
+            echo '### D. Bigme system-control app:'
+            dumpsys package com.xrz.sys.control 2>/dev/null | grep -iE 'versionName|codePath|Provider|Activity Resolver|android.permission' | head -20
+            echo
+            echo '### E. Does any Bigme app expose a settings provider?'
+            pm list packages 2>/dev/null | sed 's/package://' | grep -iE '^com\.(xrz|b300)' | while read pkg; do
+              n=${'$'}(dumpsys package "${'$'}pkg" 2>/dev/null | grep -ciE 'ContentProvider|Provider:')
+              [ "${'$'}n" -gt 0 ] && echo "${'$'}pkg: ${'$'}n provider entries"
+            done
         """.trimIndent()
         val r = ShizukuShell.run(script)
         return (r.stdout + if (r.stderr.isNotBlank()) "\n" + r.stderr else "").trim().ifBlank { "(no output)" }

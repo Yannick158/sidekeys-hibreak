@@ -1,0 +1,6 @@
+- Map the side keys (and volume keys) to actions: launch apps, Assistant, Wallet, system actions
+- Separate actions for single press, double press and long press
+- Scroll up/down in any app
+- Launch a specific app screen (activity)
+- Per-app key profiles
+- Charge alarm and Battery Saver quick tile

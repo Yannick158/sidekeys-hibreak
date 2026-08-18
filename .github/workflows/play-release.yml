@@ -1,0 +1,80 @@
+name: Play Store release
+
+# Manual only. Never runs on pull_request: a fork PR must never be able to
+# reach the signing keystore or the Play service-account key.
+on:
+  workflow_dispatch:
+    inputs:
+      track:
+        description: "Play track"
+        required: true
+        default: internal
+        type: choice
+        options: [internal, alpha, beta, production]
+      status:
+        description: "Release status"
+        required: true
+        default: draft
+        type: choice
+        options: [draft, completed]
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    # Requires a manual approval step if the environment has reviewers configured.
+    environment: play-store
+
+    steps:
+      # All third-party actions are pinned to a commit SHA, not a moving tag.
+      - name: Check out
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@06832c7b30a0129d7fb559bcc6e43d26f6374244 # v4.3.1
+
+      - name: Restore signing keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.SIDEKEYS_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.SIDEKEYS_STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.SIDEKEYS_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/keystore"
+          printf '%s' "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/keystore/sidekeys.jks"
+          cat > "$RUNNER_TEMP/keystore/keystore.properties" <<EOF
+          storeFile=sidekeys.jks
+          storePassword=$STORE_PASSWORD
+          keyAlias=sidekeys
+          keyPassword=$KEY_PASSWORD
+          EOF
+
+      - name: Run unit tests
+        run: ./gradlew --no-daemon testReleaseUnitTest
+
+      - name: Build signed App Bundle
+        env:
+          SIDEKEYS_KEYSTORE_DIR: ${{ runner.temp }}/keystore
+        run: ./gradlew --no-daemon bundleRelease
+
+      - name: Upload to Play Store
+        uses: r0adkll/upload-google-play@e738b9dd8f2476ea806d921b64aacd24f34515a5 # v1.1.5
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.sidekeys.hibreak
+          releaseFiles: app/build/outputs/bundle/release/app-release.aab
+          track: ${{ inputs.track }}
+          status: ${{ inputs.status }}
+          whatsNewDirectory: distribution/whatsnew
+
+      - name: Shred secrets
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/keystore"

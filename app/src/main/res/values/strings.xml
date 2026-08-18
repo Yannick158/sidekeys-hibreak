@@ -160,7 +160,7 @@
     <string name="qs_tile_title">Battery Saver tile in Quick Settings</string>
     <string name="qs_tile_intro">Some firmwares (e.g. Bigme\'s) hide the "edit tiles" button, so third-party tiles can never be added by hand. SideKeys can add its tile for you instead: first via Android\'s own add-tile dialog, otherwise by editing the panel\'s tile list through Shizuku (Android 14 allows that only for a privileged shell).</string>
     <string name="qs_tile_state_listed">The tile is in the panel\'s tile list. Pull the shade down twice to check — if it isn\'t visible, this firmware ignores the list.</string>
-    <string name="qs_tile_state_added">✓ Tile added — the system confirmed it. Pull the shade down to use it.</string>
+    <string name="qs_tile_state_registered">✓ The system registered the tile. If it still does not appear in the panel, this firmware draws its own fixed set of tiles and ignores registered ones — nothing an app can change. Use the key action instead.</string>
     <string name="qs_tile_add">Add tile to Quick Settings</string>
     <string name="qs_tile_remove">Remove tile again</string>
     <string name="qs_tile_note">Nothing else in the app depends on the tile — mapping Battery Saver to a key always works.</string>
@@ -170,4 +170,5 @@
     <string name="qs_tile_msg_write_failed">Could not write the tile list.</string>
     <string name="qs_tile_msg_written_unconfirmed">Written to the tile list, but the system did not confirm adding it. Pull the shade down twice — if the tile isn\'t there, this panel does not read the list.</string>
     <string name="qs_tile_working">Adding…</string>
+    <string name="qs_tile_diagnose">Run diagnostics</string>
 </resources>

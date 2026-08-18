@@ -26,6 +26,11 @@ class BatterySaverTile : TileService() {
         /** True once SystemUI has actually added the tile — the only reliable signal. */
         fun isAdded(context: android.content.Context): Boolean =
             context.getSharedPreferences(PREFS, MODE_PRIVATE).getBoolean(KEY_ADDED, false)
+
+        /** SystemUI does not report removals made outside its editor; call this ourselves. */
+        fun markRemoved(context: android.content.Context) {
+            context.getSharedPreferences(PREFS, MODE_PRIVATE).edit().putBoolean(KEY_ADDED, false).apply()
+        }
     }
 
     override fun onTileAdded() {

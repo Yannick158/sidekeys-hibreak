@@ -160,7 +160,7 @@
     <string name="qs_tile_title">Energiesparmodus-Kachel in den Schnelleinstellungen</string>
     <string name="qs_tile_intro">Manche Firmwares (z. B. Bigme) blenden den „Kacheln bearbeiten"-Knopf aus, sodass sich Fremd-Kacheln nie von Hand hinzufügen lassen. SideKeys kann seine Kachel stattdessen selbst eintragen: zuerst über Androids eigenen Hinzufügen-Dialog, sonst über Shizuku in die Kachelliste des Panels (Android 14 erlaubt das nur einer privilegierten Shell).</string>
     <string name="qs_tile_state_listed">Die Kachel steht in der Kachelliste des Panels. Zieh die Leiste zweimal herunter — ist sie nicht zu sehen, ignoriert diese Firmware die Liste.</string>
-    <string name="qs_tile_state_added">✓ Kachel hinzugefügt — vom System bestätigt. Zieh die Leiste herunter, um sie zu nutzen.</string>
+    <string name="qs_tile_state_registered">✓ Das System hat die Kachel registriert. Erscheint sie trotzdem nicht im Panel, zeichnet diese Firmware nur ihren eigenen festen Kachelsatz und ignoriert registrierte — daran kann keine App etwas ändern. Nutze dann die Tastenaktion.</string>
     <string name="qs_tile_add">Kachel zu den Schnelleinstellungen hinzufügen</string>
     <string name="qs_tile_remove">Kachel wieder entfernen</string>
     <string name="qs_tile_note">Nichts sonst in der App hängt an der Kachel — den Energiesparmodus auf eine Taste zu legen funktioniert immer.</string>
@@ -170,4 +170,5 @@
     <string name="qs_tile_msg_write_failed">Kachelliste konnte nicht geschrieben werden.</string>
     <string name="qs_tile_msg_written_unconfirmed">In die Kachelliste geschrieben, aber das System hat das Hinzufügen nicht bestätigt. Zieh die Leiste zweimal herunter — fehlt die Kachel, liest dieses Panel die Liste nicht.</string>
     <string name="qs_tile_working">Wird hinzugefügt…</string>
+    <string name="qs_tile_diagnose">Diagnose ausführen</string>
 </resources>

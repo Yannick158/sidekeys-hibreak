@@ -247,6 +247,7 @@ fun ChargeLimitScreen(onBack: () -> Unit) {
             var tileListed by remember { mutableStateOf<Boolean?>(null) }
             var tileMsg by remember { mutableIntStateOf(0) }
             var tileBusy by remember { mutableStateOf(false) }
+            var tileDiag by remember { mutableStateOf<String?>(null) }
             LaunchedEffect(shizukuReady) {
                 tileListed = withContext(Dispatchers.IO) {
                     runCatching { QsTileInstaller.isListed(context) }.getOrNull()
@@ -267,7 +268,7 @@ fun ChargeLimitScreen(onBack: () -> Unit) {
                 Spacer(Modifier.height(4.dp))
                 Text(
                     text = when {
-                        tileAdded -> stringResource(R.string.qs_tile_state_added)
+                        tileAdded -> stringResource(R.string.qs_tile_state_registered)
                         tileListed == true -> stringResource(R.string.qs_tile_state_listed)
                         else -> stringResource(R.string.qs_tile_intro)
                     },
@@ -353,7 +354,7 @@ fun ChargeLimitScreen(onBack: () -> Unit) {
                         )
                     }
                 }
-                if (tileAdded || tileListed == true) {
+                if (tileAdded || tileListed == true || shizukuReady) {
                     Spacer(Modifier.height(8.dp))
                     EInkOutlinedButton(
                         text = stringResource(R.string.qs_tile_remove),
@@ -367,6 +368,38 @@ fun ChargeLimitScreen(onBack: () -> Unit) {
                                 }
                             }.start()
                         },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+                Spacer(Modifier.height(8.dp))
+                EInkOutlinedButton(
+                    text = stringResource(R.string.qs_tile_diagnose),
+                    enabled = shizukuReady && !tileBusy,
+                    onClick = {
+                        tileBusy = true
+                        Thread {
+                            val report = runCatching { QsTileInstaller.diagnostics(context) }
+                                .getOrElse { it.message ?: "error" }
+                            android.os.Handler(android.os.Looper.getMainLooper()).post {
+                                tileDiag = report
+                                tileBusy = false
+                            }
+                        }.start()
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                tileDiag?.let { report ->
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = report,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 10.sp,
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    EInkOutlinedButton(
+                        text = stringResource(R.string.adb_setup_copy),
+                        onClick = { clipboard.setText(AnnotatedString(report)) },
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }

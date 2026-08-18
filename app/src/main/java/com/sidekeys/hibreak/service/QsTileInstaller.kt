@@ -101,23 +101,59 @@ object QsTileInstaller {
     enum class ShellResult { OK, NO_SHELL, WRITE_FAILED }
 
     /**
-     * Prepends our tile to the list (front, so it is visible even in a collapsed
-     * panel that only shows the first row). Blocking.
+     * Adds our tile through the shell. Two mechanisms, both attempted:
+     *  - `cmd statusbar add-tile` — asks SystemUI itself to add the tile via its
+     *    own tile host (the same path the system "add tile" dialog uses);
+     *  - the `sysui_qs_tiles` list, prepended (front, so it is visible even in a
+     *    collapsed panel that only shows the first row).
+     * Blocking.
      */
     fun addViaShell(context: Context): ShellResult {
         if (!shellReady()) return ShellResult.NO_SHELL
-        val tiles = currentTiles(context) ?: return ShellResult.NO_SHELL
-        val ours = spec(context)
-        if (ours in tiles) return ShellResult.OK
-        return write(listOf(ours) + tiles)
+        val comp = component(context).flattenToString()
+        val viaCmd = ShizukuShell.run("cmd statusbar add-tile $comp").ok
+        val tiles = currentTiles(context)
+        val viaList = when {
+            tiles == null -> false
+            spec(context) in tiles -> true
+            else -> write(listOf(spec(context)) + tiles) == ShellResult.OK
+        }
+        return if (viaCmd || viaList) ShellResult.OK else ShellResult.WRITE_FAILED
     }
 
     fun removeViaShell(context: Context): ShellResult {
         if (!shellReady()) return ShellResult.NO_SHELL
-        val tiles = currentTiles(context) ?: return ShellResult.NO_SHELL
-        val ours = spec(context)
-        if (ours !in tiles) return ShellResult.OK
-        return write(tiles - ours)
+        val comp = component(context).flattenToString()
+        ShizukuShell.run("cmd statusbar remove-tile $comp")
+        val tiles = currentTiles(context)
+        val ok = if (tiles == null || spec(context) !in tiles) true else write(tiles - spec(context)) == ShellResult.OK
+        // SystemUI only reports onTileRemoved for removals made through its own
+        // editor, so clear our "added" flag ourselves.
+        if (ok) BatterySaverTile.markRemoved(context)
+        return if (ok) ShellResult.OK else ShellResult.WRITE_FAILED
+    }
+
+    /**
+     * Diagnostic dump for firmwares that register the tile but never draw it:
+     * every settings key that smells like a tile list, plus SystemUI's own view
+     * of its tile host. Blocking; shell only.
+     */
+    fun diagnostics(context: Context): String {
+        if (!shellReady()) return "(Shizuku not running)"
+        val script = """
+            echo '# settings keys mentioning tiles/qs:'
+            for ns in secure system global; do
+              settings list ${'$'}ns 2>/dev/null | grep -iE 'tile|qs_|quick' | sed "s/^/${'$'}ns: /"
+            done
+            echo
+            echo '# SystemUI tile host:'
+            dumpsys activity service com.android.systemui/.SystemUIService QSTileHost 2>/dev/null | grep -iE 'tile|spec' | head -25
+            echo
+            echo '# statusbar shell command available:'
+            cmd statusbar 2>&1 | head -3
+        """.trimIndent()
+        val r = ShizukuShell.run(script)
+        return (r.stdout + if (r.stderr.isNotBlank()) "\n" + r.stderr else "").trim().ifBlank { "(no output)" }
     }
 
     private fun write(tiles: List<String>): ShellResult {

@@ -155,4 +155,18 @@
     <string name="error_no_flashlight">Keine Taschenlampe auf diesem Gerät gefunden.</string>
     <string name="error_action_failed">Aktion konnte nicht ausgeführt werden.</string>
     <string name="error_dnd_permission">Bitte erlaube SideKeys den Zugriff auf „Nicht stören" und versuche es erneut.</string>
+
+    <!-- Quick-Settings-Kachel einrichten -->
+    <string name="qs_tile_title">Energiesparmodus-Kachel in den Schnelleinstellungen</string>
+    <string name="qs_tile_intro">Manche Firmwares (z. B. Bigme) blenden den „Kacheln bearbeiten"-Knopf aus, sodass sich Fremd-Kacheln nie von Hand hinzufügen lassen. SideKeys kann seine Kachel stattdessen selbst eintragen: zuerst über Androids eigenen Hinzufügen-Dialog, sonst direkt in die Kachelliste des Panels (braucht die Berechtigung von oben).</string>
+    <string name="qs_tile_state_listed">Die Kachel steht in der Kachelliste des Panels. Zieh die Leiste zweimal herunter — ist sie nicht zu sehen, ignoriert diese Firmware die Liste.</string>
+    <string name="qs_tile_state_added">✓ Kachel hinzugefügt — vom System bestätigt. Zieh die Leiste herunter, um sie zu nutzen.</string>
+    <string name="qs_tile_add">Kachel zu den Schnelleinstellungen hinzufügen</string>
+    <string name="qs_tile_remove">Kachel wieder entfernen</string>
+    <string name="qs_tile_note">Nichts sonst in der App hängt an der Kachel — den Energiesparmodus auf eine Taste zu legen funktioniert immer.</string>
+    <string name="qs_tile_msg_added">✓ Hinzugefügt.</string>
+    <string name="qs_tile_msg_declined">Du hast den System-Dialog abgelehnt. Nochmal tippen zum Wiederholen.</string>
+    <string name="qs_tile_msg_need_permission">Diese Firmware hat keinen Hinzufügen-Dialog. Richte oben die Berechtigung ein (Shizuku oder ADB) und tippe erneut — dann trägt SideKeys die Kachel selbst in die Liste ein.</string>
+    <string name="qs_tile_msg_write_failed">Kachelliste konnte nicht geschrieben werden.</string>
+    <string name="qs_tile_msg_written_unconfirmed">In die Kachelliste geschrieben, aber das System hat das Hinzufügen nicht bestätigt. Zieh die Leiste zweimal herunter — fehlt die Kachel, liest dieses Panel die Liste nicht.</string>
 </resources>

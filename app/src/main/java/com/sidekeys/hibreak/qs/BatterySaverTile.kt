@@ -19,6 +19,25 @@ import com.sidekeys.hibreak.service.PowerSaver
  */
 class BatterySaverTile : TileService() {
 
+    companion object {
+        private const val PREFS = "qs_tile"
+        private const val KEY_ADDED = "added"
+
+        /** True once SystemUI has actually added the tile — the only reliable signal. */
+        fun isAdded(context: android.content.Context): Boolean =
+            context.getSharedPreferences(PREFS, MODE_PRIVATE).getBoolean(KEY_ADDED, false)
+    }
+
+    override fun onTileAdded() {
+        super.onTileAdded()
+        getSharedPreferences(PREFS, MODE_PRIVATE).edit().putBoolean(KEY_ADDED, true).apply()
+    }
+
+    override fun onTileRemoved() {
+        super.onTileRemoved()
+        getSharedPreferences(PREFS, MODE_PRIVATE).edit().putBoolean(KEY_ADDED, false).apply()
+    }
+
     override fun onStartListening() {
         super.onStartListening()
         refresh()

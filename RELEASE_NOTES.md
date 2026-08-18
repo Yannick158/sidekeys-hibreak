@@ -1,7 +1,21 @@
-## SideKeys v1.4.0
+## SideKeys v1.5.2
 
 Freely remap the two side keys of the **Bigme HiBreak Pro** — and the volume keys,
 or any hardware key — separately for single press, double press and long press.
+
+### New in 1.5.x
+- **Enabling the service is now two clear steps** — "Allow restricted settings"
+  (opens the app info screen) and "Enable accessibility service", each with a
+  note saying what to tap there. The old one-tap button is gone: it could never
+  work on a fresh install.
+- **"Restart service"** for when Bigme's task manager force-stops the app. Only
+  shown when the app actually holds the rights to do it, and it verifies the
+  result instead of claiming success.
+- **Battery Saver toggle: two optional setup routes** — via Shizuku from the
+  phone, or `adb pm grant` from a computer. Android offers no API for this to
+  normal apps, and the alternative (clicking the toggle through the
+  accessibility tree) would require the ability to read screen content, which
+  this app deliberately does not have.
 
 ### New in 1.4.0
 - **Scroll up / down in any app** as key actions

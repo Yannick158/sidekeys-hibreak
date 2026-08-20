@@ -9,7 +9,7 @@ Work through the phases in order. Phase 0 is already finished.
 
 ## Phase 0 — Ready to upload ✅
 
-- Signed **App Bundle** built: `SideKeys-v1.7.0.aab` (version code 21, targets API 36)
+- Signed **App Bundle** built: `app-release.aab` (version 1.11.0, version code 34, targets API 36)
 - [Privacy policy](PRIVACY.md) written — declares that no data is collected
 - Release notes per language in `distribution/whatsnew/`
 - Automated upload workflow: [.github/workflows/play-release.yml](.github/workflows/play-release.yml)
@@ -43,7 +43,7 @@ bundle goes up by hand:
 
 1. **Testing → Internal testing → Create new release**
 2. Accept **Play App Signing** when prompted (see the note below)
-3. Upload `SideKeys-v1.7.0.aab`
+3. Upload `app/build/outputs/bundle/release/app-release.aab`
 4. Paste the text from `distribution/whatsnew/whatsnew-en-US` as the release notes
 5. Save → Review release → **Start rollout to internal testing**
 
@@ -96,47 +96,37 @@ Button mapper for E-Ink phones: give your side keys any function you want.
 ```
 SideKeys lets you decide what your phone's hardware keys do.
 
-E-Ink phones usually have one or two extra side keys, but their firmware only
-offers a fixed list of actions — and typically cannot launch apps at all.
-SideKeys fills that gap: assign any action you like to each key, separately for
-single press, double press and long press.
+E-Ink phones usually have one or two extra side keys, but their firmware only offers a fixed list of actions — and typically cannot launch apps at all. SideKeys fills that gap: assign any action you like to each key, separately for single press, double press and long press. Volume keys work too.
 
 WHAT A KEY CAN DO
-• Launch any installed app
+• Launch any installed app, or jump straight to a specific screen inside it
 • Start Google Assistant, open Google Wallet
-• Home, Back, Recent apps, notifications, quick settings, power menu, lock
+• Home, Back, Recent apps, notifications, quick settings, power menu, lock screen
 • Take a screenshot
-• Scroll up and down in any app
+• Scroll up and down in any app, with the scroll distance adjustable from 10% to 90% of the screen — and separately per app, because a reading app wants a different step than a browser
 • Flashlight, media controls, volume up/down/mute, Do Not Disturb
-• Toggle Battery Saver — a key press reaches it even on phones whose quick
-  settings panel cannot be edited
+• Toggle Battery Saver — a key press reaches it even on phones whose quick settings panel cannot be edited
 • Custom intents for power users
 
 BUILT FOR E-INK
-Pure black and white, no animations, no ghosting. Keys are captured at runtime —
-just press the button you want to assign. Built-in debounce filters the ghost
-presses that bouncy side keys produce.
+Pure black and white, no animations, nothing that smears the screen. Keys are captured at runtime — just press the button you want to assign, and SideKeys names it for you. Built-in debounce filters the ghost presses that bouncy side keys produce.
 
 MORE
-• Per-app profiles: different actions while a chosen app is in the foreground
-• Charge alarm: a sound, vibration and notification at a level you pick, so you
-  can unplug in time
+• Per-app profiles: different actions while a chosen app is in the foreground, falling back to your global mapping for anything you leave empty
+• Charge alarm: a sound, vibration and notification at a level you pick, so you can unplug in time
 
 PRIVACY
-No internet permission, so the app cannot send anything anywhere. It does not
-read screen content. Your key mappings stay on the device and are deleted when
-you uninstall. Open source under the MIT licence.
+SideKeys has no internet permission, so it is technically incapable of sending anything anywhere. It does not read screen content — the accessibility service does not even request that capability. Your key mappings stay on the device and are deleted when you uninstall. No account, no analytics, no ads. Open source under the MIT licence.
 
 SETUP
-SideKeys needs the accessibility permission — that is the only way an Android app
-can receive hardware key presses. The app walks you through the steps.
+SideKeys needs the accessibility permission. That is the only way an Android app can receive hardware key presses while it is not the app on screen, and the app explains this up front and asks for your agreement before anything is enabled. Setup is three guided steps.
 ```
-- **App icon** 512×512 PNG
-- **Feature graphic** 1024×500 PNG
-- **At least 2 phone screenshots** — home screen and the mapping screen work well
+- **App icon** 512×512 PNG — `distribution/graphics/icon-512.png`
+- **Feature graphic** 1024×500 PNG — `distribution/graphics/feature-graphic-1024x500.png`
+- **At least 2 phone screenshots** — the home screen, the mapping screen and the
+  action picker cover it
 
-Screenshots and graphics are the only assets still missing; everything else is
-written.
+All graphics are generated and checked against Play's format requirements.
 
 ## Phase 6 — Automated releases from here on
 

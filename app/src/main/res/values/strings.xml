@@ -119,7 +119,6 @@
     <string name="mapping_for_app">for %1$s</string>
 
     <!-- Battery saver / Quick Settings tile -->
-    <string name="tile_battery_saver">Battery Saver</string>
     <string name="battery_saver_on">Battery Saver on</string>
     <string name="battery_saver_off">Battery Saver off</string>
     <string name="battery_saver_manual">Opening Battery Saver settings…</string>
@@ -155,26 +154,33 @@
     <string name="error_no_flashlight">No flashlight found on this device.</string>
     <string name="error_action_failed">The action could not be executed.</string>
     <string name="error_dnd_permission">Please allow SideKeys to access Do Not Disturb and try again.</string>
-
-    <!-- Quick Settings tile installer -->
-    <string name="qs_tile_title">Battery Saver tile in Quick Settings</string>
-    <string name="qs_tile_intro">SideKeys can register its tile even where the panel hides the "edit tiles" button. Note for Bigme devices: they ship a modified SystemUI whose panel draws its own fixed set of tiles (Power Management, E Ink Center, Full refresh) and never reads the system tile list, so a tile added here cannot become visible — confirmed on the HiBreak Pro. Map Battery Saver to a key instead.</string>
-    <string name="qs_tile_state_listed">The tile is in the panel\'s tile list. Pull the shade down twice to check — if it isn\'t visible, this firmware ignores the list.</string>
-    <string name="qs_tile_state_registered">✓ The system registered the tile. If it still does not appear in the panel, this firmware draws its own fixed set of tiles and ignores registered ones — nothing an app can change. Use the key action instead.</string>
-    <string name="qs_tile_add">Add tile to Quick Settings</string>
-    <string name="qs_tile_remove">Remove tile again</string>
-    <string name="qs_tile_note">Nothing else in the app depends on the tile — mapping Battery Saver to a key always works, and is the reliable route on firmwares with a custom panel.</string>
-    <string name="qs_tile_msg_added">✓ Added.</string>
-    <string name="qs_tile_msg_declined">You declined the system dialog. Tap again to retry.</string>
-    <string name="qs_tile_msg_need_shell">This firmware has no add-tile dialog, and Android 14 only lets a privileged shell edit the tile list. Start Shizuku and tap again — or run this from a computer:</string>
-    <string name="qs_tile_msg_write_failed">Could not write the tile list.</string>
-    <string name="qs_tile_msg_written_unconfirmed">Written to the tile list, but the system did not confirm adding it. Pull the shade down twice — if the tile isn\'t there, this panel does not read the list.</string>
-    <string name="qs_tile_working">Adding…</string>
-    <string name="qs_tile_diagnose">Run diagnostics</string>
-    <string name="qs_tile_position">The tile is in the list at position %1$d — that is likely on a later page of the panel. Swipe sideways in the tile area, or move it to the front:</string>
-    <string name="qs_tile_move_front">Move SideKeys tile to the front</string>
-    <string name="qs_tile_move_stock">Move the built-in Battery Saver tile to the front</string>
-    <string name="qs_tile_msg_stock_moved">Moved. Pull the shade down twice — "Battery Saver" should now be on the first page.</string>
     <string name="enable_step3">Step 3: Switch it on for real</string>
     <string name="enable_step3_note">Back to accessibility settings — the switch for "SideKeys Button Mapper" now works.</string>
+    <!-- Accessibility disclosure (required by Google Play) -->
+    <string name="consent_title">Before you start</string>
+    <string name="consent_intro">SideKeys uses Android\'s accessibility service. That is the only way an app can receive hardware key presses, so it is what makes the whole app work. Here is exactly what that means.</string>
+    <string name="consent_accesses_title">What the service accesses</string>
+    <string name="consent_accesses_body">• Hardware key events — which key you pressed and when, so the action you assigned can run. Keys you have not assigned are passed straight through, unchanged.\n• The package name of the app in the foreground — only if you use per-app profiles, so the app knows which profile applies.\n\nIt does not read screen content, text you type, or anything shown in other apps. The service does not request that capability at all.</string>
+    <string name="consent_use_title">How it is used</string>
+    <string name="consent_use_body">Solely to run the actions you configured — launching an app, Home, Back, scrolling, and so on. Your key mappings are stored in the app\'s private storage on this device and are deleted when you uninstall SideKeys.</string>
+    <string name="consent_sharing_title">What is shared</string>
+    <string name="consent_sharing_body">Nothing. SideKeys has no internet permission, so it cannot transmit anything anywhere. There is no account, no analytics and no advertising.</string>
+    <string name="consent_why_title">Why SideKeys needs it</string>
+    <string name="consent_why_body">Android gives an app no other way to receive hardware key presses while it is not the app on screen. The accessibility service is the only supported mechanism for it, so without your consent SideKeys cannot remap a single key — there is no reduced mode it could fall back to.</string>
+    <string name="consent_accept">I agree — continue</string>
+    <string name="consent_decline">No, close the app</string>
+    <string name="consent_decline_note">Declining closes SideKeys and nothing is enabled. You will be asked again the next time you open it.</string>
+    <string name="setting_scroll_percent">Scroll distance</string>
+    <string name="percent_of_screen">%1$d%% of the screen</string>
+    <string name="scroll_percent_note">How far a scroll action moves. How much text that is depends on your font size, so pick what reads well — a smaller value if a scroll currently skips past lines.</string>
+    <string name="profile_scroll_title">Own scroll distance</string>
+    <string name="profile_scroll_global">Using the global setting</string>
+    <string name="profile_scroll_note">Applies to every key you scroll with while this app is in the foreground. A reading app often wants a different step than a browser.</string>
+    <string name="capture_blocked_title">Detected: %1$s</string>
+    <string name="capture_blocked_note">This key can\'t be reassigned. Power and Home are what get you back to this app if a mapping goes wrong, so SideKeys leaves them alone. Try one of the other keys.</string>
+    <string name="capture_nothing_title">No key press detected yet</string>
+    <string name="capture_nothing_note">If pressing your side keys does nothing here, the firmware is handling them itself and no app can receive them. Look in your device settings for an option to free the key — on some devices it sits under a "custom key", "shortcut key" or "side button" entry. Volume keys almost always work.</string>
+    <string name="capture_risky_title">%1$s is a navigation key</string>
+    <string name="capture_risky_note">You can assign it, but you will lose what it does now. On some e-ink readers the page-turn buttons report exactly this code, which is why it is allowed. Any press type you leave on "No action" keeps working as before.</string>
+    <string name="capture_risky_confirm">Assign anyway</string>
 </resources>

@@ -36,7 +36,7 @@ other devices are welcome.
 - **Charge alarm**: get a sound + vibration + notification when the battery
   reaches a level you pick while plugged in, so you can unplug to protect it.
   Works on any device — no root, no helper app.
-- **Battery Saver toggle** — as a key action (and as a Quick Settings tile on
+- **Battery Saver toggle** — as a key action (needs a one-off
   firmwares that use the standard panel; see the device note below).
 - **One-tap accessibility enable** so you don't have to redo the
   "Allow restricted settings" dance after every update.
@@ -117,15 +117,9 @@ Good to know:
   (e.g. page turn / E Ink Center) interferes — long press works because usually
   no Bigme action sits there. Fix: in the Bigme settings under "Custom key" set
   **both Single Tap and Long Press to "None"** for both keys.
-- **Quick Settings tiles from apps never appear.** Not a bug in the app. Bigme
-  ships a modified SystemUI: the shade windows are named as in AOSP, and the tile
-  host still instantiates every registered tile (Google's "Quick Share" and
-  "Security & privacy" sit unused in that list too), but the panel you see draws
-  its own fixed set — Power Management, E Ink Center, Full refresh — none of
-  which appear in `sysui_qs_tiles`. Verified by moving the stock Battery Saver
-  tile to position 1 of that list: still invisible. No app, adb command or
-  settings flag can change this; only a different ROM could. Map Battery Saver
-  to a key instead.
+- **Looking for a Quick Settings tile?** There isn't one any more. Several e-ink firmwares — Bigme's among them — ship a modified SystemUI whose panel draws a fixed set of tiles and never reads the system tile list, so a tile from an app can never become visible there. Rather than ship a feature that silently does nothing, it was removed in 1.11.0. Map Battery Saver to a side key or a volume key instead — that works regardless of the panel, and takes one press instead of two.
+
+
 - **Disable DuraSpeed:** the MediaTek "DuraSpeed" feature aggressively kills
   background apps and can hit the SideKeys service too. Turn it off via ADB:
 

@@ -38,6 +38,9 @@ class ActionExecutor(private val service: AccessibilityService) {
     private val mainHandler = Handler(Looper.getMainLooper())
     private val cameraManager = service.getSystemService(Context.CAMERA_SERVICE) as CameraManager
     private var torchCameraId: String? = null
+
+    /** Scroll distance as a percentage of screen height; kept in sync by the service. */
+    var scrollPercent: Int = 45
     private var torchEnabled = false
 
     private val torchCallback = object : CameraManager.TorchCallback() {
@@ -64,15 +67,16 @@ class ActionExecutor(private val service: AccessibilityService) {
         runCatching { cameraManager.unregisterTorchCallback(torchCallback) }
     }
 
-    fun execute(action: KeyAction) {
+    fun execute(action: KeyAction, scrollPercentOverride: Int? = null) {
+        val scrollBy = scrollPercentOverride ?: scrollPercent
         when (action.type) {
             ActionType.NONE -> Unit
             ActionType.ASSISTANT -> launchAssistant()
             ActionType.WALLET -> launchWallet()
             ActionType.LAUNCH_APP -> launchApp(action.data)
             ActionType.LAUNCH_ACTIVITY -> launchActivity(action.data)
-            ActionType.SCROLL_UP -> scroll(up = true)
-            ActionType.SCROLL_DOWN -> scroll(up = false)
+            ActionType.SCROLL_UP -> scroll(up = true, percent = scrollBy)
+            ActionType.SCROLL_DOWN -> scroll(up = false, percent = scrollBy)
             ActionType.EINK_REFRESH -> einkRefresh()
             ActionType.HOME -> service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME)
             ActionType.BACK -> service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK)
@@ -189,18 +193,63 @@ class ActionExecutor(private val service: AccessibilityService) {
         return runCatching { service.dispatchGesture(gesture, null, null) }.getOrDefault(false)
     }
 
-    /** Scrolls the foreground app by roughly half a screen via a swipe gesture. */
-    private fun scroll(up: Boolean) {
+    /** Scrolls the foreground app by [percent] of the screen height. */
+    private fun scroll(up: Boolean, percent: Int) {
         val dm = service.resources.displayMetrics
         val x = dm.widthPixels / 2f
-        val yTop = dm.heightPixels * 0.30f
-        val yBottom = dm.heightPixels * 0.75f
-        val ok = if (up) {
-            swipe(x, yTop, x, yBottom, 220) // finger moves down -> content scrolls up
-        } else {
-            swipe(x, yBottom, x, yTop, 220) // finger moves up -> content scrolls down
+        val travel = dm.heightPixels * (percent.coerceIn(10, 90) / 100f)
+        val center = dm.heightPixels * 0.52f
+        // Finger moves down -> content scrolls up, and vice versa.
+        val from = center + if (up) -travel / 2f else travel / 2f
+        val to = center + if (up) travel / 2f else -travel / 2f
+        // Constant finger speed regardless of distance, so a long swipe does not
+        // become a faster one.
+        val duration = (travel / dm.heightPixels * 900f).toLong().coerceIn(150L, 900L)
+        if (!scrollSwipe(x, from, x, to, duration)) toast(R.string.error_gesture_failed)
+    }
+
+    /**
+     * A swipe that ends with the finger held still for a moment before lifting.
+     * Without that pause Android reads the release velocity as a fling and the
+     * app keeps coasting far past the requested distance — the reason scrolling
+     * used to overshoot.
+     */
+    private fun scrollSwipe(x1: Float, y1: Float, x2: Float, y2: Float, durationMs: Long): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return false
+        val path = Path().apply {
+            moveTo(x1, y1)
+            lineTo(x2, y2)
         }
-        if (!ok) toast(R.string.error_gesture_failed)
+        val drag = GestureDescription.StrokeDescription(path, 0, durationMs, true)
+        val callback = object : AccessibilityService.GestureResultCallback() {
+            override fun onCompleted(gestureDescription: GestureDescription?) = finishScroll(drag, x2, y2)
+            override fun onCancelled(gestureDescription: GestureDescription?) = finishScroll(drag, x2, y2)
+        }
+        return runCatching {
+            service.dispatchGesture(
+                GestureDescription.Builder().addStroke(drag).build(),
+                callback,
+                mainHandler,
+            )
+        }.getOrDefault(false)
+    }
+
+    /** Completes a continued stroke; leaving one open would block touch input. */
+    private fun finishScroll(drag: GestureDescription.StrokeDescription, x: Float, y: Float) {
+        runCatching {
+            // A stroke path may not be empty, so the hold moves by a single pixel.
+            val hold = Path().apply {
+                moveTo(x, y)
+                lineTo(x, y + 1f)
+            }
+            service.dispatchGesture(
+                GestureDescription.Builder()
+                    .addStroke(drag.continueStroke(hold, 0, 120, false))
+                    .build(),
+                null,
+                null,
+            )
+        }
     }
 
     /**

@@ -1,8 +1,46 @@
-## SideKeys v1.8.0
+## SideKeys v1.11.0
 
 A button mapper for **E-Ink phones**: freely remap the extra side keys, the volume
 keys or almost any hardware key — separately for single press, double press and
 long press. Developed and tested on the Bigme HiBreak Pro.
+
+### New in 1.11.0
+- **Works on Android 15 and 16.** The UI was drawing underneath the status and
+  navigation bars, which on newer devices could push the Save button out of
+  reach. Reported on a Viwoods AiPaper (Android 16); it affected every Android
+  15+ device.
+- **Key capture no longer stays silent.** Back, Home, Recents, Menu and Power
+  were dropped without a word, so a reader whose page-turn buttons report those
+  codes looked exactly like a device sending nothing at all. Capture now names
+  every key it sees, Back / Recents / Menu can be assigned after a confirmation,
+  and only Power and Home stay locked. If nothing arrives at all, the screen now
+  says so and explains why.
+- **Scroll distance per app.** An app profile can override the global scroll
+  distance — a reading app usually wants a different step than a browser.
+- **The Battery Saver Quick Settings tile is gone.** It never worked on the
+  firmwares it was built for: their panel draws a fixed set of tiles and ignores
+  the system tile list, so the tile could not become visible no matter what.
+  Shipping a button that silently does nothing is worse than not shipping it.
+  **Map Battery Saver to a key instead** — that always worked and is faster.
+
+### New in 1.9.x
+- **Adjustable scroll distance.** Scrolling used to jump a fixed ~half screen,
+  which overshoots at small font sizes. Settings → *Scroll distance* now sets it
+  anywhere from 10 % to 90 % of the screen.
+- **Scrolling no longer flings.** The swipe now ends with the finger held still
+  before it lifts, so the app stops where the gesture stops instead of coasting
+  past it. This was the real reason a scroll went further than you asked.
+- **Up-front disclosure, with a real choice.** On first launch SideKeys explains
+  why it needs the accessibility service (Android offers no other way for an app
+  to receive hardware key presses in the background), what it accesses (key
+  events, plus the foreground app's package name only if you use per-app
+  profiles), and that nothing leaves the device — it has no internet permission.
+  You either agree or decline, and declining closes the app without enabling
+  anything. Required by Google Play for apps that use the Accessibility API
+  without being an accessibility tool.
+
+First version submitted to Google Play. It remains free, open source, ad-free,
+and installable as an APK from here.
 
 ### New in 1.8.0
 - **Setup now follows the order Android actually requires.** For sideloaded apps
@@ -10,14 +48,6 @@ long press. Developed and tested on the Bigme HiBreak Pro.
   so the screen walks three steps — try, allow, switch on — and says that the
   refusal in step 1 is expected.
 - **Targets Android 16 (API 36).**
-- Fixes to the Quick Settings tile handling, and honest wording about firmwares
-  whose panel ignores app tiles entirely (see below).
-
-> **Quick Settings tiles:** some firmwares — Bigme's among them — ship a modified
-> SystemUI whose panel draws a fixed set of tiles and never reads the system tile
-> list. No app can add a tile there. **Map Battery Saver to a side key or volume
-> key instead** — that path works regardless of the panel, and is arguably faster
-> than opening the shade anyway.
 
 ### New in 1.5.x
 - Guided setup for the accessibility service, replacing a one-tap button that
@@ -45,7 +75,6 @@ long press. Developed and tested on the Bigme HiBreak Pro.
 - Keys survive Bigme's task manager: SideKeys hides itself from recent apps by
   default, and "Enable in one tap" restarts a killed service
 - **Volume Up / Down / Mute** and **Battery Saver** as actions
-- **Battery Saver Quick Settings tile** (the one the stock HiBreak Pro is missing)
 - **Charge alarm**: sound + vibration + notification at your chosen level so you
   can unplug — works on any device, no root
 - **One-tap accessibility enable** (skips the "Allow restricted settings" dance

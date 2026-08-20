@@ -17,12 +17,23 @@ object KeyCodeNames {
         }
     }
 
-    /** Keys that must never be captured/remapped so the user cannot lock themselves out. */
+    /**
+     * Keys that must never be remapped: losing either one can leave the user
+     * unable to reach the app that would undo the mapping.
+     */
     val BLOCKED_KEY_CODES = setOf(
-        KeyEvent.KEYCODE_BACK,
-        KeyEvent.KEYCODE_HOME,
-        KeyEvent.KEYCODE_APP_SWITCH,
         KeyEvent.KEYCODE_POWER,
+        KeyEvent.KEYCODE_HOME,
+    )
+
+    /**
+     * Navigation keys. Remapping them is allowed but confirmed first — several
+     * e-ink readers report exactly these codes for their page-turn buttons, so
+     * refusing them outright would make the app useless on those devices.
+     */
+    val RISKY_KEY_CODES = setOf(
+        KeyEvent.KEYCODE_BACK,
+        KeyEvent.KEYCODE_APP_SWITCH,
         KeyEvent.KEYCODE_MENU,
     )
 }

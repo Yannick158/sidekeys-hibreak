@@ -114,6 +114,35 @@ fun SettingsScreen(onBack: () -> Unit) {
 
             EInkCard {
                 Text(
+                    text = stringResource(R.string.setting_scroll_percent),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Text(
+                    text = stringResource(R.string.percent_of_screen, settings.scrollPercent),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                var scrollValue by remember(settings.scrollPercent) {
+                    mutableFloatStateOf(settings.scrollPercent.toFloat())
+                }
+                Slider(
+                    value = scrollValue,
+                    onValueChange = { scrollValue = it },
+                    onValueChangeFinished = {
+                        viewModel.setScrollPercent((scrollValue / 5).toInt() * 5)
+                    },
+                    valueRange = 10f..90f,
+                    steps = 15,
+                    colors = blackSlider,
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.scroll_percent_note),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+
+            EInkCard {
+                Text(
                     text = stringResource(R.string.setting_debounce),
                     style = MaterialTheme.typography.titleMedium,
                 )

@@ -119,7 +119,6 @@
     <string name="mapping_for_app">für %1$s</string>
 
     <!-- Batterie-Sparmodus / Quick-Settings-Kachel -->
-    <string name="tile_battery_saver">Energiesparmodus</string>
     <string name="battery_saver_on">Energiesparmodus an</string>
     <string name="battery_saver_off">Energiesparmodus aus</string>
     <string name="battery_saver_manual">Öffne Energiespar-Einstellungen…</string>
@@ -157,24 +156,33 @@
     <string name="error_dnd_permission">Bitte erlaube SideKeys den Zugriff auf „Nicht stören" und versuche es erneut.</string>
 
     <!-- Quick-Settings-Kachel einrichten -->
-    <string name="qs_tile_title">Energiesparmodus-Kachel in den Schnelleinstellungen</string>
-    <string name="qs_tile_intro">SideKeys kann seine Kachel auch dort eintragen, wo das Panel den „Kacheln bearbeiten"-Knopf ausblendet. Hinweis für Bigme-Geräte: Dort läuft eine angepasste SystemUI, deren Panel einen eigenen festen Kachelsatz zeichnet (Power Management, E Ink Center, Vollrefresh) und die System-Kachelliste nie liest — eine hier hinzugefügte Kachel kann dort also nicht sichtbar werden (auf dem HiBreak Pro bestätigt). Leg den Energiesparmodus stattdessen auf eine Taste.</string>
-    <string name="qs_tile_state_listed">Die Kachel steht in der Kachelliste des Panels. Zieh die Leiste zweimal herunter — ist sie nicht zu sehen, ignoriert diese Firmware die Liste.</string>
-    <string name="qs_tile_state_registered">✓ Das System hat die Kachel registriert. Erscheint sie trotzdem nicht im Panel, zeichnet diese Firmware nur ihren eigenen festen Kachelsatz und ignoriert registrierte — daran kann keine App etwas ändern. Nutze dann die Tastenaktion.</string>
-    <string name="qs_tile_add">Kachel zu den Schnelleinstellungen hinzufügen</string>
-    <string name="qs_tile_remove">Kachel wieder entfernen</string>
-    <string name="qs_tile_note">Nichts sonst in der App hängt an der Kachel — den Energiesparmodus auf eine Taste zu legen funktioniert immer und ist bei eigenen Panels der verlässliche Weg.</string>
-    <string name="qs_tile_msg_added">✓ Hinzugefügt.</string>
-    <string name="qs_tile_msg_declined">Du hast den System-Dialog abgelehnt. Nochmal tippen zum Wiederholen.</string>
-    <string name="qs_tile_msg_need_shell">Diese Firmware hat keinen Hinzufügen-Dialog, und Android 14 lässt die Kachelliste nur von einer privilegierten Shell bearbeiten. Starte Shizuku und tippe erneut — oder führe das am Computer aus:</string>
-    <string name="qs_tile_msg_write_failed">Kachelliste konnte nicht geschrieben werden.</string>
-    <string name="qs_tile_msg_written_unconfirmed">In die Kachelliste geschrieben, aber das System hat das Hinzufügen nicht bestätigt. Zieh die Leiste zweimal herunter — fehlt die Kachel, liest dieses Panel die Liste nicht.</string>
-    <string name="qs_tile_working">Wird hinzugefügt…</string>
-    <string name="qs_tile_diagnose">Diagnose ausführen</string>
-    <string name="qs_tile_position">Die Kachel steht an Position %1$d der Liste — damit vermutlich auf einer späteren Seite des Panels. Wisch im Kachelbereich seitwärts, oder sortiere sie nach vorne:</string>
-    <string name="qs_tile_move_front">SideKeys-Kachel nach vorne sortieren</string>
-    <string name="qs_tile_move_stock">Eingebaute Energiesparmodus-Kachel nach vorne sortieren</string>
-    <string name="qs_tile_msg_stock_moved">Sortiert. Zieh die Leiste zweimal herunter — „Energiesparmodus" sollte jetzt auf der ersten Seite stehen.</string>
     <string name="enable_step3">Schritt 3: Jetzt wirklich einschalten</string>
     <string name="enable_step3_note">Zurück in die Bedienungshilfen — der Schalter für „SideKeys Tastenbelegung" funktioniert jetzt.</string>
+    <!-- Offenlegung zur Bedienungshilfe (von Google Play gefordert) -->
+    <string name="consent_title">Bevor du loslegst</string>
+    <string name="consent_intro">SideKeys nutzt Androids Bedienungshilfe-Dienst. Nur so kann eine App Hardware-Tastendrücke empfangen — daran hängt die gesamte Funktion. Hier steht genau, was das bedeutet.</string>
+    <string name="consent_accesses_title">Worauf der Dienst zugreift</string>
+    <string name="consent_accesses_body">• Hardware-Tastenereignisse — welche Taste wann gedrückt wurde, damit die von dir gewählte Aktion läuft. Nicht belegte Tasten werden unverändert durchgereicht.\n• Den Paketnamen der App im Vordergrund — nur wenn du Profile pro App nutzt, damit das passende Profil greift.\n\nEr liest keine Bildschirminhalte, keine Eingaben und nichts aus anderen Apps. Diese Fähigkeit fordert der Dienst gar nicht erst an.</string>
+    <string name="consent_use_title">Wofür es genutzt wird</string>
+    <string name="consent_use_body">Ausschließlich, um die von dir eingerichteten Aktionen auszuführen — App starten, Startbildschirm, Zurück, Scrollen und so weiter. Deine Tastenbelegungen liegen im privaten Speicher der App auf diesem Gerät und werden mit der Deinstallation gelöscht.</string>
+    <string name="consent_sharing_title">Was weitergegeben wird</string>
+    <string name="consent_sharing_body">Nichts. SideKeys hat keine Internet-Berechtigung und kann technisch nichts übertragen. Es gibt kein Konto, keine Analyse und keine Werbung.</string>
+    <string name="consent_why_title">Warum SideKeys das braucht</string>
+    <string name="consent_why_body">Android bietet einer App keinen anderen Weg, Hardware-Tastendrücke zu empfangen, während sie nicht die App auf dem Bildschirm ist. Der Bedienungshilfe-Dienst ist dafür der einzige vorgesehene Mechanismus — ohne deine Zustimmung kann SideKeys also keine einzige Taste belegen; einen eingeschränkten Ersatzmodus gibt es nicht.</string>
+    <string name="consent_accept">Einverstanden — weiter</string>
+    <string name="consent_decline">Nein, App schließen</string>
+    <string name="consent_decline_note">Bei Ablehnung schließt sich SideKeys und es wird nichts aktiviert. Beim nächsten Öffnen wirst du erneut gefragt.</string>
+    <string name="setting_scroll_percent">Scroll-Weite</string>
+    <string name="percent_of_screen">%1$d%% des Bildschirms</string>
+    <string name="scroll_percent_note">Wie weit eine Scroll-Aktion springt. Wie viel Text das ist, hängt von deiner Schriftgröße ab — wähle also, was sich gut liest, und einen kleineren Wert, falls beim Scrollen Zeilen übersprungen werden.</string>
+    <string name="profile_scroll_title">Eigene Scroll-Weite</string>
+    <string name="profile_scroll_global">Nutzt die globale Einstellung</string>
+    <string name="profile_scroll_note">Gilt für jede Taste, mit der du scrollst, solange diese App im Vordergrund ist. Eine Lese-App braucht oft eine andere Schrittweite als ein Browser.</string>
+    <string name="capture_blocked_title">Erkannt: %1$s</string>
+    <string name="capture_blocked_note">Diese Taste lässt sich nicht neu belegen. Ein- und Startbildschirm-Taste bringen dich zurück in diese App, falls eine Belegung schiefgeht — deshalb rührt SideKeys sie nicht an. Nimm eine andere Taste.</string>
+    <string name="capture_nothing_title">Noch kein Tastendruck erkannt</string>
+    <string name="capture_nothing_note">Wenn hier beim Drücken deiner Seitentasten nichts passiert, verarbeitet die Firmware sie selbst und keine App kann sie empfangen. Suche in den Geräteeinstellungen nach einer Möglichkeit, die Taste freizugeben — oft unter „Custom key\", „Shortcut\" oder „Seitentaste\". Lautstärketasten funktionieren fast immer.</string>
+    <string name="capture_risky_title">%1$s ist eine Navigationstaste</string>
+    <string name="capture_risky_note">Du kannst sie belegen, verlierst aber ihre bisherige Funktion. Bei manchen E-Ink-Readern melden die Umblättertasten genau diesen Code — deshalb ist es erlaubt. Jede Druckart, die du auf „Keine Aktion\" lässt, funktioniert weiter wie bisher.</string>
+    <string name="capture_risky_confirm">Trotzdem belegen</string>
 </resources>

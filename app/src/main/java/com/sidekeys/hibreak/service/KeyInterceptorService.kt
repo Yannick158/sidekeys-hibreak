@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
 /** A key press observed while the capture screen is open. */
-data class CapturedKey(val keyCode: Int, val keyName: String)
+data class CapturedKey(val keyCode: Int, val keyName: String, val blocked: Boolean = false)
 
 /**
  * Accessibility service that filters hardware key events and maps the
@@ -139,7 +139,10 @@ class KeyInterceptorService : AccessibilityService() {
             }
         }
         scope.launch {
-            repository.settings.collect { settings = it }
+            repository.settings.collect {
+                settings = it
+                executor?.scrollPercent = it.scrollPercent
+            }
         }
         scope.launch {
             repository.chargeSettings.collect { chargeSettings = it }
@@ -223,15 +226,29 @@ class KeyInterceptorService : AccessibilityService() {
         val pressHandler = pressHandlers.getOrPut(event.keyCode) { KeyPressHandler(HandlerScheduler(mainHandler)) }
         return when (event.action) {
             KeyEvent.ACTION_DOWN ->
-                pressHandler.onDown(mapping, settings, event.repeatCount, event.eventTime, ::runMappedAction)
+                pressHandler.onDown(mapping, settings, event.repeatCount, event.eventTime) {
+                    runMappedAction(it, mapping.scrollPercent)
+                }
             KeyEvent.ACTION_UP ->
-                pressHandler.onUp(mapping, settings, event.eventTime, ::runMappedAction)
+                pressHandler.onUp(mapping, settings, event.eventTime) {
+                    runMappedAction(it, mapping.scrollPercent)
+                }
             else -> true
         }
     }
 
     private fun handleCapture(event: KeyEvent): Boolean {
-        if (event.keyCode in KeyCodeNames.BLOCKED_KEY_CODES) return false
+        if (event.keyCode in KeyCodeNames.BLOCKED_KEY_CODES) {
+            // Say what arrived rather than ignoring it. A capture screen that
+            // never reacts is indistinguishable from one that receives nothing,
+            // and the difference is exactly what needs diagnosing.
+            if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
+                capturedKeys.tryEmit(
+                    CapturedKey(event.keyCode, KeyCodeNames.prettyName(this, event.keyCode), blocked = true),
+                )
+            }
+            return false
+        }
         when (event.action) {
             KeyEvent.ACTION_DOWN -> if (event.repeatCount == 0) {
                 captureConsumedDowns.add(event.keyCode)
@@ -245,9 +262,9 @@ class KeyInterceptorService : AccessibilityService() {
         return true
     }
 
-    private fun runMappedAction(action: KeyAction) {
+    private fun runMappedAction(action: KeyAction, scrollPercent: Int? = null) {
         if (settings.hapticFeedback) executor?.vibrate()
-        executor?.execute(action)
+        executor?.execute(action, scrollPercent)
     }
 
     /**

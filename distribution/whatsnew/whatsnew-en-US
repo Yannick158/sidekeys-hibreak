@@ -1,11 +1,6 @@
-Give your phone's side keys and volume keys any function you want.
+Now works properly on Android 15 and 16
 
-- Launch any app, Google Assistant or Google Wallet with a key press
-- Separate actions for single press, double press and long press
-- Scroll up and down in any app
-- System actions: Home, Back, Recents, screenshot, lock, flashlight, media
-- Battery Saver on a key press — handy where the quick settings panel won't let
-  you add tiles
-- Per-app profiles: different actions while a chosen app is in the foreground
-- Charge alarm at a level you pick
-- Built for E-Ink: pure black and white, no animations, key debounce
+• Fixed a bug that drew the app underneath the status and navigation bars, which could put the Save button out of reach.
+• Assigning a key now names every key it sees, instead of silently ignoring some of them.
+• Scroll distance can now be set per app, not just globally.
+• Removed the Battery Saver quick settings tile — it could never show up on the firmwares it was meant for. Map Battery Saver to a key instead.

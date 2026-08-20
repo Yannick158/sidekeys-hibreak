@@ -108,8 +108,8 @@ WHAT A KEY CAN DO
 • Take a screenshot
 • Scroll up and down in any app
 • Flashlight, media controls, volume up/down/mute, Do Not Disturb
-• Toggle Battery Saver — useful on phones whose quick settings panel does not
-  let you add tiles: a key press reaches it either way
+• Toggle Battery Saver — a key press reaches it even on phones whose quick
+  settings panel cannot be edited
 • Custom intents for power users
 
 BUILT FOR E-INK
@@ -244,3 +244,81 @@ hier schadet:
 > ist die Voraussetzung dafür, dass die Ausnahmen der EU-Produkthaftungs-
 > richtlinie und des Cyber Resilience Act für nicht-kommerzielle freie Software
 > greifen. Siehe [DISCLAIMER.md](DISCLAIMER.md).
+
+---
+
+## Advance notice to the Play App Review team
+
+Optional but recommended for apps that use the Accessibility API
+(support.google.com/googleplay/android-developer/answer/6320428, item 5).
+Google asks for "an explanation documenting how the app uses the system
+capabilities that the service requests". Paste the following.
+
+### Subject
+
+SideKeys (com.sidekeys.hibreak) — AccessibilityService used to remap hardware
+buttons; no screen content is read
+
+### Body
+
+**What the app does.** SideKeys is a free, open-source button mapper for E-Ink
+phones. Devices such as the Bigme HiBreak Pro have extra physical side keys that
+the stock firmware exposes only for a fixed handful of functions. SideKeys lets
+the user assign their own action to a physical key — separately for single
+press, double press and long press. Every action is user-configured and runs
+only in response to a physical key press.
+
+**Why an AccessibilityService is required.** Android provides no other API for a
+normal app to receive hardware key events while it is not in the foreground.
+`FLAG_REQUEST_FILTER_KEY_EVENTS` on an AccessibilityService is the only
+supported mechanism. There is no alternative permission, intent or system API
+that achieves this.
+
+**Capabilities requested, and why.**
+
+| Requested | Purpose |
+| --- | --- |
+| `canRequestFilterKeyEvents` / `flagRequestFilterKeyEvents` | Receive hardware key events. Keys the user has not assigned are returned to the system unchanged. |
+| `canPerformGestures` | Dispatch a swipe for the "scroll up" / "scroll down" actions and the experimental E-Ink refresh. Gestures are only dispatched in direct response to a key press. |
+
+**Capabilities deliberately NOT requested.** `canRetrieveWindowContent` is not
+declared. The service therefore cannot read view hierarchies, text fields, or
+anything displayed by other apps. `isAccessibilityTool` is also not declared,
+because SideKeys is a general-purpose utility and not an accessibility tool.
+
+**The only data the service reads.** From accessibility events the app reads
+`getPackageName()` and nothing else, so that a user who has configured a per-app
+profile gets the mapping they chose for the app currently in the foreground.
+No event text, node tree, or screen content is accessed.
+
+**Where the data goes.** Nowhere. The app does not declare
+`android.permission.INTERNET`, so it is technically incapable of transmitting
+anything off the device. Key mappings are stored in the app's private storage
+and are deleted on uninstall. There is no account, no analytics, no advertising
+and no third-party SDK that collects data.
+
+**No autonomous behaviour.** The app does not use the Accessibility API to
+autonomously initiate, plan or execute actions. It is a deterministic
+key-press-to-action lookup: the user presses a key they configured, and the one
+action they assigned to it runs.
+
+**In-app disclosure.** On first launch, before any other screen and without the
+user navigating a menu, SideKeys shows a full-screen disclosure stating what the
+accessibility service accesses, what it is used for, and that nothing is shared;
+the user must accept it explicitly to continue. It is separate from the privacy
+policy.
+
+**About `WRITE_SECURE_SETTINGS` in the manifest.** This permission is declared
+but is `signature|privileged` and is therefore **never granted by a Play
+installation** — the app runs fully without it. It only takes effect if the user
+deliberately grants it themselves, either with `adb shell pm grant` from a
+computer or via Shizuku. It is declared because Android only lets an app use a
+permission it has declared; it is not requested at runtime and cannot be
+obtained through installation. Two optional features use it: toggling Battery
+Saver (`Settings.Global` `low_power`), and re-enabling the accessibility service
+after some OEM task managers force-stop the app. The in-app UI states both times
+that this is optional and how the grant works.
+
+**Source code.** https://github.com/Yannick158/sidekeys-hibreak — the
+accessibility service is `app/src/main/java/com/sidekeys/hibreak/service/KeyInterceptorService.kt`
+and its configuration is `app/src/main/res/xml/accessibility_service_config.xml`.

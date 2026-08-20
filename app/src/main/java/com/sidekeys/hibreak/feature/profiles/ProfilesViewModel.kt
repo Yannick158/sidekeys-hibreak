@@ -45,6 +45,17 @@ class ProfilesViewModel(private val repository: MappingRepository) : ViewModel()
         .map { list -> list.filter { it.packageName == packageName }.sortedBy { it.keyCode } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    /**
+     * Sets the scroll distance for a whole app profile; null restores the
+     * global setting. Stored on every mapping of the app so whichever key
+     * scrolls uses the same step.
+     */
+    fun setScrollPercent(mappings: List<KeyMapping>, percent: Int?) {
+        viewModelScope.launch {
+            mappings.forEach { repository.saveMapping(it.copy(scrollPercent = percent)) }
+        }
+    }
+
     fun deleteMapping(keyCode: Int, packageName: String) {
         viewModelScope.launch { repository.deleteMapping(keyCode, packageName) }
     }

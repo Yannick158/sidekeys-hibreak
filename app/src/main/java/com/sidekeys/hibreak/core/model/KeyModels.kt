@@ -79,6 +79,12 @@ data class KeyMapping(
     val singlePress: KeyAction = KeyAction(),
     val doublePress: KeyAction = KeyAction(),
     val longPress: KeyAction = KeyAction(),
+    /**
+     * Scroll distance for this profile, as a percentage of screen height.
+     * null means "use the global setting" — a reading app may want a different
+     * step than a browser.
+     */
+    val scrollPercent: Int? = null,
 ) {
     /** Merges an app profile over a global mapping slot by slot. */
     fun mergedOver(global: KeyMapping?): KeyMapping {
@@ -87,6 +93,7 @@ data class KeyMapping(
             singlePress = if (singlePress.type == ActionType.NONE) global.singlePress else singlePress,
             doublePress = if (doublePress.type == ActionType.NONE) global.doublePress else doublePress,
             longPress = if (longPress.type == ActionType.NONE) global.longPress else longPress,
+            scrollPercent = scrollPercent ?: global.scrollPercent,
         )
     }
 
@@ -131,4 +138,9 @@ data class KeySettings(
      * that way.
      */
     val hideFromRecents: Boolean = true,
+    /**
+     * How far a scroll action moves, as a percentage of the screen height.
+     * How much text that is depends on the font size, so it is worth adjusting.
+     */
+    val scrollPercent: Int = 45,
 )

@@ -1,12 +1,6 @@
-Belege die Seitentasten und Lautstärketasten deines Handys frei.
+Läuft jetzt richtig auf Android 15 und 16
 
-- App, Google Assistant oder Google Wallet per Tastendruck starten
-- Getrennte Aktionen für Einfach-, Doppel- und langen Druck
-- In jeder App nach oben und unten scrollen
-- Systemaktionen: Startbildschirm, Zurück, Letzte Apps, Screenshot, Sperren,
-  Taschenlampe, Medien
-- Energiesparmodus per Tastendruck — praktisch, wenn sich in den
-  Schnelleinstellungen keine Kacheln hinzufügen lassen
-- Profile pro App: andere Aktionen, solange eine bestimmte App vorn ist
-- Ladewecker bei einem Stand deiner Wahl
-- Für E-Ink gebaut: reines Schwarz-Weiß, keine Animationen, Tasten-Entprellung
+• Fehler behoben, durch den die App unter Status- und Navigationsleiste gezeichnet wurde — der Speichern-Knopf konnte unerreichbar sein.
+• Beim Zuordnen wird jetzt jede erkannte Taste benannt, statt manche stillschweigend zu ignorieren.
+• Die Scroll-Weite lässt sich jetzt pro App einstellen.
+• Die Energiesparmodus-Kachel wurde entfernt — sie konnte auf den betroffenen Firmwares nie erscheinen. Leg ihn stattdessen auf eine Taste.

@@ -32,6 +32,8 @@ class SettingsViewModel(private val repository: MappingRepository) : ViewModel()
 
     fun setDebounceMs(value: Long) = update { it.copy(debounceMs = value) }
 
+    fun setScrollPercent(value: Int) = update { it.copy(scrollPercent = value) }
+
     fun setHideFromRecents(hide: Boolean) = update { it.copy(hideFromRecents = hide) }
 
     private fun update(transform: (KeySettings) -> KeySettings) {

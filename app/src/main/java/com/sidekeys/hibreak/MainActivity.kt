@@ -1,17 +1,24 @@
 package com.sidekeys.hibreak
 
 import android.app.ActivityManager
+import android.graphics.Color as AndroidColor
 import android.os.Bundle
 import android.view.KeyEvent
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -34,6 +41,8 @@ import androidx.lifecycle.lifecycleScope
 import com.sidekeys.hibreak.core.common.KeyCodeNames
 import com.sidekeys.hibreak.core.data.Graph
 import com.sidekeys.hibreak.core.designsystem.SideKeysTheme
+import com.sidekeys.hibreak.feature.consent.Consent
+import com.sidekeys.hibreak.feature.consent.ConsentScreen
 import com.sidekeys.hibreak.service.CapturedKey
 import com.sidekeys.hibreak.service.KeyInterceptorService
 import com.sidekeys.hibreak.ui.SideKeysApp
@@ -43,23 +52,42 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // From Android 15 on, apps targeting SDK 35+ are always drawn edge to
+        // edge and the window's statusBarColor/navigationBarColor are ignored.
+        // Opting in explicitly makes every Android version behave alike, and the
+        // safeDrawing padding below keeps content clear of the system bars —
+        // without it the header sits under the status bar and the Save button
+        // under the navigation bar.
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.light(AndroidColor.WHITE, AndroidColor.WHITE),
+            navigationBarStyle = SystemBarStyle.light(AndroidColor.WHITE, AndroidColor.WHITE),
+        )
         setContent {
             SideKeysTheme {
+              Box(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
                 // If the previous run crashed, show the report first so the
                 // problem can be diagnosed straight from the phone.
-                var crash by rememberSaveable { mutableStateOf(SideKeysApplication.readCrash(this)) }
+                var crash by rememberSaveable { mutableStateOf(SideKeysApplication.readCrash(this@MainActivity)) }
                 val report = crash
                 if (report != null) {
                     CrashReportScreen(
                         report = report,
                         onDismiss = {
-                            SideKeysApplication.clearCrash(this)
+                            SideKeysApplication.clearCrash(this@MainActivity)
                             crash = null
                         },
                     )
                 } else {
-                    SideKeysApp()
+                    // Play policy: the accessibility disclosure must be shown
+                    // inside the app and accepted before the feature is used.
+                    var consented by rememberSaveable { mutableStateOf(Consent.isAccepted(this@MainActivity)) }
+                    if (!consented) {
+                        ConsentScreen(onAccept = { consented = true })
+                    } else {
+                        SideKeysApp()
+                    }
                 }
+              }
             }
         }
         // Bigme's task manager force-stops apps swiped from recents, which kills

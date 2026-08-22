@@ -1,5 +1,3 @@
-Drei Korrekturen, alle aus Nutzer-Rückmeldungen
+Behebt einen Fehler aus 1.12.0
 
-• Neue Aktion „Taste blockieren (nichts tun)" — für Seitentasten, die sich als F1/F2 melden und im Browser Tabs öffneten. „Keine Aktion" reicht die Taste durch, das hier verschluckt sie.
-• Neue Aktion „Taste der App überlassen" — für Lese-Apps, die die Taste selbst nutzen. „Keine Aktion" erbt im Profil die globale Belegung und konnte das nicht ausdrücken.
-• Seitentasten, die sich als „unbekannt" melden, sind jetzt unterscheidbar.
+Auf Geräten, bei denen beide Seitentasten denselben Code melden, konnte 1.12.0 eine bestehende Belegung zerstören. Ohne Treffer für die genaue Taste greift jetzt wieder der gemeinsame Code — „beide Tasten tun dasselbe" funktioniert also weiter, und eine einzeln zugeordnete Taste überschreibt weiterhin nur sich selbst.

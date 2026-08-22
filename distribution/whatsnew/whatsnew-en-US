@@ -1,5 +1,3 @@
-Three fixes, all from user reports
+Fixes a regression from 1.12.0
 
-• New action "Block the key (do nothing)" — for side keys that report as F1/F2, which made browsers open a tab. Leaving a key on "No action" passes it through; this swallows it.
-• New action "Let the app handle this key" — use it in an app profile for readers that use the key themselves. "No action" in a profile inherits the global mapping, so it could not express this.
-• Side keys that report as "unknown" can now be told apart.
+On devices where both side keys report the same code, 1.12.0 could break a mapping you already had saved. Resolving now falls back to the shared code when nothing is mapped to the exact button, so "both buttons do the same thing" keeps working — and assigning one button individually still overrides it for just that button.

@@ -151,11 +151,22 @@ class KeyInterceptorService : AccessibilityService() {
     }
 
     /**
-     * Effective mapping for [keyCode]: the foreground app's profile (if any)
+     * Effective mapping for [keyId]: the foreground app's profile (if any)
      * merged slot-by-slot over the global mapping; null if neither exists.
+     *
+     * Falls back to [rawKeyCode] when nothing is mapped to the precise key.
+     * That covers two cases at once. Mappings saved before scan codes were used
+     * as identity sit under the raw key code, so an existing setup keeps
+     * working after an update. And on devices whose side keys all report
+     * KEYCODE_UNKNOWN, one mapping saved under that code drives every one of
+     * them — which some people prefer, since both keys doing the same thing is
+     * a legitimate setup, not a bug. Assigning a key individually stores it
+     * under its own id, and that takes precedence.
      */
-    private fun resolveMapping(keyCode: Int): KeyMapping? {
-        val candidates = mappingsByKey[keyCode] ?: return null
+    private fun resolveMapping(keyId: Int, rawKeyCode: Int = keyId): KeyMapping? {
+        val candidates = mappingsByKey[keyId]
+            ?: mappingsByKey[rawKeyCode]
+            ?: return null
         val global = candidates.firstOrNull { it.packageName == null }
         val fg = foregroundPackage
         val perApp = if (fg != null) candidates.firstOrNull { it.packageName == fg } else null
@@ -213,7 +224,7 @@ class KeyInterceptorService : AccessibilityService() {
             return true
         }
 
-        val mapping = resolveMapping(keyId)
+        val mapping = resolveMapping(keyId, event.keyCode)
         if (mapping == null || mapping.isEmpty || mapping.isPassThrough) {
             // Orphaned UP after we consumed the DOWN (mapping deleted mid-press,
             // capture transition, ...): consume it for symmetry and reset.

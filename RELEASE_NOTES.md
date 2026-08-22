@@ -1,8 +1,17 @@
-## SideKeys v1.12.0
+## SideKeys v1.12.1
 
 A button mapper for **E-Ink phones**: freely remap the extra side keys, the volume
 keys or almost any hardware key — separately for single press, double press and
 long press. Developed and tested on the Bigme HiBreak Pro.
+
+### New in 1.12.1
+- **Fixes a regression from 1.12.0.** On devices where every side key reports
+  the same code (KEYCODE_UNKNOWN), 1.12.0 made each button resolve to its own
+  scan code — which broke any mapping saved before that change, since it lived
+  under the old shared code. Resolving now falls back to the raw key code when
+  nothing is mapped to the precise one, so an existing "both buttons do the
+  same thing" setup keeps working exactly as before, and assigning a button
+  individually still overrides it for that button only.
 
 ### New in 1.12.0
 

@@ -17,6 +17,18 @@ class KeyMappingTest {
     )
 
     @Test
+    fun `scan-code identity stays distinct from the raw key code`() {
+        // Devices that report side keys as KEYCODE_UNKNOWN get a negative id
+        // derived from the scan code. It must never collide with a real key
+        // code, otherwise one button would hijack another's mapping.
+        val perButton = KeyMapping(keyCode = -158, keyName = "Side key (scan code 158)")
+        val shared = KeyMapping(keyCode = 0, keyName = "Key 0")
+
+        assertTrue(perButton.keyCode < 0)
+        assertFalse(perButton.keyCode == shared.keyCode)
+    }
+
+    @Test
     fun `pass-through in a profile beats the global mapping`() {
         // NONE means "inherit the global slot", so it can never express "leave
         // this key alone here" — that is what PASS_THROUGH is for.

@@ -6,6 +6,30 @@ import kotlinx.serialization.Serializable
 @Serializable
 enum class ActionType {
     NONE,
+
+    /**
+     * Swallow the key and do nothing with it.
+     *
+     * Distinct from [NONE]: a mapping whose slots are all NONE counts as empty
+     * and the key is passed through untouched, which is what an unconfigured
+     * key should do. BLOCK is the explicit "this key must stop here" — some
+     * firmwares report their side keys as F1/F2, and apps then react to them.
+     */
+    BLOCK,
+
+    /**
+     * Hand the key to the foreground app untouched.
+     *
+     * Whole-key, not per-gesture: detecting a double or long press means
+     * holding on to the DOWN event, so a key cannot be forwarded immediately
+     * and gesture-detected at the same time. Any press type set to this makes
+     * the whole key pass through.
+     *
+     * Needed because NONE in an app profile means "inherit the global
+     * mapping" — without this there is no way to say "leave this key alone in
+     * this app", which readers with their own page-turn keys need.
+     */
+    PASS_THROUGH,
     ASSISTANT,
     WALLET,
     LAUNCH_APP,
@@ -96,6 +120,12 @@ data class KeyMapping(
             scrollPercent = scrollPercent ?: global.scrollPercent,
         )
     }
+
+    /** True when the key must reach the foreground app untouched. */
+    val isPassThrough: Boolean
+        get() = singlePress.type == ActionType.PASS_THROUGH ||
+            doublePress.type == ActionType.PASS_THROUGH ||
+            longPress.type == ActionType.PASS_THROUGH
 
     val isEmpty: Boolean
         get() = singlePress.type == ActionType.NONE &&

@@ -118,8 +118,9 @@ class MainActivity : ComponentActivity() {
             keyCode !in KeyCodeNames.BLOCKED_KEY_CODES
         ) {
             if (event == null || event.repeatCount == 0) {
+                val keyId = if (event != null) KeyCodeNames.keyIdOf(event) else keyCode
                 KeyInterceptorService.capturedKeys.tryEmit(
-                    CapturedKey(keyCode, KeyCodeNames.prettyName(this, keyCode)),
+                    CapturedKey(keyId, KeyCodeNames.prettyName(this, keyId)),
                 )
             }
             return true

@@ -185,4 +185,8 @@
     <string name="capture_risky_title">%1$s ist eine Navigationstaste</string>
     <string name="capture_risky_note">Du kannst sie belegen, verlierst aber ihre bisherige Funktion. Bei manchen E-Ink-Readern melden die Umblättertasten genau diesen Code — deshalb ist es erlaubt. Jede Druckart, die du auf „Keine Aktion\" lässt, funktioniert weiter wie bisher.</string>
     <string name="capture_risky_confirm">Trotzdem belegen</string>
+    <string name="action_block">Taste blockieren (nichts tun)</string>
+    <string name="action_pass_through">Taste der App überlassen</string>
+    <string name="action_pass_through_note">Gilt für die ganze Taste, nicht nur für diese Druckart: SideKeys fängt sie dann nicht mehr ab. Nutze das im Profil einer App, die die Taste selbst verwendet.</string>
+    <string name="key_scancode">Seitentaste (Scancode %1$d)</string>
 </resources>

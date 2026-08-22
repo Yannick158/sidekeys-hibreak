@@ -183,4 +183,8 @@
     <string name="capture_risky_title">%1$s is a navigation key</string>
     <string name="capture_risky_note">You can assign it, but you will lose what it does now. On some e-ink readers the page-turn buttons report exactly this code, which is why it is allowed. Any press type you leave on "No action" keeps working as before.</string>
     <string name="capture_risky_confirm">Assign anyway</string>
+    <string name="action_block">Block the key (do nothing)</string>
+    <string name="action_pass_through">Let the app handle this key</string>
+    <string name="action_pass_through_note">Applies to the whole key, not just this press type: SideKeys stops intercepting it. Use it in an app profile for readers that already use the key themselves.</string>
+    <string name="key_scancode">Side key (scan code %1$d)</string>
 </resources>

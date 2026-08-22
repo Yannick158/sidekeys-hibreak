@@ -1,6 +1,5 @@
-Läuft jetzt richtig auf Android 15 und 16
+Drei Korrekturen, alle aus Nutzer-Rückmeldungen
 
-• Fehler behoben, durch den die App unter Status- und Navigationsleiste gezeichnet wurde — der Speichern-Knopf konnte unerreichbar sein.
-• Beim Zuordnen wird jetzt jede erkannte Taste benannt, statt manche stillschweigend zu ignorieren.
-• Die Scroll-Weite lässt sich jetzt pro App einstellen.
-• Die Energiesparmodus-Kachel wurde entfernt — sie konnte auf den betroffenen Firmwares nie erscheinen. Leg ihn stattdessen auf eine Taste.
+• Neue Aktion „Taste blockieren (nichts tun)" — für Seitentasten, die sich als F1/F2 melden und im Browser Tabs öffneten. „Keine Aktion" reicht die Taste durch, das hier verschluckt sie.
+• Neue Aktion „Taste der App überlassen" — für Lese-Apps, die die Taste selbst nutzen. „Keine Aktion" erbt im Profil die globale Belegung und konnte das nicht ausdrücken.
+• Seitentasten, die sich als „unbekannt" melden, sind jetzt unterscheidbar.

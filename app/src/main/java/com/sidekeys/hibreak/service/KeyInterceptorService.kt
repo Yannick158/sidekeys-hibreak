@@ -15,6 +15,7 @@ import android.view.accessibility.AccessibilityEvent
 import androidx.core.content.ContextCompat
 import com.sidekeys.hibreak.core.common.KeyCodeNames
 import com.sidekeys.hibreak.core.data.Graph
+import com.sidekeys.hibreak.core.model.ActionType
 import com.sidekeys.hibreak.core.model.ChargeSettings
 import com.sidekeys.hibreak.core.model.KeyAction
 import com.sidekeys.hibreak.core.model.KeyMapping
@@ -193,29 +194,30 @@ class KeyInterceptorService : AccessibilityService() {
             pressHandlers.values.forEach { it.reset() }
         }
 
-        if (capture) return handleCapture(event)
+        val keyId = KeyCodeNames.keyIdOf(event)
+        if (capture) return handleCapture(event, keyId)
 
         // Grace period: swallow all leftovers of a just-captured key.
-        captureGraceUntil[event.keyCode]?.let { until ->
+        captureGraceUntil[keyId]?.let { until ->
             if (event.eventTime <= until) {
-                if (event.action == KeyEvent.ACTION_UP) captureConsumedDowns.remove(event.keyCode)
+                if (event.action == KeyEvent.ACTION_UP) captureConsumedDowns.remove(keyId)
                 return true
             }
-            captureGraceUntil.remove(event.keyCode)
+            captureGraceUntil.remove(keyId)
         }
 
         // Any event of a key whose DOWN was consumed while capture was active
         // (repeats while held, and the final release).
-        if (event.keyCode in captureConsumedDowns) {
-            if (event.action == KeyEvent.ACTION_UP) captureConsumedDowns.remove(event.keyCode)
+        if (keyId in captureConsumedDowns) {
+            if (event.action == KeyEvent.ACTION_UP) captureConsumedDowns.remove(keyId)
             return true
         }
 
-        val mapping = resolveMapping(event.keyCode)
-        if (mapping == null || mapping.isEmpty) {
+        val mapping = resolveMapping(keyId)
+        if (mapping == null || mapping.isEmpty || mapping.isPassThrough) {
             // Orphaned UP after we consumed the DOWN (mapping deleted mid-press,
             // capture transition, ...): consume it for symmetry and reset.
-            val pressHandler = pressHandlers[event.keyCode]
+            val pressHandler = pressHandlers[keyId]
             if (pressHandler != null && event.action == KeyEvent.ACTION_UP && pressHandler.hasActiveGesture()) {
                 pressHandler.reset()
                 return true
@@ -223,7 +225,7 @@ class KeyInterceptorService : AccessibilityService() {
             return false
         }
 
-        val pressHandler = pressHandlers.getOrPut(event.keyCode) { KeyPressHandler(HandlerScheduler(mainHandler)) }
+        val pressHandler = pressHandlers.getOrPut(keyId) { KeyPressHandler(HandlerScheduler(mainHandler)) }
         return when (event.action) {
             KeyEvent.ACTION_DOWN ->
                 pressHandler.onDown(mapping, settings, event.repeatCount, event.eventTime) {
@@ -237,33 +239,34 @@ class KeyInterceptorService : AccessibilityService() {
         }
     }
 
-    private fun handleCapture(event: KeyEvent): Boolean {
+    private fun handleCapture(event: KeyEvent, keyId: Int): Boolean {
         if (event.keyCode in KeyCodeNames.BLOCKED_KEY_CODES) {
             // Say what arrived rather than ignoring it. A capture screen that
             // never reacts is indistinguishable from one that receives nothing,
             // and the difference is exactly what needs diagnosing.
             if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
                 capturedKeys.tryEmit(
-                    CapturedKey(event.keyCode, KeyCodeNames.prettyName(this, event.keyCode), blocked = true),
+                    CapturedKey(keyId, KeyCodeNames.prettyName(this, keyId), blocked = true),
                 )
             }
             return false
         }
         when (event.action) {
             KeyEvent.ACTION_DOWN -> if (event.repeatCount == 0) {
-                captureConsumedDowns.add(event.keyCode)
-                captureGraceUntil[event.keyCode] = event.eventTime + CAPTURE_GRACE_MS
+                captureConsumedDowns.add(keyId)
+                captureGraceUntil[keyId] = event.eventTime + CAPTURE_GRACE_MS
                 capturedKeys.tryEmit(
-                    CapturedKey(event.keyCode, KeyCodeNames.prettyName(this, event.keyCode)),
+                    CapturedKey(keyId, KeyCodeNames.prettyName(this, keyId)),
                 )
             }
-            KeyEvent.ACTION_UP -> captureConsumedDowns.remove(event.keyCode)
+            KeyEvent.ACTION_UP -> captureConsumedDowns.remove(keyId)
         }
         return true
     }
 
     private fun runMappedAction(action: KeyAction, scrollPercent: Int? = null) {
-        if (settings.hapticFeedback) executor?.vibrate()
+        // A blocked key should feel like a dead key, not like a triggered one.
+        if (settings.hapticFeedback && action.type != ActionType.BLOCK) executor?.vibrate()
         executor?.execute(action, scrollPercent)
     }
 

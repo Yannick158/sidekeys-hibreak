@@ -71,6 +71,10 @@ class ActionExecutor(private val service: AccessibilityService) {
         val scrollBy = scrollPercentOverride ?: scrollPercent
         when (action.type) {
             ActionType.NONE -> Unit
+            // The point is that nothing happens — the key is already consumed.
+            ActionType.BLOCK -> Unit
+            // Handled before dispatch: the key was never consumed.
+            ActionType.PASS_THROUGH -> Unit
             ActionType.ASSISTANT -> launchAssistant()
             ActionType.WALLET -> launchWallet()
             ActionType.LAUNCH_APP -> launchApp(action.data)

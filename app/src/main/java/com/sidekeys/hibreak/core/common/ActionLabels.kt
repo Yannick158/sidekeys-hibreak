@@ -9,6 +9,8 @@ import com.sidekeys.hibreak.core.model.KeyAction
 @StringRes
 fun ActionType.labelRes(): Int = when (this) {
     ActionType.NONE -> R.string.action_none
+    ActionType.BLOCK -> R.string.action_block
+    ActionType.PASS_THROUGH -> R.string.action_pass_through
     ActionType.ASSISTANT -> R.string.action_assistant
     ActionType.WALLET -> R.string.action_wallet
     ActionType.LAUNCH_APP -> R.string.action_launch_app

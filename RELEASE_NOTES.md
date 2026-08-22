@@ -1,8 +1,30 @@
-## SideKeys v1.11.0
+## SideKeys v1.12.0
 
 A button mapper for **E-Ink phones**: freely remap the extra side keys, the volume
 keys or almost any hardware key — separately for single press, double press and
 long press. Developed and tested on the Bigme HiBreak Pro.
+
+### New in 1.12.0
+
+All three from user reports, and two of them were the same misunderstanding
+seen from opposite sides: "No action" never meant what people expected.
+
+- **"Block the key (do nothing)"** — a new action. Leaving all three press
+  types on *No action* means the key is unassigned, so it is passed through
+  untouched and the foreground app still reacts to it. Some HiBreak side keys
+  report as F1/F2, and browsers open a tab on those. This action swallows the
+  key instead, without a haptic buzz, so it behaves like a dead key.
+- **"Let the app handle this key"** — the opposite, and the fix for readers
+  with their own page-turn keys. In an app profile, *No action* means "inherit
+  the global mapping", so there was no way to say "don't intercept here". This
+  overrides the global mapping and stops interception for that key. It applies
+  to the whole key, not one press type: detecting a double or long press means
+  holding the key back, so it cannot be forwarded instantly and gesture-checked
+  at the same time.
+- **Keys that report as "unknown" can now be told apart.** On a Bigme B7 both
+  side keys arrive as key code 0, which made them one and the same key. The
+  kernel scan code still differs per button, so it is used as the identity when
+  the key code is unknown.
 
 ### New in 1.11.0
 - **Works on Android 15 and 16.** The UI was drawing underneath the status and

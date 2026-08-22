@@ -1,6 +1,5 @@
-Now works properly on Android 15 and 16
+Three fixes, all from user reports
 
-• Fixed a bug that drew the app underneath the status and navigation bars, which could put the Save button out of reach.
-• Assigning a key now names every key it sees, instead of silently ignoring some of them.
-• Scroll distance can now be set per app, not just globally.
-• Removed the Battery Saver quick settings tile — it could never show up on the firmwares it was meant for. Map Battery Saver to a key instead.
+• New action "Block the key (do nothing)" — for side keys that report as F1/F2, which made browsers open a tab. Leaving a key on "No action" passes it through; this swallows it.
+• New action "Let the app handle this key" — use it in an app profile for readers that use the key themselves. "No action" in a profile inherits the global mapping, so it could not express this.
+• Side keys that report as "unknown" can now be told apart.

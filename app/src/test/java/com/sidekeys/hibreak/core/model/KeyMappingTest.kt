@@ -17,6 +17,38 @@ class KeyMappingTest {
     )
 
     @Test
+    fun `pass-through in a profile beats the global mapping`() {
+        // NONE means "inherit the global slot", so it can never express "leave
+        // this key alone here" — that is what PASS_THROUGH is for.
+        val profile = KeyMapping(
+            keyCode = 100,
+            keyName = "Key 100",
+            packageName = "com.example.reader",
+            singlePress = KeyAction(ActionType.PASS_THROUGH),
+        )
+
+        val merged = profile.mergedOver(global)
+
+        assertTrue(merged.isPassThrough)
+        assertFalse("a plain profile must not pass through", global.isPassThrough)
+    }
+
+    @Test
+    fun `a mapping that only blocks is not empty`() {
+        // isEmpty decides whether the service passes the key through. Some
+        // firmwares report side keys as F1/F2 and apps react to them, so a
+        // key set to BLOCK must be consumed, not forwarded.
+        val blocking = KeyMapping(
+            keyCode = 131,
+            keyName = "F1 (131)",
+            singlePress = KeyAction(ActionType.BLOCK),
+        )
+
+        assertFalse(blocking.isEmpty)
+        assertTrue(KeyMapping(keyCode = 131, keyName = "F1 (131)").isEmpty)
+    }
+
+    @Test
     fun `app profile overrides only the slots it defines`() {
         val profile = KeyMapping(
             keyCode = 100,

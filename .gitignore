@@ -16,6 +16,8 @@ keystore/
 
 # Built artifacts
 *.apk
+# Build artefacts belong on the release page, not in the history.
+*.aab
 
 # Personal drafts — not part of the app
 reddit-post.md

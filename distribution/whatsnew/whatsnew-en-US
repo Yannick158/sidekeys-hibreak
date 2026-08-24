@@ -1,3 +1,5 @@
-Fixes a regression from 1.12.0
+Three additions, all from user requests
 
-On devices where both side keys report the same code, 1.12.0 could break a mapping you already had saved. Resolving now falls back to the shared code when nothing is mapped to the exact button, so "both buttons do the same thing" keeps working — and assigning one button individually still overrides it for just that button.
+• Launch several apps with one key press — pick the action again to add more. Launches are staggered so each one actually starts; handy against aggressive task killers.
+• Tap left/right screen edge: page turns in readers like Storytel, no extra setup.
+• D-pad left/right for apps that only listen to arrow keys (needs Shizuku — Android offers apps no other way to send key presses).

@@ -34,6 +34,29 @@ enum class ActionType {
     WALLET,
     LAUNCH_APP,
     LAUNCH_ACTIVITY,
+
+    /**
+     * Launch several apps back to back. The last one ends up in front and the
+     * rest stay warm behind it, which is the point: aggressive task killers on
+     * e-ink devices keep evicting background apps, and one key press can bring
+     * a whole set back.
+     */
+    LAUNCH_APPS,
+    /**
+     * Send a D-pad key press to the focused app, for readers that page with the
+     * arrow keys. No public API lets an app inject key events, so this goes
+     * through a shell and needs Shizuku.
+     */
+    DPAD_LEFT,
+    DPAD_RIGHT,
+
+    /**
+     * Synthetic tap on the left/right screen edge. The no-Shizuku route to page
+     * turns: most readers flip on an edge tap, and dispatching a tap only needs
+     * the gesture capability the service already has for scrolling.
+     */
+    TAP_LEFT_EDGE,
+    TAP_RIGHT_EDGE,
     SCROLL_UP,
     SCROLL_DOWN,
     EINK_REFRESH,
@@ -70,6 +93,24 @@ data class KeyAction(
     val data: String? = null,
     val label: String? = null,
 )
+
+/**
+ * Encoding for [ActionType.LAUNCH_APPS]: one "package|label" per line, in the
+ * order they should be launched.
+ */
+object AppList {
+    fun parse(data: String?): List<Pair<String, String>> =
+        data.orEmpty().lineSequence()
+            .filter { it.isNotBlank() }
+            .map { line ->
+                val sep = line.indexOf('|')
+                if (sep < 0) line to line else line.substring(0, sep) to line.substring(sep + 1)
+            }
+            .toList()
+
+    fun encode(items: List<Pair<String, String>>): String =
+        items.joinToString("\n") { "${it.first}|${it.second}" }
+}
 
 /** How a custom intent should be dispatched. */
 @Serializable

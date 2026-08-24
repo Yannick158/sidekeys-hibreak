@@ -47,6 +47,7 @@ import com.sidekeys.hibreak.core.designsystem.EInkButton
 import com.sidekeys.hibreak.core.designsystem.EInkCard
 import com.sidekeys.hibreak.core.designsystem.EInkHeader
 import com.sidekeys.hibreak.core.model.ActionType
+import com.sidekeys.hibreak.core.model.AppList
 import com.sidekeys.hibreak.core.model.KeyAction
 import com.sidekeys.hibreak.core.model.PressType
 import com.sidekeys.hibreak.service.KeyInterceptorService
@@ -79,10 +80,7 @@ fun MappingScreen(
                 val pickedPackage = parts[0]
                 val label = parts.getOrElse(1) { pickedPackage }
                 viewModel.pendingSlot?.let { slot ->
-                    viewModel.setAction(
-                        slot,
-                        KeyAction(ActionType.LAUNCH_APP, data = pickedPackage, label = label),
-                    )
+                    viewModel.setAction(slot, appAction(uiState.action(slot), pickedPackage, label))
                 }
                 viewModel.pendingSlot = null
                 handle[PICKED_APP_RESULT_KEY] = ""
@@ -167,7 +165,18 @@ fun MappingScreen(
                 when (type) {
                     ActionType.LAUNCH_APP -> {
                         viewModel.pendingSlot = slot
+                        // Replace whatever was there: a single-app action starts fresh.
+                        viewModel.setAction(slot, KeyAction(ActionType.NONE))
                         navController.navigate(Routes.appPicker(Routes.PURPOSE_LAUNCH_APP))
+                    }
+                    ActionType.LAUNCH_APPS -> {
+                        viewModel.pendingSlot = slot
+                        // Deliberately keeps an existing list: picking this action
+                        // again is how another app is added to it.
+                        if (uiState.action(slot).type != ActionType.LAUNCH_APPS) {
+                            viewModel.setAction(slot, KeyAction(ActionType.LAUNCH_APPS, data = ""))
+                        }
+                        navController.navigate(Routes.appPicker(Routes.PURPOSE_LAUNCH_APPS))
                     }
                     ActionType.LAUNCH_ACTIVITY -> {
                         viewModel.pendingSlot = slot
@@ -263,5 +272,22 @@ private fun ActionPickerDialog(
         containerColor = Color.White,
         titleContentColor = Color.Black,
         textContentColor = Color.Black,
+    )
+}
+
+/**
+ * Builds the action for an app chosen in the picker. For [ActionType.LAUNCH_APPS]
+ * the pick is appended to the existing list — choosing the action again is how a
+ * user adds the next app — while a plain launch replaces whatever was there.
+ */
+private fun appAction(current: KeyAction, packageName: String, label: String): KeyAction {
+    if (current.type != ActionType.LAUNCH_APPS) {
+        return KeyAction(ActionType.LAUNCH_APP, data = packageName, label = label)
+    }
+    val items = AppList.parse(current.data).filterNot { it.first == packageName } + (packageName to label)
+    return KeyAction(
+        type = ActionType.LAUNCH_APPS,
+        data = AppList.encode(items),
+        label = items.joinToString(", ") { it.second },
     )
 }

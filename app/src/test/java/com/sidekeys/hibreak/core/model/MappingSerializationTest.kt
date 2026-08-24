@@ -61,4 +61,28 @@ class MappingSerializationTest {
         assertEquals("new field must use its default", 75L, decoded.debounceMs)
         assertEquals("new field must use its default", true, decoded.hideFromRecents)
     }
+
+    @Test
+    fun `app list survives an encode-parse round trip`() {
+        // The list is stored in KeyAction.data as one "package|label" per line,
+        // so a label containing a pipe must not split into a bogus entry.
+        val items = listOf(
+            "com.example.reader" to "Reader",
+            "com.example.notes" to "Notes | Pro",
+        )
+
+        val parsed = AppList.parse(AppList.encode(items))
+
+        assertEquals(items.size, parsed.size)
+        assertEquals("com.example.reader", parsed[0].first)
+        assertEquals("Notes | Pro", parsed[1].second)
+        assertEquals("order must be preserved: it decides which app ends up in front",
+            "com.example.notes", parsed[1].first)
+    }
+
+    @Test
+    fun `blank lines are ignored when parsing an app list`() {
+        assertEquals(0, AppList.parse("").size)
+        assertEquals(1, AppList.parse("\ncom.example.a|A\n\n").size)
+    }
 }

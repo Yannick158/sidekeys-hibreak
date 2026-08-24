@@ -1,8 +1,28 @@
-## SideKeys v1.12.1
+## SideKeys v1.14.0
 
 A button mapper for **E-Ink phones**: freely remap the extra side keys, the volume
 keys or almost any hardware key — separately for single press, double press and
 long press. Developed and tested on the Bigme HiBreak Pro.
+
+### New in 1.14.0
+
+All three from user requests.
+
+- **Launch several apps with one key press.** Pick "Launch several apps", choose
+  an app, then pick the same action again to add the next — the list grows
+  instead of being replaced. Launches are staggered by 350 ms on purpose: fired
+  at once, Android folds them into a single transition and only the last app
+  actually starts. The last app in the list ends up in front, the earlier ones
+  stay warm behind it — useful on devices whose task killers keep evicting
+  background apps.
+- **Tap left/right screen edge** — page turns without anything extra. Most
+  readers (Storytel included) flip on an edge tap, and a synthetic tap only
+  needs the gesture capability the service already uses for scrolling. No
+  Shizuku, no new permission.
+- **D-pad left/right** — for apps that only listen to real arrow keys. Android
+  offers no public API for injecting key events (the permission is reserved for
+  system apps), so these two actions require Shizuku running. Try the edge-tap
+  actions first; they cover the common case without it.
 
 ### New in 1.12.1
 - **Fixes a regression from 1.12.0.** On devices where every side key reports

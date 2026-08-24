@@ -189,4 +189,10 @@
     <string name="action_pass_through">Taste der App überlassen</string>
     <string name="action_pass_through_note">Gilt für die ganze Taste, nicht nur für diese Druckart: SideKeys fängt sie dann nicht mehr ab. Nutze das im Profil einer App, die die Taste selbst verwendet.</string>
     <string name="key_scancode">Seitentaste (Scancode %1$d)</string>
+    <string name="action_launch_apps">Mehrere Apps starten (erneut wählen zum Hinzufügen)</string>
+    <string name="action_dpad_left">Steuerkreuz links (braucht Shizuku)</string>
+    <string name="action_dpad_right">Steuerkreuz rechts (braucht Shizuku)</string>
+    <string name="error_needs_shizuku">Diese Aktion sendet einen Tastendruck, was Android nur über eine Shell erlaubt. Starte Shizuku und erteile SideKeys Zugriff.</string>
+    <string name="action_tap_left_edge">Linken Bildschirmrand antippen (in Readern zurückblättern)</string>
+    <string name="action_tap_right_edge">Rechten Bildschirmrand antippen (in Readern vorblättern)</string>
 </resources>

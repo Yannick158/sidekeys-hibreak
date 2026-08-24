@@ -1,3 +1,5 @@
-Behebt einen Fehler aus 1.12.0
+Drei Neuerungen, alle aus Nutzerwünschen
 
-Auf Geräten, bei denen beide Seitentasten denselben Code melden, konnte 1.12.0 eine bestehende Belegung zerstören. Ohne Treffer für die genaue Taste greift jetzt wieder der gemeinsame Code — „beide Tasten tun dasselbe" funktioniert also weiter, und eine einzeln zugeordnete Taste überschreibt weiterhin nur sich selbst.
+• Mehrere Apps mit einem Tastendruck starten — Aktion erneut wählen, um weitere hinzuzufügen. Die Starts sind zeitversetzt, damit jede App wirklich startet; hilfreich gegen aggressive Task-Killer.
+• Linken/rechten Bildschirmrand antippen: Umblättern in Readern wie Storytel, ohne Zusatzeinrichtung.
+• Steuerkreuz links/rechts für Apps, die nur auf Pfeiltasten hören (braucht Shizuku — anders erlaubt Android das Senden von Tastendrücken nicht).

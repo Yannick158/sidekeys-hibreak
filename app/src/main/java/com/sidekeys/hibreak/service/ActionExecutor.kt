@@ -23,6 +23,7 @@ import android.view.KeyEvent
 import android.widget.Toast
 import com.sidekeys.hibreak.R
 import com.sidekeys.hibreak.core.model.ActionType
+import com.sidekeys.hibreak.core.model.AppList
 import com.sidekeys.hibreak.core.model.CustomIntentMode
 import com.sidekeys.hibreak.core.model.CustomIntentSpec
 import com.sidekeys.hibreak.core.model.KeyAction
@@ -79,6 +80,11 @@ class ActionExecutor(private val service: AccessibilityService) {
             ActionType.WALLET -> launchWallet()
             ActionType.LAUNCH_APP -> launchApp(action.data)
             ActionType.LAUNCH_ACTIVITY -> launchActivity(action.data)
+            ActionType.LAUNCH_APPS -> launchApps(action.data)
+            ActionType.DPAD_LEFT -> sendKeyEvent(KeyEvent.KEYCODE_DPAD_LEFT)
+            ActionType.DPAD_RIGHT -> sendKeyEvent(KeyEvent.KEYCODE_DPAD_RIGHT)
+            ActionType.TAP_LEFT_EDGE -> tapEdge(right = false)
+            ActionType.TAP_RIGHT_EDGE -> tapEdge(right = true)
             ActionType.SCROLL_UP -> scroll(up = true, percent = scrollBy)
             ActionType.SCROLL_DOWN -> scroll(up = false, percent = scrollBy)
             ActionType.EINK_REFRESH -> einkRefresh()
@@ -159,6 +165,55 @@ class ActionExecutor(private val service: AccessibilityService) {
         if (intent == null || !startActivitySafely(intent)) {
             toast(R.string.error_app_not_found)
         }
+    }
+
+    /**
+     * Launches every app in the list, staggered so the system actually starts
+     * each one instead of collapsing them into a single transition. The last
+     * entry wins the foreground; the earlier ones stay resident behind it.
+     */
+    private fun launchApps(data: String?) {
+        val packages = AppList.parse(data).map { it.first }
+        if (packages.isEmpty()) {
+            toast(R.string.error_app_not_found)
+            return
+        }
+        packages.forEachIndexed { index, pkg ->
+            val intent = service.packageManager.getLaunchIntentForPackage(pkg)
+            if (intent == null) return@forEachIndexed
+            mainHandler.postDelayed({ startActivitySafely(intent) }, index * LAUNCH_STAGGER_MS)
+        }
+    }
+
+    /**
+     * Taps the left/right edge of the screen, mid-height — where readers flip
+     * pages. 8% from the edge lands inside the tap zone without touching the
+     * system's edge-swipe area, and a tap (unlike a swipe) cannot trigger the
+     * back gesture anyway.
+     */
+    private fun tapEdge(right: Boolean) {
+        val dm = service.resources.displayMetrics
+        val x = dm.widthPixels * if (right) 0.92f else 0.08f
+        val y = dm.heightPixels * 0.5f
+        if (!swipe(x, y, x, y + 1f, 60)) toast(R.string.error_gesture_failed)
+    }
+
+    /**
+     * Sends a key press to whatever has focus.
+     *
+     * An accessibility service can dispatch touch gestures but not key events,
+     * and Android exposes no public API for injecting them — INJECT_EVENTS is
+     * signature-level. A shell process can do it, so this needs Shizuku.
+     */
+    private fun sendKeyEvent(keyCode: Int) {
+        if (!ShizukuShell.isAvailable() || !ShizukuShell.isPermissionGranted()) {
+            toast(R.string.error_needs_shizuku)
+            return
+        }
+        Thread {
+            val result = ShizukuShell.run("input keyevent $keyCode")
+            if (!result.ok) mainHandler.post { toast(R.string.error_action_failed) }
+        }.start()
     }
 
     /**
@@ -426,6 +481,13 @@ class ActionExecutor(private val service: AccessibilityService) {
     }
 
     companion object {
+        /**
+         * Gap between consecutive launches in [ActionType.LAUNCH_APPS]. Firing
+         * them in one go makes the system fold them into a single transition
+         * and only the last app actually starts.
+         */
+        private const val LAUNCH_STAGGER_MS = 350L
+
         /** Google Wallet — correct package for Germany/Europe. */
         private const val WALLET_PACKAGE = "com.google.android.apps.walletnfcrel"
         private const val GOOGLE_APP_PACKAGE = "com.google.android.googlequicksearchbox"

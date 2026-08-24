@@ -35,6 +35,7 @@ object Routes {
 
     /** Why the app picker was opened — decides where its result goes. */
     const val PURPOSE_LAUNCH_APP = "launch"
+    const val PURPOSE_LAUNCH_APPS = "launch_many"
     const val PURPOSE_ACTIVITY = "activity"
     const val PURPOSE_PROFILE = "profile"
 

@@ -35,6 +35,6 @@ are signed with this certificate:
 SHA-256: CE:1A:7F:AC:78:29:3F:ED:0C:B7:6A:48:7F:7C:09:FB:81:EA:44:89:AD:36:75:29:72:27:9C:CD:8B:34:F9:D3
 ```
 
-Check any APK with `apksigner verify --print-certs SideKeys-release.apk`.
+Check any APK with `apksigner verify --print-certs SideKeys-v1.15.0.apk`.
 A build from Google Play has a different signature, because Play re-signs apps
 with its own key (Play App Signing).

@@ -52,14 +52,12 @@ object ChargeAlarm {
 
     private fun notify(context: Context, percent: Int) {
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                context.getString(R.string.charge_alarm_channel),
-                NotificationManager.IMPORTANCE_HIGH,
-            )
-            manager.createNotificationChannel(channel)
-        }
+        val channel = NotificationChannel(
+            CHANNEL_ID,
+            context.getString(R.string.charge_alarm_channel),
+            NotificationManager.IMPORTANCE_HIGH,
+        )
+        manager.createNotificationChannel(channel)
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_battery_saver)
             .setContentTitle(context.getString(R.string.charge_alarm_title))

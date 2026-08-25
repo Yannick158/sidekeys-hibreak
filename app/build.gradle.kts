@@ -14,8 +14,8 @@ android {
         applicationId = "com.sidekeys.hibreak"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 39
-        versionName = "1.14.0"
+        versionCode = 40
+        versionName = "1.15.0"
     }
 
     // The signing keystore lives OUTSIDE the repo tree so it can never be
@@ -45,17 +45,17 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            // Left unset without a keystore. The check below then fails only if a
+            // release build is actually requested -- throwing here would run at
+            // configuration time and break every task, so a fresh clone could not
+            // even generate a wrapper or build a debug APK.
             signingConfig = when {
                 hasReleaseKeystore -> signingConfigs.getByName("release")
                 project.hasProperty("allowDebugSigning") -> {
-                    logger.warn("WARNUNG: release wird mit dem lokalen DEBUG-Key signiert — NICHT veröffentlichen!")
+                    logger.warn("WARNING: release is signed with the local DEBUG key -- do not publish it!")
                     signingConfigs.getByName("debug")
                 }
-                else -> throw GradleException(
-                    "Kein Release-Keystore gefunden. Setze SIDEKEYS_KEYSTORE_DIR auf das Verzeichnis " +
-                        "mit keystore.properties, oder baue ein lokales Testbuild mit " +
-                        "./gradlew assembleRelease -PallowDebugSigning",
-                )
+                else -> null
             }
         }
     }
@@ -67,6 +67,16 @@ android {
 
     kotlinOptions {
         jvmTarget = "17"
+    }
+
+    lint {
+        // Machine-readable output, so a pre-upload check can actually read it.
+        textReport = true
+        xmlReport = true
+        // Anything that would ship broken behaviour fails the build rather than
+        // scrolling past in a log.
+        warningsAsErrors = false
+        abortOnError = true
     }
 
     buildFeatures {
@@ -105,4 +115,24 @@ dependencies {
     implementation(libs.shizuku.provider)
 
     testImplementation(libs.junit)
+}
+
+// Refuse to produce an unsigned release, but only when one is actually asked
+// for. Configuration-time failure would make the repo unusable without the
+// private keystore, which only the maintainer has.
+gradle.taskGraph.whenReady {
+    val buildsRelease = allTasks.any { task ->
+        task.project == project &&
+            task.name.contains("Release") &&
+            (task.name.startsWith("assemble") || task.name.startsWith("bundle"))
+    }
+    val keystoreDir = System.getenv("SIDEKEYS_KEYSTORE_DIR")
+    val hasKeystore = keystoreDir?.let { File(it, "keystore.properties").exists() } == true
+    if (buildsRelease && !hasKeystore && !project.hasProperty("allowDebugSigning")) {
+        throw GradleException(
+            "No release keystore. Point SIDEKEYS_KEYSTORE_DIR at the directory holding " +
+                "keystore.properties, or build a local test APK with " +
+                "./gradlew assembleRelease -PallowDebugSigning (never publish that one).",
+        )
+    }
 }

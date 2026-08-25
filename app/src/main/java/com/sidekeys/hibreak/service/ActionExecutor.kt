@@ -241,7 +241,6 @@ class ActionExecutor(private val service: AccessibilityService) {
 
     /** Dispatches a straight-line swipe. Returns false if gestures aren't available. */
     private fun swipe(x1: Float, y1: Float, x2: Float, y2: Float, durationMs: Long): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return false
         val path = Path().apply {
             moveTo(x1, y1)
             lineTo(x2, y2)
@@ -274,7 +273,6 @@ class ActionExecutor(private val service: AccessibilityService) {
      * used to overshoot.
      */
     private fun scrollSwipe(x1: Float, y1: Float, x2: Float, y2: Float, durationMs: Long): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return false
         val path = Path().apply {
             moveTo(x1, y1)
             lineTo(x2, y2)

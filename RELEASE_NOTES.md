@@ -1,8 +1,29 @@
-## SideKeys v1.14.0
+## SideKeys v1.15.0
 
 A button mapper for **E-Ink phones**: freely remap the extra side keys, the volume
 keys or almost any hardware key — separately for single press, double press and
 long press. Developed and tested on the Bigme HiBreak Pro.
+
+### New in 1.15.0
+
+- **Pick several apps at once.** The app picker now has checkboxes and opens
+  with your current list already ticked, so the same screen adds and removes.
+  Building a list of ten apps no longer means ten round trips through the menu.
+  Selection order is kept, since it decides which app ends up in front.
+- **Keep DuraSpeed off.** MediaTek's DuraSpeed stops background apps, this
+  service among them, which is why keys silently stop working on some devices.
+  Settings can now hold it off — and because the value comes back on its own on
+  some firmwares, it is watched rather than written once. Shown only on devices
+  that actually have DuraSpeed. Disabling the DuraSpeed app itself is a red
+  herring: it only hides the notification.
+- **"Let the app handle this key" now explains itself** in the mapping screen.
+  It applies to the whole key rather than one press type, which is worth saying
+  where the choice is made.
+- Fixes: the multi-select picker showed package names instead of app names for
+  anything scrolled out of view by the search; the DuraSpeed watcher could chase
+  its own writes; the watcher was not unregistered when the service stopped.
+- The repository now carries a Gradle wrapper, so the release workflow can
+  actually run, and a fresh clone builds without the private signing key.
 
 ### New in 1.14.0
 

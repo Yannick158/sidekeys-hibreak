@@ -5,6 +5,7 @@ import android.accessibilityservice.AccessibilityServiceInfo
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.database.ContentObserver
 import android.content.IntentFilter
 import android.os.BatteryManager
 import android.os.Handler
@@ -81,6 +82,7 @@ class KeyInterceptorService : AccessibilityService() {
     private var lastCaptureMode = false
 
     private var executor: ActionExecutor? = null
+    private var duraSpeedObserver: ContentObserver? = null
 
     /** All mappings (global + per-app), grouped by key code. */
     @Volatile
@@ -143,6 +145,7 @@ class KeyInterceptorService : AccessibilityService() {
             repository.settings.collect {
                 settings = it
                 executor?.scrollPercent = it.scrollPercent
+                applyDuraSpeedGuard(it.keepDuraSpeedOff)
             }
         }
         scope.launch {
@@ -275,6 +278,43 @@ class KeyInterceptorService : AccessibilityService() {
         return true
     }
 
+    /**
+     * Watches DuraSpeed and switches it back off whenever something turns it
+     * on. A one-off write is not enough: on some firmwares the value comes back
+     * after a reboot or a system update, and by then the service is already
+     * being killed again without the user knowing why.
+     */
+    private fun applyDuraSpeedGuard(enabled: Boolean) {
+        if (!enabled) {
+            duraSpeedObserver?.let { contentResolver.unregisterContentObserver(it) }
+            duraSpeedObserver = null
+            return
+        }
+        if (duraSpeedObserver != null) return
+        val observer = object : ContentObserver(mainHandler) {
+            override fun onChange(selfChange: Boolean) = enforceDuraSpeedOff()
+        }
+        runCatching {
+            contentResolver.registerContentObserver(DuraSpeed.globalUri(), false, observer)
+            duraSpeedObserver = observer
+        }
+        enforceDuraSpeedOff()
+    }
+
+    private fun enforceDuraSpeedOff() {
+        // Skip the changes we caused ourselves, otherwise the write and the
+        // watcher chase each other.
+        if (DuraSpeed.isApplying()) return
+        // Blocks on the Shizuku path, so never on the main thread.
+        scope.launch(Dispatchers.IO) {
+            if (!DuraSpeed.isDisabled(this@KeyInterceptorService) &&
+                DuraSpeed.canWrite(this@KeyInterceptorService)
+            ) {
+                DuraSpeed.disable(this@KeyInterceptorService)
+            }
+        }
+    }
+
     private fun runMappedAction(action: KeyAction, scrollPercent: Int? = null) {
         // A blocked key should feel like a dead key, not like a triggered one.
         if (settings.hapticFeedback && action.type != ActionType.BLOCK) executor?.vibrate()
@@ -319,6 +359,10 @@ class KeyInterceptorService : AccessibilityService() {
             isRunning = false
         }
         scope.cancel()
+        // Registered against the ContentResolver, which outlives the service —
+        // leaving it holds a reference to a dead service.
+        duraSpeedObserver?.let { runCatching { contentResolver.unregisterContentObserver(it) } }
+        duraSpeedObserver = null
         runCatching { unregisterReceiver(batteryReceiver) }
         pressHandlers.values.forEach { it.reset() }
         pressHandlers.clear()

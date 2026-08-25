@@ -116,7 +116,6 @@
     <string name="profiles_add_app">+ App hinzufügen</string>
     <string name="profile_keys_empty">Für diese App ist noch keine Taste belegt.</string>
     <string name="profile_delete_app">Alle Belegungen dieser App entfernen</string>
-    <string name="mapping_for_app">für %1$s</string>
 
     <!-- Batterie-Sparmodus / Quick-Settings-Kachel -->
     <string name="battery_saver_on">Energiesparmodus an</string>
@@ -187,12 +186,21 @@
     <string name="capture_risky_confirm">Trotzdem belegen</string>
     <string name="action_block">Taste blockieren (nichts tun)</string>
     <string name="action_pass_through">Taste der App überlassen</string>
-    <string name="action_pass_through_note">Gilt für die ganze Taste, nicht nur für diese Druckart: SideKeys fängt sie dann nicht mehr ab. Nutze das im Profil einer App, die die Taste selbst verwendet.</string>
+    <string name="action_pass_through_note">Gilt für die ganze Taste, nicht nur für diese Druckart: SideKeys fängt sie dann nicht mehr ab. Nutze das im Profil einer App, die selbst auf die Taste reagiert.</string>
     <string name="key_scancode">Seitentaste (Scancode %1$d)</string>
-    <string name="action_launch_apps">Mehrere Apps starten (erneut wählen zum Hinzufügen)</string>
+    <string name="action_launch_apps">Mehrere Apps starten</string>
     <string name="action_dpad_left">Steuerkreuz links (braucht Shizuku)</string>
     <string name="action_dpad_right">Steuerkreuz rechts (braucht Shizuku)</string>
     <string name="error_needs_shizuku">Diese Aktion sendet einen Tastendruck, was Android nur über eine Shell erlaubt. Starte Shizuku und erteile SideKeys Zugriff.</string>
     <string name="action_tap_left_edge">Linken Bildschirmrand antippen (in Readern zurückblättern)</string>
     <string name="action_tap_right_edge">Rechten Bildschirmrand antippen (in Readern vorblättern)</string>
+    <string name="setting_duraspeed">DuraSpeed ausgeschaltet halten</string>
+    <string name="duraspeed_note">MediaTeks DuraSpeed beendet Hintergrund-Apps — auch diesen Dienst, der dann stillschweigend keine Tasten mehr belegt. SideKeys überwacht die Einstellung und schaltet sie wieder aus, sobald etwas sie aktiviert. (Die DuraSpeed-App zu deaktivieren blendet nur deren Benachrichtigung aus, beendet aber weiterhin Apps.)</string>
+    <string name="duraspeed_state_off">✓ DuraSpeed ist aus</string>
+    <string name="duraspeed_state_on">DuraSpeed ist derzeit an</string>
+    <string name="duraspeed_needs_access">Braucht den einmaligen Zugriff (adb oder Shizuku), bevor das geändert werden kann.</string>
+    <plurals name="app_picker_done">
+        <item quantity="one">Diese %1$d App übernehmen</item>
+        <item quantity="other">Diese %1$d Apps übernehmen</item>
+    </plurals>
 </resources>

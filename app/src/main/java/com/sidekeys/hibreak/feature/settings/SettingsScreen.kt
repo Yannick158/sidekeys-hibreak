@@ -18,6 +18,8 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -31,6 +33,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sidekeys.hibreak.R
 import com.sidekeys.hibreak.core.designsystem.EInkCard
+import com.sidekeys.hibreak.service.DuraSpeed
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import com.sidekeys.hibreak.core.designsystem.EInkHeader
 
 @Composable
@@ -110,6 +115,63 @@ fun SettingsScreen(onBack: () -> Unit) {
                     text = stringResource(R.string.double_press_note),
                     style = MaterialTheme.typography.bodyMedium,
                 )
+            }
+
+            // Only on devices that actually have DuraSpeed — offering a switch
+            // that provably does nothing is worse than not offering it.
+            var duraPresent by remember { mutableStateOf(false) }
+            var duraDisabled by remember { mutableStateOf(true) }
+            var duraCanWrite by remember { mutableStateOf(false) }
+            LaunchedEffect(settings.keepDuraSpeedOff) {
+                withContext(Dispatchers.IO) {
+                    val value = DuraSpeed.currentValue(context)
+                    val canWrite = DuraSpeed.canWrite(context)
+                    withContext(Dispatchers.Main) {
+                        duraPresent = value != null
+                        duraDisabled = value == 0
+                        duraCanWrite = canWrite
+                    }
+                }
+            }
+
+            if (duraPresent) {
+                EInkCard {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.setting_duraspeed),
+                                style = MaterialTheme.typography.titleMedium,
+                            )
+                            Text(
+                                text = stringResource(
+                                    if (duraDisabled) R.string.duraspeed_state_off
+                                    else R.string.duraspeed_state_on,
+                                ),
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                        }
+                        Switch(
+                            checked = settings.keepDuraSpeedOff,
+                            onCheckedChange = { viewModel.setKeepDuraSpeedOff(it) },
+                            enabled = duraCanWrite,
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = Color.White,
+                                checkedTrackColor = Color.Black,
+                                uncheckedThumbColor = Color.Black,
+                                uncheckedTrackColor = Color.White,
+                                uncheckedBorderColor = Color.Black,
+                            ),
+                        )
+                    }
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(
+                            if (duraCanWrite) R.string.duraspeed_note
+                            else R.string.duraspeed_needs_access,
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
             }
 
             EInkCard {

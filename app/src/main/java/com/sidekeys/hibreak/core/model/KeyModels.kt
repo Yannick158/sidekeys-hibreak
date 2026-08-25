@@ -214,4 +214,10 @@ data class KeySettings(
      * How much text that is depends on the font size, so it is worth adjusting.
      */
     val scrollPercent: Int = 45,
+    /**
+     * Re-assert that MediaTek's DuraSpeed stays off. It kills background apps,
+     * this service among them, and some firmwares switch it back on by
+     * themselves — so it is watched, not written once.
+     */
+    val keepDuraSpeedOff: Boolean = false,
 )

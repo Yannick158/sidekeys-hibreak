@@ -1,5 +1,6 @@
 package com.sidekeys.hibreak.feature.apppicker
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import androidx.compose.ui.graphics.ImageBitmap
@@ -26,9 +27,22 @@ data class AppEntry(
 
 data class AppPickerUiState(
     val loading: Boolean = true,
+    /** Filtered by the search query — what the list shows. */
     val apps: List<AppEntry> = emptyList(),
+    /**
+     * Labels of *all* installed apps, not just the filtered ones. Multi-select
+     * has to name apps the search has scrolled out of view: ticking ten apps
+     * means searching between each one, and looking labels up in the filtered
+     * list would leave those entries showing raw package names.
+     */
+    val labels: Map<String, String> = emptyMap(),
 )
 
+/**
+ * [context] must be the application context — the factory passes it — so holding
+ * it in a ViewModel outlives no Activity. Lint cannot see that from the type.
+ */
+@SuppressLint("StaticFieldLeak")
 class AppPickerViewModel(private val context: Context) : ViewModel() {
 
     private val allApps = MutableStateFlow<List<AppEntry>?>(null)
@@ -43,7 +57,11 @@ class AppPickerViewModel(private val context: Context) : ViewModel() {
             } else {
                 apps.filter { it.label.contains(filter, ignoreCase = true) }
             }
-            AppPickerUiState(loading = false, apps = filtered)
+            AppPickerUiState(
+                loading = false,
+                apps = filtered,
+                labels = apps.associate { it.packageName to it.label },
+            )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AppPickerUiState())
 

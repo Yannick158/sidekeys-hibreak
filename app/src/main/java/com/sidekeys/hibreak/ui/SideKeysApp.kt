@@ -12,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.sidekeys.hibreak.core.model.AppList
 import com.sidekeys.hibreak.feature.activitypicker.ActivityPickerScreen
 import com.sidekeys.hibreak.feature.apppicker.AppPickerScreen
 import com.sidekeys.hibreak.feature.capture.CaptureScreen
@@ -26,7 +27,7 @@ object Routes {
     const val HOME = "home"
     const val CAPTURE = "capture?pkg={pkg}&label={label}"
     const val MAPPING = "mapping/{keyCode}?pkg={pkg}&label={label}"
-    const val APP_PICKER = "apppicker/{purpose}"
+    const val APP_PICKER = "apppicker/{purpose}?preselect={preselect}"
     const val ACTIVITY_PICKER = "activitypicker/{pkg}?label={label}"
     const val SETTINGS = "settings"
     const val CHARGE = "charge"
@@ -47,7 +48,9 @@ object Routes {
     fun mapping(keyCode: Int, pkg: String? = null, label: String? = null) =
         "mapping/$keyCode?pkg=${enc(pkg)}&label=${enc(label)}"
 
-    fun appPicker(purpose: String) = "apppicker/$purpose"
+    /** [preselect] is a comma-separated package list, only used by multi-select. */
+    fun appPicker(purpose: String, preselect: List<String> = emptyList()) =
+        "apppicker/$purpose?preselect=${enc(preselect.joinToString(","))}"
 
     fun activityPicker(pkg: String, label: String?) =
         "activitypicker/${enc(pkg)}?label=${enc(label)}"
@@ -57,6 +60,9 @@ object Routes {
 
 /** Result keys used via SavedStateHandle. Values are "$data\n$label". */
 const val PICKED_APP_RESULT_KEY = "picked_app"
+
+/** Multi-select result: one "package|label" per line, in the chosen order. */
+const val PICKED_APPS_RESULT_KEY = "picked_apps"
 const val PICKED_ACTIVITY_RESULT_KEY = "picked_activity"
 
 private val optionalString = navArgument("pkg") { type = NavType.StringType; defaultValue = "" }
@@ -120,10 +126,27 @@ fun SideKeysApp() {
             }
             composable(
                 route = Routes.APP_PICKER,
-                arguments = listOf(navArgument("purpose") { type = NavType.StringType }),
+                arguments = listOf(
+                    navArgument("purpose") { type = NavType.StringType },
+                    navArgument("preselect") { type = NavType.StringType; defaultValue = "" },
+                ),
             ) { entry ->
                 val purpose = entry.arguments?.getString("purpose") ?: Routes.PURPOSE_LAUNCH_APP
+                val multi = purpose == Routes.PURPOSE_LAUNCH_APPS
                 AppPickerScreen(
+                    preselected = if (multi) {
+                        entry.arguments?.getString("preselect").orEmpty()
+                            .split(",").filter { it.isNotBlank() }
+                    } else {
+                        null
+                    },
+                    onPickedMany = { picked ->
+                        if (navController.currentBackStackEntry != entry) return@AppPickerScreen
+                        navController.previousBackStackEntry
+                            ?.savedStateHandle
+                            ?.set(PICKED_APPS_RESULT_KEY, AppList.encode(picked))
+                        navController.popBackStack()
+                    },
                     onPicked = { packageName, label ->
                         // Guard against double taps on the sluggish e-ink panel:
                         // only act while this picker is still the top entry.

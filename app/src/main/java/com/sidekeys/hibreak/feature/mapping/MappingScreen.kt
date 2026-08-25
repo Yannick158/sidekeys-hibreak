@@ -52,6 +52,7 @@ import com.sidekeys.hibreak.core.model.KeyAction
 import com.sidekeys.hibreak.core.model.PressType
 import com.sidekeys.hibreak.service.KeyInterceptorService
 import com.sidekeys.hibreak.ui.PICKED_ACTIVITY_RESULT_KEY
+import com.sidekeys.hibreak.ui.PICKED_APPS_RESULT_KEY
 import com.sidekeys.hibreak.ui.PICKED_APP_RESULT_KEY
 import com.sidekeys.hibreak.ui.Routes
 
@@ -80,10 +81,40 @@ fun MappingScreen(
                 val pickedPackage = parts[0]
                 val label = parts.getOrElse(1) { pickedPackage }
                 viewModel.pendingSlot?.let { slot ->
-                    viewModel.setAction(slot, appAction(uiState.action(slot), pickedPackage, label))
+                    viewModel.setAction(
+                        slot,
+                        KeyAction(ActionType.LAUNCH_APP, data = pickedPackage, label = label),
+                    )
                 }
                 viewModel.pendingSlot = null
                 handle[PICKED_APP_RESULT_KEY] = ""
+            }
+        }
+    }
+
+    // Receive the full list chosen in the multi-select picker. It replaces the
+    // previous list rather than merging, so unticking an app removes it.
+    LaunchedEffect(backStackEntry) {
+        val handle = backStackEntry.savedStateHandle
+        handle.getStateFlow(PICKED_APPS_RESULT_KEY, "").collect { value ->
+            if (value.isNotBlank()) {
+                val items = AppList.parse(value)
+                viewModel.pendingSlot?.let { slot ->
+                    viewModel.setAction(
+                        slot,
+                        if (items.isEmpty()) {
+                            KeyAction(ActionType.NONE)
+                        } else {
+                            KeyAction(
+                                type = ActionType.LAUNCH_APPS,
+                                data = AppList.encode(items),
+                                label = items.joinToString(", ") { it.second },
+                            )
+                        },
+                    )
+                }
+                viewModel.pendingSlot = null
+                handle[PICKED_APPS_RESULT_KEY] = ""
             }
         }
     }
@@ -145,6 +176,17 @@ fun MappingScreen(
                 action = uiState.action(PressType.LONG),
                 onClick = { pickerSlot = PressType.LONG },
             )
+
+            // Pass-through is whole-key, not per press type — surprising enough
+            // that it needs saying where the choice was made, not just in a
+            // changelog.
+            if (PressType.entries.any { uiState.action(it).type == ActionType.PASS_THROUGH }) {
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.action_pass_through_note),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
             Spacer(Modifier.height(4.dp))
         }
 
@@ -165,18 +207,17 @@ fun MappingScreen(
                 when (type) {
                     ActionType.LAUNCH_APP -> {
                         viewModel.pendingSlot = slot
-                        // Replace whatever was there: a single-app action starts fresh.
-                        viewModel.setAction(slot, KeyAction(ActionType.NONE))
                         navController.navigate(Routes.appPicker(Routes.PURPOSE_LAUNCH_APP))
                     }
                     ActionType.LAUNCH_APPS -> {
                         viewModel.pendingSlot = slot
-                        // Deliberately keeps an existing list: picking this action
-                        // again is how another app is added to it.
-                        if (uiState.action(slot).type != ActionType.LAUNCH_APPS) {
-                            viewModel.setAction(slot, KeyAction(ActionType.LAUNCH_APPS, data = ""))
-                        }
-                        navController.navigate(Routes.appPicker(Routes.PURPOSE_LAUNCH_APPS))
+                        val current = uiState.action(slot)
+                            .takeIf { it.type == ActionType.LAUNCH_APPS }
+                            ?.let { AppList.parse(it.data).map { entry -> entry.first } }
+                            .orEmpty()
+                        navController.navigate(
+                            Routes.appPicker(Routes.PURPOSE_LAUNCH_APPS, current),
+                        )
                     }
                     ActionType.LAUNCH_ACTIVITY -> {
                         viewModel.pendingSlot = slot
@@ -275,19 +316,3 @@ private fun ActionPickerDialog(
     )
 }
 
-/**
- * Builds the action for an app chosen in the picker. For [ActionType.LAUNCH_APPS]
- * the pick is appended to the existing list — choosing the action again is how a
- * user adds the next app — while a plain launch replaces whatever was there.
- */
-private fun appAction(current: KeyAction, packageName: String, label: String): KeyAction {
-    if (current.type != ActionType.LAUNCH_APPS) {
-        return KeyAction(ActionType.LAUNCH_APP, data = packageName, label = label)
-    }
-    val items = AppList.parse(current.data).filterNot { it.first == packageName } + (packageName to label)
-    return KeyAction(
-        type = ActionType.LAUNCH_APPS,
-        data = AppList.encode(items),
-        label = items.joinToString(", ") { it.second },
-    )
-}

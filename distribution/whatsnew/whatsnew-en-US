@@ -1,5 +1,5 @@
-Three additions, all from user requests
+Pick several apps at once, and keep DuraSpeed off
 
-• Launch several apps with one key press — pick the action again to add more. Launches are staggered so each one actually starts; handy against aggressive task killers.
-• Tap left/right screen edge: page turns in readers like Storytel, no extra setup.
-• D-pad left/right for apps that only listen to arrow keys (needs Shizuku — Android offers apps no other way to send key presses).
+• The app picker now has checkboxes and opens with your current list ticked — building a list of ten apps no longer means ten trips through the menu.
+• New setting: keep MediaTek's DuraSpeed off. It stops background apps, including this service, which is why keys silently stop working on some devices. It is watched, not just switched once.
+• Fixes to app names in the picker and to the DuraSpeed watcher.

@@ -32,6 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sidekeys.hibreak.R
+import com.sidekeys.hibreak.core.designsystem.EInkOutlinedButton
+import com.sidekeys.hibreak.core.designsystem.EInkButton
 import com.sidekeys.hibreak.core.designsystem.EInkCard
 import com.sidekeys.hibreak.service.DuraSpeed
 import kotlinx.coroutines.Dispatchers
@@ -120,16 +122,20 @@ fun SettingsScreen(onBack: () -> Unit) {
             // Only on devices that actually have DuraSpeed — offering a switch
             // that provably does nothing is worse than not offering it.
             var duraPresent by remember { mutableStateOf(false) }
-            var duraDisabled by remember { mutableStateOf(true) }
+            var duraActive by remember { mutableStateOf<Boolean?>(null) }
             var duraCanWrite by remember { mutableStateOf(false) }
+            var duraCanPersist by remember { mutableStateOf(false) }
             LaunchedEffect(settings.keepDuraSpeedOff) {
                 withContext(Dispatchers.IO) {
-                    val value = DuraSpeed.currentValue(context)
+                    val present = DuraSpeed.isPresent(context)
+                    val active = DuraSpeed.isActive(context)
                     val canWrite = DuraSpeed.canWrite(context)
+                    val canPersist = DuraSpeed.canPersist(context)
                     withContext(Dispatchers.Main) {
-                        duraPresent = value != null
-                        duraDisabled = value == 0
+                        duraPresent = present
+                        duraActive = active
                         duraCanWrite = canWrite
+                        duraCanPersist = canPersist
                     }
                 }
             }
@@ -144,8 +150,11 @@ fun SettingsScreen(onBack: () -> Unit) {
                             )
                             Text(
                                 text = stringResource(
-                                    if (duraDisabled) R.string.duraspeed_state_off
-                                    else R.string.duraspeed_state_on,
+                                    when (duraActive) {
+                                        true -> R.string.duraspeed_state_on
+                                        false -> R.string.duraspeed_state_off
+                                        null -> R.string.duraspeed_state_unknown
+                                    },
                                 ),
                                 style = MaterialTheme.typography.bodyMedium,
                             )
@@ -166,8 +175,11 @@ fun SettingsScreen(onBack: () -> Unit) {
                     Spacer(Modifier.height(4.dp))
                     Text(
                         text = stringResource(
-                            if (duraCanWrite) R.string.duraspeed_note
-                            else R.string.duraspeed_needs_access,
+                            when {
+                                !duraCanWrite -> R.string.duraspeed_needs_access
+                                duraCanPersist -> R.string.duraspeed_note
+                                else -> R.string.duraspeed_temporary_only
+                            },
                         ),
                         style = MaterialTheme.typography.bodyMedium,
                     )

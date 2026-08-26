@@ -30,7 +30,21 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
 /** A key press observed while the capture screen is open. */
-data class CapturedKey(val keyCode: Int, val keyName: String, val blocked: Boolean = false)
+data class CapturedKey(
+    val keyCode: Int,
+    val keyName: String,
+    val blocked: Boolean = false,
+    /**
+     * Raw numbers behind the name, e.g. "key code 0, scan code 143". Shown in
+     * the capture screen because when two physical keys arrive looking alike,
+     * these are the only values that say whether the device distinguishes them
+     * at all — and a user can read them off the screen and report them.
+     */
+    val detail: String = "",
+)
+
+/** The raw identity of a key event, for reporting what a device actually sends. */
+fun KeyEvent.identityDetail(): String = "key code $keyCode, scan code $scanCode"
 
 /**
  * Accessibility service that filters hardware key events and maps the
@@ -83,6 +97,18 @@ class KeyInterceptorService : AccessibilityService() {
 
     private var executor: ActionExecutor? = null
     private var duraSpeedObserver: ContentObserver? = null
+
+    /**
+     * Id chosen at DOWN, kept until the matching UP, keyed by the raw key code.
+     *
+     * [KeyCodeNames.keyIdOf] falls back to the scan code, and a device does not
+     * have to report the scan code on every event of a press. If DOWN resolved
+     * to a scan-code id and UP did not, the release would be filed under a
+     * different key: the press handler would never see it, so a long-press timer
+     * would hang and the next press would be swallowed as a leftover. The key
+     * would simply stop working.
+     */
+    private val activeKeyIds = HashMap<Int, Int>()
 
     /** All mappings (global + per-app), grouped by key code. */
     @Volatile
@@ -208,7 +234,7 @@ class KeyInterceptorService : AccessibilityService() {
             pressHandlers.values.forEach { it.reset() }
         }
 
-        val keyId = KeyCodeNames.keyIdOf(event)
+        val keyId = stableKeyId(event)
         if (capture) return handleCapture(event, keyId)
 
         // Grace period: swallow all leftovers of a just-captured key.
@@ -253,6 +279,20 @@ class KeyInterceptorService : AccessibilityService() {
         }
     }
 
+    /**
+     * The id for this event, pinned to whatever DOWN decided so a press and its
+     * release always resolve to the same key.
+     */
+    private fun stableKeyId(event: KeyEvent): Int {
+        val raw = event.keyCode
+        if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
+            return KeyCodeNames.keyIdOf(event).also { activeKeyIds[raw] = it }
+        }
+        val id = activeKeyIds[raw] ?: KeyCodeNames.keyIdOf(event)
+        if (event.action == KeyEvent.ACTION_UP) activeKeyIds.remove(raw)
+        return id
+    }
+
     private fun handleCapture(event: KeyEvent, keyId: Int): Boolean {
         if (event.keyCode in KeyCodeNames.BLOCKED_KEY_CODES) {
             // Say what arrived rather than ignoring it. A capture screen that
@@ -260,7 +300,12 @@ class KeyInterceptorService : AccessibilityService() {
             // and the difference is exactly what needs diagnosing.
             if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
                 capturedKeys.tryEmit(
-                    CapturedKey(keyId, KeyCodeNames.prettyName(this, keyId), blocked = true),
+                    CapturedKey(
+                        keyId,
+                        KeyCodeNames.prettyName(this, keyId),
+                        blocked = true,
+                        detail = event.identityDetail(),
+                    ),
                 )
             }
             return false
@@ -270,7 +315,7 @@ class KeyInterceptorService : AccessibilityService() {
                 captureConsumedDowns.add(keyId)
                 captureGraceUntil[keyId] = event.eventTime + CAPTURE_GRACE_MS
                 capturedKeys.tryEmit(
-                    CapturedKey(keyId, KeyCodeNames.prettyName(this, keyId)),
+                    CapturedKey(keyId, KeyCodeNames.prettyName(this, keyId), detail = event.identityDetail()),
                 )
             }
             KeyEvent.ACTION_UP -> captureConsumedDowns.remove(keyId)
@@ -290,7 +335,13 @@ class KeyInterceptorService : AccessibilityService() {
             duraSpeedObserver = null
             return
         }
-        if (duraSpeedObserver != null) return
+        // Runs on every service start, which is the moment that matters: after a
+        // reboot the stored value reads 0 while DuraSpeed is up and running
+        // again, so the value alone would never trigger anything.
+        if (duraSpeedObserver != null) {
+            enforceDuraSpeedOff()
+            return
+        }
         val observer = object : ContentObserver(mainHandler) {
             override fun onChange(selfChange: Boolean) = enforceDuraSpeedOff()
         }
@@ -307,10 +358,9 @@ class KeyInterceptorService : AccessibilityService() {
         if (DuraSpeed.isApplying()) return
         // Blocks on the Shizuku path, so never on the main thread.
         scope.launch(Dispatchers.IO) {
-            if (!DuraSpeed.isDisabled(this@KeyInterceptorService) &&
-                DuraSpeed.canWrite(this@KeyInterceptorService)
-            ) {
-                DuraSpeed.disable(this@KeyInterceptorService)
+            val context = this@KeyInterceptorService
+            if (DuraSpeed.canWrite(context) && DuraSpeed.needsDisabling(context)) {
+                DuraSpeed.disable(context)
             }
         }
     }
@@ -366,6 +416,7 @@ class KeyInterceptorService : AccessibilityService() {
         runCatching { unregisterReceiver(batteryReceiver) }
         pressHandlers.values.forEach { it.reset() }
         pressHandlers.clear()
+        activeKeyIds.clear()
         captureConsumedDowns.clear()
         captureGraceUntil.clear()
         executor?.release()

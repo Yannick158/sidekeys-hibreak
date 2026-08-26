@@ -1,5 +1,6 @@
-Mehrere Apps auf einmal wählen, DuraSpeed aus halten
+Bessere Behandlung von Tasten ohne eigenen Tastencode
 
-• Die App-Auswahl hat jetzt Kontrollkästchen und öffnet mit der bisherigen Liste angehakt — für zehn Apps braucht es nicht mehr zehn Durchgänge.
-• Neu: MediaTeks DuraSpeed ausgeschaltet halten. Es beendet Hintergrund-Apps, auch diesen Dienst — deshalb hören Tasten auf manchen Geräten still auf zu funktionieren. Wird überwacht, nicht nur einmal gesetzt.
-• Korrekturen an den App-Namen in der Auswahl und am DuraSpeed-Wächter.
+• Die Kennung einer Taste steht jetzt beim Drücken fest und gilt bis zum Loslassen. Wurde sie je Ereignis neu bestimmt, konnte das Loslassen woanders landen — der Druck wurde nie abgeschlossen, die Taste tat nichts.
+• Beim Zuordnen werden die Rohwerte angezeigt, mit Pause zum Mitlesen.
+• Führt Android SideKeys als aktiv, obwohl nichts läuft, sagt die App das jetzt.
+• DuraSpeed-Behandlung überarbeitet.

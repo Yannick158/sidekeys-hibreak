@@ -193,7 +193,7 @@
     <string name="action_tap_left_edge">Tap left screen edge (page back in readers)</string>
     <string name="action_tap_right_edge">Tap right screen edge (page forward in readers)</string>
     <string name="setting_duraspeed">Keep DuraSpeed off</string>
-    <string name="duraspeed_note">MediaTek\'s DuraSpeed stops background apps — including this service, which then quietly stops remapping keys. SideKeys watches the setting and switches it back off whenever something turns it on. (Disabling the DuraSpeed app itself only hides its notification, it keeps killing.)</string>
+    <string name="duraspeed_note">MediaTek\'s DuraSpeed stops background apps — including this service, which then quietly stops remapping keys. SideKeys checks whether the service is really running — at every start and whenever the setting changes — and switches it off in both places it is stored. The one that survives a restart only takes hold from the next boot, so reboot once after enabling this. (Disabling the DuraSpeed app itself only hides its notification, it keeps killing.)</string>
     <string name="duraspeed_state_off">✓ DuraSpeed is off</string>
     <string name="duraspeed_state_on">DuraSpeed is currently on</string>
     <string name="duraspeed_needs_access">Needs the one-off access below (adb or Shizuku) before it can change this.</string>
@@ -201,4 +201,10 @@
         <item quantity="one">Use this %1$d app</item>
         <item quantity="other">Use these %1$d apps</item>
     </plurals>
+    <string name="duraspeed_temporary_only">Without Shizuku, SideKeys can switch DuraSpeed off for now but not keep it off: the setting that survives a restart lives where only a shell can write, and there is no way to read back whether the service is really running. With Shizuku it can do both, and confirm it.</string>
+    <string name="duraspeed_state_unknown">Can\'t tell whether DuraSpeed is running</string>
+    <string name="capture_last_seen">Last key seen: %1$s</string>
+    <string name="service_stale_title">Listed as enabled, but not running</string>
+    <string name="service_stale_note">Android still counts SideKeys among the enabled accessibility services, yet nothing is intercepting keys. This is what a reinstall leaves behind — most often after switching between the Play version and the APK from GitHub, which forces an uninstall because the two are signed differently.\n\nThe switch in Accessibility settings will already look switched on. Turn it OFF and then ON again; that is all it takes.</string>
+    <string name="service_stale_open">Open Accessibility settings</string>
 </resources>

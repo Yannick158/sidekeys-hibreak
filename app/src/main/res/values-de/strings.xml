@@ -195,7 +195,7 @@
     <string name="action_tap_left_edge">Linken Bildschirmrand antippen (in Readern zurückblättern)</string>
     <string name="action_tap_right_edge">Rechten Bildschirmrand antippen (in Readern vorblättern)</string>
     <string name="setting_duraspeed">DuraSpeed ausgeschaltet halten</string>
-    <string name="duraspeed_note">MediaTeks DuraSpeed beendet Hintergrund-Apps — auch diesen Dienst, der dann stillschweigend keine Tasten mehr belegt. SideKeys überwacht die Einstellung und schaltet sie wieder aus, sobald etwas sie aktiviert. (Die DuraSpeed-App zu deaktivieren blendet nur deren Benachrichtigung aus, beendet aber weiterhin Apps.)</string>
+    <string name="duraspeed_note">MediaTeks DuraSpeed beendet Hintergrund-Apps — auch diesen Dienst, der dann stillschweigend keine Tasten mehr belegt. SideKeys prüft bei jedem Start und bei jeder Änderung, ob der Dienst wirklich läuft, und schaltet ihn an beiden Speicherorten ab. Der Ort, der einen Neustart übersteht, greift erst ab dem nächsten Hochfahren — starte also einmal neu, nachdem du das aktiviert hast. (Die DuraSpeed-App zu deaktivieren blendet nur deren Benachrichtigung aus, beendet aber weiterhin Apps.)</string>
     <string name="duraspeed_state_off">✓ DuraSpeed ist aus</string>
     <string name="duraspeed_state_on">DuraSpeed ist derzeit an</string>
     <string name="duraspeed_needs_access">Braucht den einmaligen Zugriff (adb oder Shizuku), bevor das geändert werden kann.</string>
@@ -203,4 +203,10 @@
         <item quantity="one">Diese %1$d App übernehmen</item>
         <item quantity="other">Diese %1$d Apps übernehmen</item>
     </plurals>
+    <string name="duraspeed_temporary_only">Ohne Shizuku kann SideKeys DuraSpeed jetzt ausschalten, aber nicht dauerhaft: Die Einstellung, die einen Neustart übersteht, liegt an einer Stelle, die nur eine Shell beschreiben kann — und ob der Dienst wirklich läuft, ist ohne Shell nicht auslesbar. Mit Shizuku geht beides, inklusive Bestätigung.</string>
+    <string name="duraspeed_state_unknown">Nicht feststellbar, ob DuraSpeed läuft</string>
+    <string name="capture_last_seen">Zuletzt erkannt: %1$s</string>
+    <string name="service_stale_title">Als aktiv gelistet, läuft aber nicht</string>
+    <string name="service_stale_note">Android führt SideKeys weiterhin unter den aktivierten Bedienungshilfen, es fängt aber keine Tasten ab. Das bleibt nach einer Neuinstallation zurück — meist nach einem Wechsel zwischen Play-Version und GitHub-APK, der eine Deinstallation erzwingt, weil beide unterschiedlich signiert sind.\n\nDer Schalter in den Bedienungshilfen sieht bereits eingeschaltet aus. Schalte ihn AUS und wieder EIN, mehr ist nicht nötig.</string>
+    <string name="service_stale_open">Bedienungshilfen öffnen</string>
 </resources>

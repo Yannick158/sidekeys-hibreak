@@ -42,6 +42,14 @@ import kotlinx.coroutines.delay
 /** How long to wait before suggesting that no key events are arriving at all. */
 private const val NO_KEY_HINT_MS = 6_000L
 
+/**
+ * Pause between detecting a key and moving on, so the user can read which key
+ * was detected and the raw numbers behind it. Also plain feedback: on a slow
+ * e-ink panel, a screen that changes instantly leaves you unsure it registered
+ * the press you meant.
+ */
+private const val CONFIRM_MS = 900L
+
 @Composable
 fun CaptureScreen(
     onCaptured: (Int) -> Unit,
@@ -53,7 +61,9 @@ fun CaptureScreen(
     var sawAnyKey by remember { mutableStateOf(false) }
     var showNoKeyHint by remember { mutableStateOf(false) }
     var blockedKey by remember { mutableStateOf<CapturedKey?>(null) }
+    var lastSeen by remember { mutableStateOf<CapturedKey?>(null) }
     var riskyKey by remember { mutableStateOf<CapturedKey?>(null) }
+    var pendingCapture by remember { mutableStateOf<CapturedKey?>(null) }
 
     // Lifecycle-aware: capture must stop the moment the screen is no longer
     // visible (Home button, screen off), otherwise the service would keep
@@ -70,18 +80,26 @@ fun CaptureScreen(
         showNoKeyHint = !sawAnyKey
     }
 
+    LaunchedEffect(pendingCapture) {
+        pendingCapture?.let { key ->
+            delay(CONFIRM_MS)
+            onCaptured(key.keyCode)
+        }
+    }
+
     val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(Unit) {
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             KeyInterceptorService.capturedKeys.collect { captured ->
                 sawAnyKey = true
                 showNoKeyHint = false
+                lastSeen = captured
                 when {
                     captured.blocked -> blockedKey = captured
                     captured.keyCode in KeyCodeNames.RISKY_KEY_CODES -> riskyKey = captured
                     !handled -> {
                         handled = true
-                        onCaptured(captured.keyCode)
+                        pendingCapture = captured
                     }
                 }
             }
@@ -111,6 +129,21 @@ fun CaptureScreen(
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(32.dp))
+
+            // Always show the raw values of the last key seen. When two keys look
+            // identical, this is the only thing that says whether the device even
+            // reports them differently -- and it is readable off the screen, so a
+            // user can report it without any tooling.
+            lastSeen?.let { key ->
+                EInkCard {
+                    Text(
+                        text = stringResource(R.string.capture_last_seen, key.keyName),
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Text(text = key.detail, style = MaterialTheme.typography.bodyMedium)
+                }
+                Spacer(Modifier.height(16.dp))
+            }
 
             blockedKey?.let { key ->
                 EInkCard {

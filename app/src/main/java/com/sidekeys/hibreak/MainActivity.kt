@@ -44,6 +44,7 @@ import com.sidekeys.hibreak.core.designsystem.SideKeysTheme
 import com.sidekeys.hibreak.feature.consent.Consent
 import com.sidekeys.hibreak.feature.consent.ConsentScreen
 import com.sidekeys.hibreak.service.CapturedKey
+import com.sidekeys.hibreak.service.identityDetail
 import com.sidekeys.hibreak.service.KeyInterceptorService
 import com.sidekeys.hibreak.ui.SideKeysApp
 import kotlinx.coroutines.launch
@@ -120,7 +121,11 @@ class MainActivity : ComponentActivity() {
             if (event == null || event.repeatCount == 0) {
                 val keyId = if (event != null) KeyCodeNames.keyIdOf(event) else keyCode
                 KeyInterceptorService.capturedKeys.tryEmit(
-                    CapturedKey(keyId, KeyCodeNames.prettyName(this, keyId)),
+                    CapturedKey(
+                        keyId,
+                        KeyCodeNames.prettyName(this, keyId),
+                        detail = event?.identityDetail() ?: "key code $keyCode",
+                    ),
                 )
             }
             return true

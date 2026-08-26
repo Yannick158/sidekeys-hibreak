@@ -33,6 +33,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sidekeys.hibreak.R
+import com.sidekeys.hibreak.core.common.rememberServiceHealth
+import com.sidekeys.hibreak.core.common.ServiceHealth
 import com.sidekeys.hibreak.core.common.rememberServiceRunningState
 import com.sidekeys.hibreak.core.designsystem.EInkButton
 import com.sidekeys.hibreak.core.designsystem.EInkCard
@@ -56,6 +58,7 @@ fun HomeScreen(
         viewModel(factory = HomeViewModel.factory(context.applicationContext))
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val serviceRunning by rememberServiceRunningState()
+    val serviceHealth by rememberServiceHealth()
     var mappingToDelete by remember { mutableStateOf<KeyMapping?>(null) }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -87,7 +90,30 @@ fun HomeScreen(
                     },
                     style = MaterialTheme.typography.titleMedium,
                 )
-                if (!serviceRunning) {
+                // Android still lists the app as an enabled accessibility
+                // service while nothing runs. The setup steps below would tell
+                // the user to switch on something that already shows as on, so
+                // say what is actually wrong and how to clear it instead.
+                if (serviceHealth == ServiceHealth.ENABLED_BUT_DEAD) {
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(R.string.service_stale_title),
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Text(
+                        text = stringResource(R.string.service_stale_note),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    EInkButton(
+                        text = stringResource(R.string.service_stale_open),
+                        onClick = {
+                            context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+                if (!serviceRunning && serviceHealth != ServiceHealth.ENABLED_BUT_DEAD) {
                     Spacer(Modifier.height(8.dp))
                     Text(
                         text = stringResource(R.string.service_inactive_hint),

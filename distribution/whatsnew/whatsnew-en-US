@@ -1,5 +1,6 @@
-Pick several apps at once, and keep DuraSpeed off
+Better handling of keys that report no proper code
 
-• The app picker now has checkboxes and opens with your current list ticked — building a list of ten apps no longer means ten trips through the menu.
-• New setting: keep MediaTek's DuraSpeed off. It stops background apps, including this service, which is why keys silently stop working on some devices. It is watched, not just switched once.
-• Fixes to app names in the picker and to the DuraSpeed watcher.
+• A key's identity is now fixed when you press it and kept until you release it. Recomputing it per event could file the release under a different key, so the press never completed and the key silently did nothing.
+• Assigning a key now shows the raw numbers it received, and pauses so you can read them.
+• If Android lists SideKeys as enabled while nothing is running, the app says so.
+• DuraSpeed handling rebuilt on better information.

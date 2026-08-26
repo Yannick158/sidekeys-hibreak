@@ -1,8 +1,38 @@
-## SideKeys v1.15.0
+## SideKeys v1.16.3
 
 A button mapper for **E-Ink phones**: freely remap the extra side keys, the volume
 keys or almost any hardware key — separately for single press, double press and
 long press. Developed and tested on the Bigme HiBreak Pro.
+
+### New in 1.16.3
+
+- **Keys that report no proper code are handled more reliably.** The identity of
+  a key is now decided when it goes down and kept until it comes up. It used to
+  be recomputed for every event, and a device does not have to report the scan
+  code on every event of one press — when it did not, the release was filed
+  under a different key, so the press never completed and the key silently did
+  nothing.
+- **Key capture shows the raw numbers** it received, and pauses so they can be
+  read. When two keys look identical this is the only thing that says whether
+  the device distinguishes them at all, and it can be read off the screen and
+  reported without any tooling.
+- **"Enabled but not running" is detected and explained.** Reinstalling can
+  leave SideKeys listed among the enabled accessibility services while nothing
+  is actually running — most often after moving between the Play build and the
+  APK here, which forces an uninstall because the two are signed differently.
+  The switch in system settings then already looks on, so the old setup steps
+  were telling people to enable something that appeared enabled. The main screen
+  now says what is wrong: switch it off and on again.
+- **DuraSpeed handling rebuilt on much better information**, thanks to a user's
+  testing and decompilation of the service
+  (https://www.reddit.com/r/Bigme/s/M8tCfoal21):
+  - The value is nudged through **2** before 0, not 1 — some firmwares use 1 as
+    their own "enabled" value, so 1 → 0 may not register as a change.
+  - **Settings.System** is what the service reads at startup, so that is what
+    makes the change survive a reboot. Global only takes effect immediately.
+  - Status now comes from `dumpsys duraspeed status` rather than the stored
+    value, which can read 0 while DuraSpeed is running. Without a shell to ask
+    with, the app says it does not know instead of claiming it is off.
 
 ### New in 1.15.0
 

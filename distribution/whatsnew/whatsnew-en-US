@@ -1,6 +1,4 @@
-Better handling of keys that report no proper code
+Volume keys now work even where the firmware eats them
 
-• A key's identity is now fixed when you press it and kept until you release it. Recomputing it per event could file the release under a different key, so the press never completed and the key silently did nothing.
-• Assigning a key now shows the raw numbers it received, and pauses so you can read them.
-• If Android lists SideKeys as enabled while nothing is running, the app says so.
-• DuraSpeed handling rebuilt on better information.
+• New in Settings: catch volume keys via the audio route — for devices (like Viwoods) that swallow them before apps can see them. Single, double and long press all work. Leave single press unassigned and it keeps changing the volume, so one press is volume, a double press is your action.
+• Capture now filters phantom twin events (Bigme B7 Pro page keys), shows raw key codes, and tells you to hold the key if a tap isn't reported.

@@ -1,8 +1,31 @@
-## SideKeys v1.16.3
+## SideKeys v1.18.0
 
 A button mapper for **E-Ink phones**: freely remap the extra side keys, the volume
 keys or almost any hardware key — separately for single press, double press and
 long press. Developed and tested on the Bigme HiBreak Pro.
+
+### New in 1.18.0
+
+- **Volume keys through the audio route** — for devices whose firmware swallows
+  the volume keys before any app can see them (Viwoods among them). A new
+  opt-in switch in Settings makes SideKeys receive the press through the audio
+  system instead, the same mechanism Tasker uses for its volume triggers. And
+  not just single presses: the release is reconstructed from tick timing, so
+  **single, double and long press all work**. Leave the single press unassigned
+  and it keeps changing the volume — one press is volume, a double press is
+  whatever you want. Unassigned keys behave completely normally; while another
+  app is actively playing media, that app gets the keys. Covered by six new
+  unit tests that pin down exactly these semantics.
+- **Phantom key events are filtered during capture.** On a Bigme B7 Pro one
+  press of a page-turn key emits two events: the key configured in system
+  settings and a raw twin (scan code 143) that is identical for both keys.
+  Capture used to grab whichever came first — often the twin, which cannot
+  tell the keys apart. It now waits 120 ms for a proper key code and prefers
+  it, so the two keys stay separable.
+- **Capture shows what it is doing.** A pulsing "waiting for a key" indicator,
+  a hint after 1.5 s to hold the key rather than tap it (some devices only
+  report a held key), and the raw key/scan codes of every press, with a pause
+  so they can actually be read.
 
 ### New in 1.16.3
 

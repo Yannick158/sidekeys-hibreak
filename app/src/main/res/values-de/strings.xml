@@ -209,4 +209,8 @@
     <string name="service_stale_title">Als aktiv gelistet, läuft aber nicht</string>
     <string name="service_stale_note">Android führt SideKeys weiterhin unter den aktivierten Bedienungshilfen, es fängt aber keine Tasten ab. Das bleibt nach einer Neuinstallation zurück — meist nach einem Wechsel zwischen Play-Version und GitHub-APK, der eine Deinstallation erzwingt, weil beide unterschiedlich signiert sind.\n\nDer Schalter in den Bedienungshilfen sieht bereits eingeschaltet aus. Schalte ihn AUS und wieder EIN, mehr ist nicht nötig.</string>
     <string name="service_stale_open">Bedienungshilfen öffnen</string>
+    <string name="capture_waiting">● Warte auf einen Tastendruck…</string>
+    <string name="capture_hold_longer">● Halte die Taste eine Sekunde gedrückt — manche Geräte melden sie erst dann</string>
+    <string name="setting_volume_audio">Lautstärketasten über den Audio-Weg abfangen</string>
+    <string name="volume_audio_note">Für Geräte, deren Firmware die Lautstärketasten schluckt, bevor Apps sie sehen (z. B. Viwoods). SideKeys empfängt den Druck dann über das Audiosystem — einschließlich Einfach-, Doppel- und Langdruck. Lässt du den einfachen Druck unbelegt, regelt er weiter die Lautstärke: einmal drücken ist dann Lautstärke, zweimal drücken etwas anderes. Solange eine andere App aktiv Medien abspielt, bekommt diese App die Tasten.</string>
 </resources>

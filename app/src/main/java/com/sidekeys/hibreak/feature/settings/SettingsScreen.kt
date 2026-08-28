@@ -119,6 +119,33 @@ fun SettingsScreen(onBack: () -> Unit) {
                 )
             }
 
+            EInkCard {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.setting_volume_audio),
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                    }
+                    Switch(
+                        checked = settings.volumeAudioCapture,
+                        onCheckedChange = { viewModel.setVolumeAudioCapture(it) },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = Color.White,
+                            checkedTrackColor = Color.Black,
+                            uncheckedThumbColor = Color.Black,
+                            uncheckedTrackColor = Color.White,
+                            uncheckedBorderColor = Color.Black,
+                        ),
+                    )
+                }
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.volume_audio_note),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+
             // Only on devices that actually have DuraSpeed — offering a switch
             // that provably does nothing is worse than not offering it.
             var duraPresent by remember { mutableStateOf(false) }

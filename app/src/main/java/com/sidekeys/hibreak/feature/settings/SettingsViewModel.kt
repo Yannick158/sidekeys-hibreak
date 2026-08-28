@@ -34,6 +34,8 @@ class SettingsViewModel(private val repository: MappingRepository) : ViewModel()
 
     fun setScrollPercent(value: Int) = update { it.copy(scrollPercent = value) }
 
+    fun setVolumeAudioCapture(enabled: Boolean) = update { it.copy(volumeAudioCapture = enabled) }
+
     fun setKeepDuraSpeedOff(enabled: Boolean) = update { it.copy(keepDuraSpeedOff = enabled) }
 
     fun setHideFromRecents(hide: Boolean) = update { it.copy(hideFromRecents = hide) }

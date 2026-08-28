@@ -6,6 +6,10 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.database.ContentObserver
+import android.media.session.PlaybackState
+import android.media.session.MediaSession
+import android.media.VolumeProvider
+import android.media.AudioManager
 import android.content.IntentFilter
 import android.os.BatteryManager
 import android.os.Handler
@@ -54,6 +58,29 @@ class KeyInterceptorService : AccessibilityService() {
 
     companion object {
         private const val TAG = "SideKeys"
+        /**
+         * How long a capture without a real key code waits for a proper one.
+         * Long enough to catch the paired event some firmwares send, short
+         * enough that a device which only ever sends the raw event still feels
+         * immediate.
+         */
+        private const val PHANTOM_GRACE_MS = 120L
+
+        /**
+         * How long after the last tick the synthetic release fires. Longer
+         * than typical volume auto-repeat (50–125 ms), so a held key stays one
+         * gesture; short enough that a deliberate second tap lands after the
+         * release and reads as a double press.
+         */
+        private const val SYNTH_UP_MS = 130L
+
+        /**
+         * Debounce floor on the audio route: the gap between a synthetic
+         * release and a genuine second tap must clear it, so it is kept low.
+         * The user's own setting still applies when larger.
+         */
+        private const val AUDIO_DEBOUNCE_FLOOR_MS = 60L
+
         private const val CAPTURE_GRACE_MS = 700L
 
         @Volatile
@@ -109,6 +136,54 @@ class KeyInterceptorService : AccessibilityService() {
      * would simply stop working.
      */
     private val activeKeyIds = HashMap<Int, Int>()
+
+    /**
+     * A capture held back because it carried no real key code.
+     *
+     * Some firmwares emit two events for one press: the key the user configured
+     * in system settings, and a raw one the vendor sends alongside it. On a
+     * Bigme B7 Pro both page-turn keys emit the same raw event (scan code 143),
+     * so grabbing whichever arrives first can land on the one that cannot tell
+     * the keys apart. Waiting a moment for a real key code and preferring that
+     * keeps the two keys separable.
+     */
+    private var pendingPhantom: Runnable? = null
+
+    /**
+     * Volume-key capture through the audio system — the route of last resort
+     * for firmwares that consume volume keys before input dispatch.
+     *
+     * A MediaSession with [MediaSession.setPlaybackToRemote] makes the system
+     * deliver volume presses as [VolumeProvider.onAdjustVolume] callbacks
+     * instead of changing a stream volume. Tasker and Key Mapper use the same
+     * mechanism for their screen-off volume triggers.
+     *
+     * No double-firing with the normal path by construction: when the key
+     * filter receives a volume key and a mapping consumes it, the event never
+     * reaches the audio system, so this callback does not fire. This path only
+     * sees what the filter could not.
+     */
+    private var volumeSession: MediaSession? = null
+
+    /**
+     * One in-flight gesture per volume key on the audio route.
+     *
+     * The audio route delivers bare ticks, not down/up pairs, so the release
+     * is synthesised: the DOWN goes to the state machine on the first tick,
+     * and the UP fires [SYNTH_UP_MS] after the *last* tick — every further
+     * tick just postpones it. A held key auto-repeats faster than that, so to
+     * the state machine it looks like one continuous hold, and the ordinary
+     * long-press timer fires mid-hold. Single and double press fall out of the
+     * same machinery unchanged.
+     */
+    private class AudioGesture(val handler: KeyPressHandler) {
+        var synthUp: Runnable? = null
+    }
+
+    private val audioGestures = HashMap<Int, AudioGesture>()
+
+    private val audioSettings: KeySettings
+        get() = settings.let { it.copy(debounceMs = maxOf(it.debounceMs, AUDIO_DEBOUNCE_FLOOR_MS)) }
 
     /** All mappings (global + per-app), grouped by key code. */
     @Volatile
@@ -172,6 +247,7 @@ class KeyInterceptorService : AccessibilityService() {
                 settings = it
                 executor?.scrollPercent = it.scrollPercent
                 applyDuraSpeedGuard(it.keepDuraSpeedOff)
+                applyVolumeCapture(it.volumeAudioCapture)
             }
         }
         scope.launch {
@@ -293,6 +369,12 @@ class KeyInterceptorService : AccessibilityService() {
         return id
     }
 
+    /** Cancels a held-back capture, because something better arrived. */
+    private fun dropPendingPhantom() {
+        pendingPhantom?.let { mainHandler.removeCallbacks(it) }
+        pendingPhantom = null
+    }
+
     private fun handleCapture(event: KeyEvent, keyId: Int): Boolean {
         if (event.keyCode in KeyCodeNames.BLOCKED_KEY_CODES) {
             // Say what arrived rather than ignoring it. A capture screen that
@@ -314,9 +396,23 @@ class KeyInterceptorService : AccessibilityService() {
             KeyEvent.ACTION_DOWN -> if (event.repeatCount == 0) {
                 captureConsumedDowns.add(keyId)
                 captureGraceUntil[keyId] = event.eventTime + CAPTURE_GRACE_MS
-                capturedKeys.tryEmit(
-                    CapturedKey(keyId, KeyCodeNames.prettyName(this, keyId), detail = event.identityDetail()),
-                )
+                val captured =
+                    CapturedKey(keyId, KeyCodeNames.prettyName(this, keyId), detail = event.identityDetail())
+                if (event.keyCode == KeyEvent.KEYCODE_UNKNOWN) {
+                    // Might be the vendor's raw twin of a real key. Hold it back
+                    // briefly; if a proper key code follows it wins, because only
+                    // that one distinguishes one page key from the other.
+                    dropPendingPhantom()
+                    val emit = Runnable {
+                        pendingPhantom = null
+                        capturedKeys.tryEmit(captured)
+                    }
+                    pendingPhantom = emit
+                    mainHandler.postDelayed(emit, PHANTOM_GRACE_MS)
+                } else {
+                    dropPendingPhantom()
+                    capturedKeys.tryEmit(captured)
+                }
             }
             KeyEvent.ACTION_UP -> captureConsumedDowns.remove(keyId)
         }
@@ -363,6 +459,110 @@ class KeyInterceptorService : AccessibilityService() {
                 DuraSpeed.disable(context)
             }
         }
+    }
+
+    private fun applyVolumeCapture(enabled: Boolean) {
+        if (!enabled) {
+            volumeSession?.release()
+            volumeSession = null
+            return
+        }
+        if (volumeSession != null) return
+        runCatching {
+            val session = MediaSession(this, "SideKeys volume capture")
+            // STATE_PLAYING gives the session volume-routing priority. It takes
+            // no audio focus, so real playback elsewhere is not interrupted —
+            // but while another app is actively playing, its session wins the
+            // keys, which is documented in the setting's description.
+            session.setPlaybackState(
+                PlaybackState.Builder()
+                    .setState(PlaybackState.STATE_PLAYING, 0L, 1f)
+                    .build(),
+            )
+            session.setPlaybackToRemote(object : VolumeProvider(VOLUME_CONTROL_RELATIVE, 2, 1) {
+                override fun onAdjustVolume(direction: Int) {
+                    // 0 is ADJUST_SAME (key release on some devices) — ignore.
+                    if (direction != 0) mainHandler.post { onVolumeTick(direction) }
+                }
+            })
+            session.isActive = true
+            volumeSession = session
+        }
+    }
+
+    /**
+     * A volume press that arrived through the audio route.
+     *
+     * An empty single-press slot falls back to the plain volume action, so
+     * "single press changes the volume, double press does something else"
+     * needs nothing more than leaving the single slot unassigned.
+     */
+    private fun onVolumeTick(direction: Int) {
+        val keyCode =
+            if (direction > 0) KeyEvent.KEYCODE_VOLUME_UP else KeyEvent.KEYCODE_VOLUME_DOWN
+
+        if (captureMode) {
+            capturedKeys.tryEmit(
+                CapturedKey(
+                    keyCode,
+                    KeyCodeNames.prettyName(this, keyCode),
+                    detail = "key code $keyCode, via audio route",
+                ),
+            )
+            return
+        }
+
+        val volumeFallback = KeyAction(
+            if (direction > 0) ActionType.VOLUME_UP else ActionType.VOLUME_DOWN,
+        )
+
+        val mapping = resolveMapping(keyCode)
+        if (mapping == null || mapping.isEmpty || mapping.isPassThrough) {
+            // No mapping at all: stay a stock volume key, tick for tick, so a
+            // held key still ramps the volume. The state machine is engaged
+            // only when there is a real mapping to disambiguate for.
+            runMappedAction(volumeFallback)
+            return
+        }
+
+        // An unassigned single slot means "keep changing the volume" — the
+        // state machine skips NONE actions, so substitute the volume action.
+        val effective = if (mapping.singlePress.type == ActionType.NONE) {
+            mapping.copy(singlePress = volumeFallback)
+        } else {
+            mapping
+        }
+
+        val gesture = audioGestures.getOrPut(keyCode) {
+            AudioGesture(KeyPressHandler(HandlerScheduler(mainHandler)))
+        }
+        val runner: (KeyAction) -> Unit = { runMappedAction(it, effective.scrollPercent) }
+
+        gesture.synthUp?.let { pending ->
+            // The key is considered held; this tick is its auto-repeat.
+            // Postpone the synthetic release — the DOWN stays pressed, so the
+            // ordinary long-press timer keeps running.
+            mainHandler.removeCallbacks(pending)
+        } ?: run {
+            gesture.handler.onDown(
+                effective,
+                audioSettings,
+                0,
+                android.os.SystemClock.uptimeMillis(),
+                runner,
+            )
+        }
+        val release = Runnable {
+            gesture.synthUp = null
+            gesture.handler.onUp(
+                effective,
+                audioSettings,
+                android.os.SystemClock.uptimeMillis(),
+                runner,
+            )
+        }
+        gesture.synthUp = release
+        mainHandler.postDelayed(release, SYNTH_UP_MS)
     }
 
     private fun runMappedAction(action: KeyAction, scrollPercent: Int? = null) {
@@ -417,6 +617,14 @@ class KeyInterceptorService : AccessibilityService() {
         pressHandlers.values.forEach { it.reset() }
         pressHandlers.clear()
         activeKeyIds.clear()
+        dropPendingPhantom()
+        volumeSession?.release()
+        volumeSession = null
+        audioGestures.values.forEach { gesture ->
+            gesture.synthUp?.let { mainHandler.removeCallbacks(it) }
+            gesture.handler.reset()
+        }
+        audioGestures.clear()
         captureConsumedDowns.clear()
         captureGraceUntil.clear()
         executor?.release()

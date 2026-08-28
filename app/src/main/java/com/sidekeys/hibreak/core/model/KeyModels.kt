@@ -220,4 +220,12 @@ data class KeySettings(
      * themselves — so it is watched, not written once.
      */
     val keepDuraSpeedOff: Boolean = false,
+    /**
+     * Catch volume keys through the audio system instead of the key-event
+     * filter. Some firmwares (Viwoods, some Bigme modes) consume the volume
+     * keys before apps can see them — but they still route the press into the
+     * audio system, and a MediaSession with remote playback receives it there.
+     * Off by default: while active, SideKeys takes over volume routing.
+     */
+    val volumeAudioCapture: Boolean = false,
 )

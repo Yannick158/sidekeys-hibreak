@@ -2,6 +2,12 @@ package com.sidekeys.hibreak.feature.capture
 
 import android.content.Intent
 import android.provider.Settings
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -50,6 +56,9 @@ private const val NO_KEY_HINT_MS = 6_000L
  */
 private const val CONFIRM_MS = 900L
 
+/** How long to wait before suggesting the key be held rather than tapped. */
+private const val HOLD_HINT_MS = 1_500L
+
 @Composable
 fun CaptureScreen(
     onCaptured: (Int) -> Unit,
@@ -64,6 +73,7 @@ fun CaptureScreen(
     var lastSeen by remember { mutableStateOf<CapturedKey?>(null) }
     var riskyKey by remember { mutableStateOf<CapturedKey?>(null) }
     var pendingCapture by remember { mutableStateOf<CapturedKey?>(null) }
+    var showHoldHint by remember { mutableStateOf(false) }
 
     // Lifecycle-aware: capture must stop the moment the screen is no longer
     // visible (Home button, screen off), otherwise the service would keep
@@ -71,6 +81,14 @@ fun CaptureScreen(
     LifecycleStartEffect(Unit) {
         KeyInterceptorService.captureMode = true
         onStopOrDispose { KeyInterceptorService.captureMode = false }
+    }
+
+    // A quick tap is not always enough: some firmwares only report the key once
+    // it has been held for a moment. Suggest that before concluding the key
+    // cannot be seen at all.
+    LaunchedEffect(Unit) {
+        delay(HOLD_HINT_MS)
+        showHoldHint = !sawAnyKey
     }
 
     // If nothing arrives at all, the firmware is handling the keys itself —
@@ -93,6 +111,7 @@ fun CaptureScreen(
             KeyInterceptorService.capturedKeys.collect { captured ->
                 sawAnyKey = true
                 showNoKeyHint = false
+                showHoldHint = false
                 lastSeen = captured
                 when {
                     captured.blocked -> blockedKey = captured
@@ -128,7 +147,33 @@ fun CaptureScreen(
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
             )
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(24.dp))
+
+            // A slow pulse, so it is obvious the screen is waiting for a press
+            // rather than stuck. E-ink cannot do smooth motion, so this is a
+            // deliberate two-second fade rather than a spinner.
+            if (lastSeen == null) {
+                val pulse = rememberInfiniteTransition(label = "waiting")
+                val alpha by pulse.animateFloat(
+                    initialValue = 0.25f,
+                    targetValue = 1f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(durationMillis = 1000),
+                        repeatMode = RepeatMode.Reverse,
+                    ),
+                    label = "alpha",
+                )
+                Text(
+                    text = stringResource(
+                        if (showHoldHint) R.string.capture_hold_longer else R.string.capture_waiting,
+                    ),
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center,
+                    color = Color.Black.copy(alpha = alpha),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(Modifier.height(24.dp))
+            }
 
             // Always show the raw values of the last key seen. When two keys look
             // identical, this is the only thing that says whether the device even

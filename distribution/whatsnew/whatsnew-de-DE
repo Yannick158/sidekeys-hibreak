@@ -1,6 +1,4 @@
-Bessere Behandlung von Tasten ohne eigenen Tastencode
+Lautstärketasten funktionieren jetzt auch, wo die Firmware sie schluckt
 
-• Die Kennung einer Taste steht jetzt beim Drücken fest und gilt bis zum Loslassen. Wurde sie je Ereignis neu bestimmt, konnte das Loslassen woanders landen — der Druck wurde nie abgeschlossen, die Taste tat nichts.
-• Beim Zuordnen werden die Rohwerte angezeigt, mit Pause zum Mitlesen.
-• Führt Android SideKeys als aktiv, obwohl nichts läuft, sagt die App das jetzt.
-• DuraSpeed-Behandlung überarbeitet.
+• Neu in den Einstellungen: Lautstärketasten über den Audio-Weg abfangen — für Geräte (z. B. Viwoods), die sie vor den Apps abfangen. Einfach-, Doppel- und Langdruck funktionieren. Bleibt der einfache Druck unbelegt, regelt er weiter die Lautstärke.
+• Die Erfassung filtert Phantom-Zwillingsereignisse (Bigme B7 Pro), zeigt Rohcodes an und bittet ums Halten der Taste, wenn ein Tippen nicht gemeldet wird.

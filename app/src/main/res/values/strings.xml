@@ -207,4 +207,8 @@
     <string name="service_stale_title">Listed as enabled, but not running</string>
     <string name="service_stale_note">Android still counts SideKeys among the enabled accessibility services, yet nothing is intercepting keys. This is what a reinstall leaves behind — most often after switching between the Play version and the APK from GitHub, which forces an uninstall because the two are signed differently.\n\nThe switch in Accessibility settings will already look switched on. Turn it OFF and then ON again; that is all it takes.</string>
     <string name="service_stale_open">Open Accessibility settings</string>
+    <string name="capture_waiting">● Waiting for a key…</string>
+    <string name="capture_hold_longer">● Try holding the key for a second — some devices only report it once it is held</string>
+    <string name="setting_volume_audio">Catch volume keys via the audio route</string>
+    <string name="volume_audio_note">For devices whose firmware swallows the volume keys before apps can see them (e.g. Viwoods). SideKeys then receives the press through the audio system instead — single, double and long press included. Leave the single press unassigned and it keeps changing the volume, so one press can be volume and a double press something else. While another app is actively playing media, that app gets the keys.</string>
 </resources>

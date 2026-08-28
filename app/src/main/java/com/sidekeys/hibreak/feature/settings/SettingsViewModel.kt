@@ -36,6 +36,8 @@ class SettingsViewModel(private val repository: MappingRepository) : ViewModel()
 
     fun setVolumeAudioCapture(enabled: Boolean) = update { it.copy(volumeAudioCapture = enabled) }
 
+    fun setVolumeChangeObserver(enabled: Boolean) = update { it.copy(volumeChangeObserver = enabled) }
+
     fun setKeepDuraSpeedOff(enabled: Boolean) = update { it.copy(keepDuraSpeedOff = enabled) }
 
     fun setHideFromRecents(hide: Boolean) = update { it.copy(hideFromRecents = hide) }

@@ -74,6 +74,16 @@ class KeyInterceptorService : AccessibilityService() {
          */
         private const val SYNTH_UP_MS = 130L
 
+        /** Hidden but long-stable system broadcast and its extras (API 21+). */
+        private const val VOLUME_CHANGED_ACTION = "android.media.VOLUME_CHANGED_ACTION"
+        private const val EXTRA_VOLUME_STREAM_TYPE = "android.media.EXTRA_VOLUME_STREAM_TYPE"
+        private const val EXTRA_VOLUME_STREAM_VALUE = "android.media.EXTRA_VOLUME_STREAM_VALUE"
+        private const val EXTRA_VOLUME_STREAM_PREV_VALUE =
+            "android.media.EXTRA_PREV_VOLUME_STREAM_VALUE"
+
+        /** How long our own volume writes blind the watcher. */
+        private const val SELF_CHANGE_SUPPRESS_MS = 400L
+
         /**
          * Debounce floor on the audio route: the gap between a synthetic
          * release and a genuine second tap must clear it, so it is kept low.
@@ -182,6 +192,32 @@ class KeyInterceptorService : AccessibilityService() {
 
     private val audioGestures = HashMap<Int, AudioGesture>()
 
+    /**
+     * Second engine of the audio route: observe the *effect* of a volume key
+     * instead of the key itself.
+     *
+     * The MediaSession path only fires when the firmware routes volume keys
+     * through the media-session service. A vendor that handles them internally
+     * (adjusting the stream directly — the Viwoods pattern) bypasses it, and no
+     * app ever sees the key. But the volume still changes, and the system
+     * announces every change as a broadcast with the previous and new value.
+     * Direction read from the delta, volume snapped back, and the press is
+     * recovered — nothing intercepted at all.
+     *
+     * Exactly one engine fires per press by construction: when the session
+     * receives the key, the stream volume never changes, so there is no
+     * broadcast; when the firmware adjusts the stream directly, the session
+     * stays silent and the broadcast fires.
+     */
+    private var volumeWatcher: BroadcastReceiver? = null
+
+    /**
+     * Ignore volume broadcasts until this uptime: they are echoes of our own
+     * writes (the snap-back, or an executed volume action), not key presses.
+     */
+    @Volatile
+    private var volumeSelfChangeUntil = 0L
+
     private val audioSettings: KeySettings
         get() = settings.let { it.copy(debounceMs = maxOf(it.debounceMs, AUDIO_DEBOUNCE_FLOOR_MS)) }
 
@@ -247,7 +283,7 @@ class KeyInterceptorService : AccessibilityService() {
                 settings = it
                 executor?.scrollPercent = it.scrollPercent
                 applyDuraSpeedGuard(it.keepDuraSpeedOff)
-                applyVolumeCapture(it.volumeAudioCapture)
+                applyVolumeCapture(it.volumeAudioCapture, it.volumeChangeObserver)
             }
         }
         scope.launch {
@@ -461,11 +497,34 @@ class KeyInterceptorService : AccessibilityService() {
         }
     }
 
-    private fun applyVolumeCapture(enabled: Boolean) {
+    private fun applyVolumeCapture(enabled: Boolean, observer: Boolean) {
         if (!enabled) {
             volumeSession?.release()
             volumeSession = null
-            return
+        }
+        // The watcher is its own opt-in on top of the audio route. On a device
+        // whose volume keys arrive through the normal filter it adds nothing
+        // but side effects, so it must never ride along silently.
+        if (!enabled || !observer) {
+            volumeWatcher?.let { runCatching { unregisterReceiver(it) } }
+            volumeWatcher = null
+        }
+        if (!enabled) return
+        if (observer && volumeWatcher == null) {
+            val watcher = object : BroadcastReceiver() {
+                override fun onReceive(context: Context?, intent: Intent?) {
+                    if (intent?.action == VOLUME_CHANGED_ACTION) onVolumeChanged(intent)
+                }
+            }
+            runCatching {
+                ContextCompat.registerReceiver(
+                    this,
+                    watcher,
+                    IntentFilter(VOLUME_CHANGED_ACTION),
+                    ContextCompat.RECEIVER_NOT_EXPORTED,
+                )
+                volumeWatcher = watcher
+            }
         }
         if (volumeSession != null) return
         runCatching {
@@ -488,6 +547,44 @@ class KeyInterceptorService : AccessibilityService() {
             session.isActive = true
             volumeSession = session
         }
+    }
+
+    /** A volume change observed on the media stream — engine 2's input. */
+    private fun onVolumeChanged(intent: Intent) {
+        val now = android.os.SystemClock.uptimeMillis()
+        if (now < volumeSelfChangeUntil) return
+
+        val stream = intent.getIntExtra(EXTRA_VOLUME_STREAM_TYPE, -1)
+        if (stream != AudioManager.STREAM_MUSIC) return
+        val newValue = intent.getIntExtra(EXTRA_VOLUME_STREAM_VALUE, -1)
+        val prevValue = intent.getIntExtra(EXTRA_VOLUME_STREAM_PREV_VALUE, -1)
+        if (newValue < 0 || prevValue < 0 || newValue == prevValue) return
+
+        // Engaged only when a volume key is actually mapped — otherwise stock
+        // behaviour must stay untouched, slider drags included.
+        val upMapped = resolveMapping(KeyEvent.KEYCODE_VOLUME_UP)
+            ?.let { !it.isEmpty && !it.isPassThrough } == true
+        val downMapped = resolveMapping(KeyEvent.KEYCODE_VOLUME_DOWN)
+            ?.let { !it.isEmpty && !it.isPassThrough } == true
+        val direction = if (newValue > prevValue) 1 else -1
+        if (!(if (direction > 0) upMapped else downMapped)) return
+
+        // While something is really playing, a volume change is what the user
+        // wanted; hijacking it would break every music app.
+        val audio = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        if (runCatching { audio.isMusicActive }.getOrDefault(false)) return
+
+        // Undo the change so the press reads as a key, not as volume. Clamped
+        // one step away from both ends: at the limit a press changes nothing,
+        // sends no broadcast, and would be lost.
+        val max = runCatching { audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC) }.getOrDefault(15)
+        val restore = prevValue.coerceIn(1, (max - 1).coerceAtLeast(1))
+        volumeSelfChangeUntil = now + SELF_CHANGE_SUPPRESS_MS
+        runCatching {
+            audio.setStreamVolume(AudioManager.STREAM_MUSIC, restore, 0)
+        }
+
+        onVolumeTick(direction)
     }
 
     /**
@@ -566,6 +663,14 @@ class KeyInterceptorService : AccessibilityService() {
     }
 
     private fun runMappedAction(action: KeyAction, scrollPercent: Int? = null) {
+        // A volume action changes the stream we watch; its broadcast is an
+        // echo of ours, not a key press.
+        if (action.type == ActionType.VOLUME_UP || action.type == ActionType.VOLUME_DOWN ||
+            action.type == ActionType.VOLUME_MUTE_TOGGLE
+        ) {
+            volumeSelfChangeUntil =
+                android.os.SystemClock.uptimeMillis() + SELF_CHANGE_SUPPRESS_MS
+        }
         // A blocked key should feel like a dead key, not like a triggered one.
         if (settings.hapticFeedback && action.type != ActionType.BLOCK) executor?.vibrate()
         executor?.execute(action, scrollPercent)
@@ -620,6 +725,8 @@ class KeyInterceptorService : AccessibilityService() {
         dropPendingPhantom()
         volumeSession?.release()
         volumeSession = null
+        volumeWatcher?.let { runCatching { unregisterReceiver(it) } }
+        volumeWatcher = null
         audioGestures.values.forEach { gesture ->
             gesture.synthUp?.let { mainHandler.removeCallbacks(it) }
             gesture.handler.reset()

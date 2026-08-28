@@ -1,4 +1,5 @@
-Lautstärketasten funktionieren jetzt auch, wo die Firmware sie schluckt
+Letzter Ausweg für Lautstärketasten, die die Firmware ganz schluckt
 
-• Neu in den Einstellungen: Lautstärketasten über den Audio-Weg abfangen — für Geräte (z. B. Viwoods), die sie vor den Apps abfangen. Einfach-, Doppel- und Langdruck funktionieren. Bleibt der einfache Druck unbelegt, regelt er weiter die Lautstärke.
-• Die Erfassung filtert Phantom-Zwillingsereignisse (Bigme B7 Pro), zeigt Rohcodes an und bittet ums Halten der Taste, wenn ein Tippen nicht gemeldet wird.
+Manche Geräte geben den Druck nicht mal ans Audiosystem weiter — sie stellen einfach selbst die Lautstärke. Die neue zweite Stufe (Einstellungen, unter dem Audio-Weg-Schalter) erkennt diese Änderung, macht sie lautlos rückgängig und behandelt sie als Tastendruck. Einfach-, Doppel- und Langdruck funktionieren.
+
+Bewusst standardmäßig aus: nur nötig, wo die Tasten sonst nicht auftauchen. Laufende Medien bleiben unberührt.

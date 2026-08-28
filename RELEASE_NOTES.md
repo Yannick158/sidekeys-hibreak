@@ -1,8 +1,26 @@
-## SideKeys v1.18.0
+## SideKeys v1.19.0
 
 A button mapper for **E-Ink phones**: freely remap the extra side keys, the volume
 keys or almost any hardware key — separately for single press, double press and
 long press. Developed and tested on the Bigme HiBreak Pro.
+
+### New in 1.19.0
+
+- **A last-resort route for volume keys the firmware fully swallows.** Some
+  vendors don't even hand the press to the audio system — they just change the
+  volume themselves, and both the key filter and the MediaSession route stay
+  silent. The new second stage observes exactly that: it detects the volume
+  change, silently undoes it, and treats it as the key press it was. Nothing is
+  intercepted, so there is nothing for the firmware to block. Feeds the same
+  gesture machine, so single, double and long press all work.
+- **Deliberately staged, each stage its own opt-in.** The observer only appears
+  once the audio route is on, and stays off by default: on a phone whose keys
+  arrive normally it would add nothing but side effects (dragging the volume
+  slider by hand could read as a key press). The settings text says when each
+  stage is needed — and when it is not.
+- Guards built in: echoes of SideKeys' own volume writes are ignored, active
+  media playback is never hijacked, and the volume is kept one step away from
+  its limits so both directions always produce a detectable change.
 
 ### New in 1.18.0
 

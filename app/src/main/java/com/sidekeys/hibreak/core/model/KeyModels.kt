@@ -228,4 +228,12 @@ data class KeySettings(
      * Off by default: while active, SideKeys takes over volume routing.
      */
     val volumeAudioCapture: Boolean = false,
+    /**
+     * Second stage of the audio route, separately opt-in: recover a press by
+     * observing the volume *change* the firmware makes and undoing it. Only
+     * for devices where even the MediaSession path stays silent — on a phone
+     * whose keys arrive normally it would add nothing but side effects
+     * (dragging the volume slider could read as a key press).
+     */
+    val volumeChangeObserver: Boolean = false,
 )

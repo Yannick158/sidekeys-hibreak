@@ -1,5 +1,7 @@
 package com.sidekeys.hibreak.feature.charge
 
+import android.content.Intent
+import android.provider.Settings
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -44,6 +46,8 @@ import com.sidekeys.hibreak.core.designsystem.EInkButton
 import com.sidekeys.hibreak.core.designsystem.EInkCard
 import com.sidekeys.hibreak.core.designsystem.EInkHeader
 import com.sidekeys.hibreak.core.designsystem.EInkOutlinedButton
+import androidx.core.app.NotificationManagerCompat
+import com.sidekeys.hibreak.service.ChargeAlarm
 import com.sidekeys.hibreak.service.PowerSaver
 import com.sidekeys.hibreak.service.ShizukuShell
 import kotlinx.coroutines.Dispatchers
@@ -104,10 +108,18 @@ fun ChargeLimitScreen(onBack: () -> Unit) {
                 .padding(horizontal = 16.dp, vertical = 4.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            // Charge alarm — works on any device, no extra permission needed.
+            // Charge alarm. Everything it does now goes through a notification,
+            // so that it obeys Do Not Disturb — which also means a denied
+            // notification permission leaves it completely silent. That has to
+            // be visible here rather than discovered on a night it stays quiet.
+            var notificationsBlocked by remember { mutableStateOf(false) }
             val notifLauncher = rememberLauncherForActivityResult(
                 ActivityResultContracts.RequestPermission(),
-            ) { /* result ignored: sound/vibration fire regardless */ }
+            ) { granted -> notificationsBlocked = !granted }
+            LaunchedEffect(settings.alarmEnabled) {
+                notificationsBlocked = settings.alarmEnabled &&
+                    !NotificationManagerCompat.from(context).areNotificationsEnabled()
+            }
             EInkCard {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
@@ -119,8 +131,18 @@ fun ChargeLimitScreen(onBack: () -> Unit) {
                         checked = settings.alarmEnabled,
                         onCheckedChange = { on ->
                             viewModel.setAlarmEnabled(on)
-                            if (on && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                notifLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                            if (on) {
+                                // Create the channel now, so its "Override Do Not
+                                // Disturb" switch is there to be found before the
+                                // alarm has ever fired.
+                                runCatching { ChargeAlarm.ensureChannel(context) }
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                    notifLauncher.launch(
+                                        android.Manifest.permission.POST_NOTIFICATIONS,
+                                    )
+                                }
+                            } else {
+                                notificationsBlocked = false
                             }
                         },
                         colors = SwitchDefaults.colors(
@@ -130,6 +152,28 @@ fun ChargeLimitScreen(onBack: () -> Unit) {
                             uncheckedTrackColor = Color.White,
                             uncheckedBorderColor = Color.Black,
                         ),
+                    )
+                }
+                if (notificationsBlocked) {
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(R.string.charge_alarm_needs_notifications),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    EInkOutlinedButton(
+                        text = stringResource(R.string.charge_alarm_open_notif_settings),
+                        onClick = {
+                            runCatching {
+                                context.startActivity(
+                                    Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(
+                                        Settings.EXTRA_APP_PACKAGE,
+                                        context.packageName,
+                                    ),
+                                )
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
                 Spacer(Modifier.height(4.dp))

@@ -57,8 +57,8 @@ helper app is involved. Without it, every other feature still works.
 | Permission | Why |
 |---|---|
 | Accessibility service | Receive hardware key presses, perform assigned actions |
-| `VIBRATE` | Haptic feedback on key press, charge alarm |
-| `POST_NOTIFICATIONS` | Show the charge alarm notification |
+| `VIBRATE` | Haptic feedback on key press |
+| `POST_NOTIFICATIONS` | The charge alarm (Android 13+). Its notification, sound and vibration all go through the notification channel, so Do Not Disturb applies to it |
 | `ACCESS_NOTIFICATION_POLICY` | Toggle Do Not Disturb, if you assign that action |
 
 ## Children

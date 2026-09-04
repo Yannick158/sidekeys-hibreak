@@ -33,9 +33,11 @@ other devices are welcome.
 
 ### Battery extras
 
-- **Charge alarm**: get a sound + vibration + notification when the battery
+- **Charge alarm**: a notification with sound and vibration when the battery
   reaches a level you pick while plugged in, so you can unplug to protect it.
-  Works on any device — no root, no helper app.
+  Works on any device — no root, no helper app. It respects Do Not Disturb and
+  your ringer mode; to let it through at night, allow its notification channel
+  to override Do Not Disturb in system settings.
 - **Battery Saver toggle** — as a key action (needs a one-off
   firmwares that use the standard panel; see the device note below).
 - **One-tap accessibility enable** so you don't have to redo the

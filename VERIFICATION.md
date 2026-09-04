@@ -41,6 +41,11 @@ maintainer's phone or by a user reporting back.
 - **Gesture dispatch:** scrolling, edge taps, the e-ink refresh.
 - **Anything needing elevated rights:** Battery Saver, the DuraSpeed guard,
   Shizuku paths.
+- **Notification and Do Not Disturb behaviour.** Whether the charge alarm is
+  actually silenced by DND, whether its channel's override switch works, and
+  what it does in silent or vibrate mode. The fix for this was verified by
+  reading AOSP's `ZenModeFiltering` rather than by observing a phone — enough
+  to catch a wrong notification category, not enough to prove the result.
 - **Vendor firmware behaviour.** Which keys a device even delivers differs per
   model and cannot be simulated.
 

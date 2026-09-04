@@ -1,5 +1,5 @@
-Letzter Ausweg für Lautstärketasten, die die Firmware ganz schluckt
+Der Ladewecker durchbricht „Nicht stören" nicht mehr
 
-Manche Geräte geben den Druck nicht mal ans Audiosystem weiter — sie stellen einfach selbst die Lautstärke. Die neue zweite Stufe (Einstellungen, unter dem Audio-Weg-Schalter) erkennt diese Änderung, macht sie lautlos rückgängig und behandelt sie als Tastendruck. Einfach-, Doppel- und Langdruck funktionieren.
+Er hat Ton und Vibration bisher direkt ausgelöst, und beides ist keine Benachrichtigung — „Nicht stören" galt also nie, und der Schalter „Nicht stören überschreiben" war wirkungslos. Beides läuft jetzt über den Benachrichtigungskanal, wo der Schalter wirklich greift.
 
-Bewusst standardmäßig aus: nur nötig, wo die Tasten sonst nicht auftauchen. Laufende Medien bleiben unberührt.
+Nebeneffekte: Der Kanal wird einmalig neu angelegt, und ab Android 13 braucht der Wecker die Benachrichtigungsberechtigung.

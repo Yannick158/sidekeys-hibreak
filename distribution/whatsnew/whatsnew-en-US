@@ -1,5 +1,5 @@
-A last-resort route for volume keys the firmware fully swallows
+The charge alarm no longer breaks through Do Not Disturb
 
-Some devices don't even hand the volume press to the audio system — they just change the volume themselves. The new second stage (Settings, below the audio route switch) detects that change, silently undoes it, and treats it as the key press it was. Single, double and long press all work.
+It used to vibrate and play its sound directly, and neither is a notification — so Do Not Disturb never applied, and the channel's "override Do Not Disturb" switch had no effect. Both now go through the notification channel, where DND applies and that switch is the real control.
 
-Deliberately off by default: only needed where the keys don't show up otherwise. Won't touch active media playback.
+Side effects: the channel is recreated once, and on Android 13+ the alarm needs notification permission.

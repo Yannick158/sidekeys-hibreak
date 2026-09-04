@@ -1,8 +1,28 @@
-## SideKeys v1.19.0
+## SideKeys v1.19.1
 
 A button mapper for **E-Ink phones**: freely remap the extra side keys, the volume
 keys or almost any hardware key — separately for single press, double press and
 long press. Developed and tested on the Bigme HiBreak Pro.
+
+### New in 1.19.1
+
+- **The charge alarm no longer breaks through Do Not Disturb.** It used to
+  vibrate and play its sound directly, and neither is a notification — so Do Not
+  Disturb never applied, and the channel's "override Do Not Disturb" switch, the
+  one control a user would look for, had no effect at all. Reported by a tester
+  whose phone rang in the middle of the night.
+
+  Both now go through the notification channel, where DND applies. That switch
+  is the real control: leave it off and DND silences the alarm, turn it on and
+  it breaks through by your own choice. The alarm also follows your ringer mode
+  now, so it stays quiet on Mute.
+
+  Two consequences worth knowing. The channel had to be recreated (vibration
+  cannot be added to an existing one), so custom channel settings return to
+  their defaults once — a lowered importance is carried over, so an alarm you
+  had quietened stays quiet. And since everything now goes through a
+  notification, the alarm needs notification permission on Android 13+; the
+  charge screen says so and offers a way in if notifications are switched off.
 
 ### New in 1.19.0
 

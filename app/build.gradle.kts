@@ -14,8 +14,8 @@ android {
         applicationId = "com.sidekeys.hibreak"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 47
-        versionName = "1.19.0"
+        versionCode = 48
+        versionName = "1.19.1"
     }
 
     // The signing keystore lives OUTSIDE the repo tree so it can never be

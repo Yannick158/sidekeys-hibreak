@@ -140,7 +140,7 @@
     <string name="charge_limit_menu">Battery &amp; charge alarm</string>
     <string name="charge_alarm_enable">Charge alarm</string>
     <string name="charge_alarm_percent">Alert at %1$d%%</string>
-    <string name="charge_alarm_desc">Works on any device (no root, no extra permission). When plugged in and this level is reached, SideKeys plays a sound, vibrates and shows a notification so you can unplug.</string>
+    <string name="charge_alarm_desc">Works on any device, no root needed. When plugged in and this level is reached, SideKeys posts a notification with sound and vibration so you can unplug. It follows your notification settings: silent on Mute, and silenced by Do Not Disturb — unless you allow this notification to override it, in the channel\'s settings. On Android 13 and newer it needs permission to post notifications.</string>
     <string name="charge_alarm_channel">Charge alarm</string>
     <string name="charge_alarm_title">Time to unplug</string>
     <string name="charge_alarm_text">Battery reached %1$d%% — unplug to protect it.</string>
@@ -213,4 +213,7 @@
     <string name="volume_audio_note">For devices whose firmware swallows the volume keys before apps can see them (e.g. Viwoods). SideKeys then receives the press through the audio system. Single, double and long press all work; leave the single press unassigned and it keeps changing the volume. While another app is actively playing media, that app gets the keys. Only turn this on if your volume keys don\'t show up when assigning — where they arrive normally, this route is not needed.</string>
     <string name="setting_volume_observer">Last resort: recover presses from volume changes</string>
     <string name="volume_observer_note">Only if the keys still don\'t show up with the switch above: some firmwares don\'t hand the press to the audio system either — they just change the volume themselves. This detects that change, undoes it, and treats it as the key press it was. Side effect: dragging the media volume slider by hand can read as a key press while a volume key is mapped, so leave this off unless you need it.</string>
+    <string name="charge_alarm_channel_desc">Sound and vibration when the battery reaches your chosen level. Respects Do Not Disturb unless you allow this channel to override it here.</string>
+    <string name="charge_alarm_needs_notifications">Notifications are turned off for SideKeys, so the alarm cannot make a sound. It goes through a notification precisely so that Do Not Disturb applies to it.</string>
+    <string name="charge_alarm_open_notif_settings">Open notification settings</string>
 </resources>

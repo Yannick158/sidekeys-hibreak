@@ -10,22 +10,22 @@
     <string name="service_inactive">Dienst nicht aktiv</string>
     <string name="service_inactive_hint">Damit die Seitentasten belegt werden können, muss SideKeys als Bedienungshilfe aktiviert werden. Bei per APK installierten Apps verlangt Android drei Schritte — in dieser Reihenfolge, weil die Freigabe erst *nach* einem abgelehnten Versuch erscheint:</string>
     <string name="enable_step1">Schritt 1: Einschalten versuchen</string>
-    <string name="enable_step1_note">Öffnet die Bedienungshilfen. Tippe auf „SideKeys Tastenbelegung" und versuche den Schalter — Android lehnt mit „Eingeschränkte Einstellung" ab. Genau diese Ablehnung schaltet Schritt 2 frei, sie gehört also dazu.</string>
+    <string name="enable_step1_note">Öffnet die Bedienungshilfen. Tippe auf „SideKeys Tastenbelegung“ und versuche den Schalter — Android lehnt mit „Eingeschränkte Einstellung“ ab. Genau diese Ablehnung schaltet Schritt 2 frei, sie gehört also dazu.</string>
     <string name="enable_step2">Schritt 2: Eingeschränkte Einstellungen zulassen</string>
-    <string name="enable_step2_note">Öffnet die App-Info. Dort: Menü (⋮) oben rechts → „Eingeschränkte Einstellungen zulassen". Dieser Eintrag existiert erst, wenn Schritt 1 abgelehnt wurde.</string>
+    <string name="enable_step2_note">Öffnet die App-Info. Dort: Menü (⋮) oben rechts → „Eingeschränkte Einstellungen zulassen“. Dieser Eintrag existiert erst, wenn Schritt 1 abgelehnt wurde.</string>
     <string name="restart_service">Dienst neu starten</string>
-    <string name="restart_service_note">Nimm das, wenn der Dienst lief und nach dem „Schließen" im Prozessmanager gestoppt wurde. Wird nur angezeigt, weil SideKeys die nötige Berechtigung hat.</string>
+    <string name="restart_service_note">Nimm das, wenn der Dienst lief und nach dem „Schließen“ im Prozessmanager gestoppt wurde. Wird nur angezeigt, weil SideKeys die nötige Berechtigung hat.</string>
     <string name="restart_service_ok">✓ Dienst läuft wieder</string>
     <string name="restart_service_failed">Neustart hat nicht geklappt — bitte über Schritt 2 SideKeys aus- und einschalten.</string>
     <string name="add_key">+ Taste zuordnen</string>
-    <string name="no_mappings_hint">Noch keine Taste belegt. Tippe auf „Taste zuordnen" und drücke dann eine Hardware-Taste deines Handys.</string>
+    <string name="no_mappings_hint">Noch keine Taste belegt. Tippe auf „Taste zuordnen“ und drücke dann eine Hardware-Taste deines Handys.</string>
     <string name="delete">Löschen</string>
     <string name="cancel">Abbrechen</string>
     <string name="ok">OK</string>
     <string name="save">Speichern</string>
     <string name="loading">Lade…</string>
     <string name="confirm_delete_title">Belegung löschen?</string>
-    <string name="confirm_delete_text">Die Belegung für „%1$s" wird entfernt. Die Taste erhält ihre ursprüngliche Funktion zurück.</string>
+    <string name="confirm_delete_text">Die Belegung für „%1$s“ wird entfernt. Die Taste erhält ihre ursprüngliche Funktion zurück.</string>
 
     <!-- Capture -->
     <string name="capture_title">Taste erfassen</string>
@@ -67,7 +67,7 @@
     <string name="action_volume_up">Lautstärke lauter</string>
     <string name="action_volume_down">Lautstärke leiser</string>
     <string name="action_volume_mute">Stumm umschalten</string>
-    <string name="action_dnd">„Nicht stören" umschalten</string>
+    <string name="action_dnd">„Nicht stören“ umschalten</string>
     <string name="action_battery_saver">Energiesparmodus umschalten</string>
     <string name="action_custom_intent">Eigener Intent (Experten)</string>
 
@@ -89,10 +89,10 @@
     <string name="setting_debounce">Tasten-Entprellung</string>
     <string name="debounce_note">Manche Seitentasten prellen und lösen doppelt aus. Drücke, die schneller als dieses Intervall aufeinander folgen, werden ignoriert.</string>
     <string name="milliseconds">%1$d ms</string>
-    <string name="setting_hide_recents">Aus „Letzte Apps" ausblenden</string>
-    <string name="hide_recents_note">Auf Bigme-Geräten empfohlen: Der Prozessmanager beendet weggewischte/„geschlossene" Apps per Force-Stop — dabei stirbt auch der Tasten-Dienst, bis er neu eingeschaltet wird. Ausgeblendet lässt sich SideKeys dort nicht schließen. Öffne die App stattdessen über den App-Drawer.</string>
+    <string name="setting_hide_recents">Aus „Letzte Apps“ ausblenden</string>
+    <string name="hide_recents_note">Auf Bigme-Geräten empfohlen: Der Prozessmanager beendet weggewischte/„geschlossene“ Apps per Force-Stop — dabei stirbt auch der Tasten-Dienst, bis er neu eingeschaltet wird. Ausgeblendet lässt sich SideKeys dort nicht schließen. Öffne die App stattdessen über den App-Drawer.</string>
     <string name="tips_title">Tipps für E-Ink-Handys</string>
-    <string name="tips_text">• Tasten gehen nach dem „Schließen" der App nicht mehr? Manche Prozessmanager (z. B. auf Bigme-Geräten) stoppen die App per Force-Stop und damit den Tasten-Dienst. Abhilfe: SideKeys in den Bedienungshilfen aus- und wieder einschalten. „Aus ‚Letzte Apps\' ausblenden" eingeschaltet lassen, um das zu verhindern.\n\n• Kommt eine Seitentaste nicht an, verarbeitet sie womöglich die Firmware selbst. Auf Bigme-Geräten: unter Einstellungen → „Benutzerdefinierte Taste" auf „Keine" stellen, damit SideKeys sie erhält.\n\n• MediaTeks „DuraSpeed" (u. a. auf Bigme-Geräten) beendet Hintergrund-Apps aggressiv. Sollte der Dienst stoppen, DuraSpeed deaktivieren (per ADB: settings put global setting.duraspeed.enabled 0) und SideKeys von der Akku-Optimierung ausnehmen.</string>
+    <string name="tips_text">• Tasten gehen nach dem „Schließen“ der App nicht mehr? Manche Prozessmanager (z. B. auf Bigme-Geräten) stoppen die App per Force-Stop und damit den Tasten-Dienst. Abhilfe: SideKeys in den Bedienungshilfen aus- und wieder einschalten. „Aus ‚Letzte Apps\' ausblenden“ eingeschaltet lassen, um das zu verhindern.\n\n• Kommt eine Seitentaste nicht an, verarbeitet sie womöglich die Firmware selbst. Auf Bigme-Geräten: unter Einstellungen → „Benutzerdefinierte Taste“ auf „Keine“ stellen, damit SideKeys sie erhält.\n\n• MediaTeks „DuraSpeed“ (u. a. auf Bigme-Geräten) beendet Hintergrund-Apps aggressiv. Sollte der Dienst stoppen, DuraSpeed deaktivieren (per ADB: settings put global setting.duraspeed.enabled 0) und SideKeys von der Akku-Optimierung ausnehmen.</string>
 
     <!-- App picker -->
     <string name="app_picker_title">App wählen</string>
@@ -112,7 +112,7 @@
     <string name="profiles_menu">Tasten pro App belegen</string>
     <string name="profiles_title">Belegung pro App</string>
     <string name="profiles_intro">Gib Tasten andere Aktionen, solange eine bestimmte App im Vordergrund ist. Leer gelassene Slots nutzen die globale Belegung.</string>
-    <string name="profiles_empty">Noch keine App-Profile. Tippe auf „+ App hinzufügen" und wähle die App.</string>
+    <string name="profiles_empty">Noch keine App-Profile. Tippe auf „+ App hinzufügen“ und wähle die App.</string>
     <string name="profiles_add_app">+ App hinzufügen</string>
     <string name="profile_keys_empty">Für diese App ist noch keine Taste belegt.</string>
     <string name="profile_delete_app">Alle Belegungen dieser App entfernen</string>
@@ -133,14 +133,14 @@
     <string name="adb_setup_copy">Befehl kopieren</string>
     <string name="adb_setup_note">Einmal erteilt bleibt sie bis zur Deinstallation — und funktioniert dann auch, wenn Shizuku nicht läuft. Alles andere in SideKeys funktioniert ohnehin ohne.</string>
     <string name="adb_setup_granted">✓ Eingerichtet — Energiesparmodus-Aktion, Kachel und Ein-Tipp-Aktivierung sind aktiv.</string>
-    <string name="error_permission_required">Benötigt die einmalige ADB-Einrichtung — siehe „Akku &amp; Ladewecker".</string>
+    <string name="error_permission_required">Benötigt die einmalige ADB-Einrichtung — siehe „Akku &amp; Ladewecker“.</string>
 
     <!-- Akku-Screen / Ladewecker -->
     <string name="battery_title">Akku</string>
     <string name="charge_limit_menu">Akku &amp; Ladewecker</string>
     <string name="charge_alarm_enable">Ladewecker</string>
     <string name="charge_alarm_percent">Wecken bei %1$d%%</string>
-    <string name="charge_alarm_desc">Funktioniert auf jedem Gerät (kein Root, keine Zusatzberechtigung). Ist das Kabel dran und dieser Stand erreicht, gibt SideKeys Ton + Vibration + Benachrichtigung, damit du aussteckst.</string>
+    <string name="charge_alarm_desc">Funktioniert auf jedem Gerät, kein Root nötig. Ist das Kabel dran und dieser Stand erreicht, zeigt SideKeys eine Benachrichtigung mit Ton und Vibration, damit du aussteckst. Sie richtet sich nach deinen Benachrichtigungseinstellungen: still bei stummgeschaltetem Gerät, und von „Nicht stören“ unterdrückt — es sei denn, du erlaubst ihr in den Kanal-Einstellungen das Überschreiben. Ab Android 13 braucht sie die Berechtigung, Benachrichtigungen zu senden.</string>
     <string name="charge_alarm_channel">Ladewecker</string>
     <string name="charge_alarm_title">Zeit zum Ausstecken</string>
     <string name="charge_alarm_text">Akku bei %1$d%% — zum Schonen bitte ausstecken.</string>
@@ -152,11 +152,11 @@
     <string name="error_requires_android_9">Diese Aktion benötigt Android 9 oder neuer.</string>
     <string name="error_no_flashlight">Keine Taschenlampe auf diesem Gerät gefunden.</string>
     <string name="error_action_failed">Aktion konnte nicht ausgeführt werden.</string>
-    <string name="error_dnd_permission">Bitte erlaube SideKeys den Zugriff auf „Nicht stören" und versuche es erneut.</string>
+    <string name="error_dnd_permission">Bitte erlaube SideKeys den Zugriff auf „Nicht stören“ und versuche es erneut.</string>
 
     <!-- Quick-Settings-Kachel einrichten -->
     <string name="enable_step3">Schritt 3: Jetzt wirklich einschalten</string>
-    <string name="enable_step3_note">Zurück in die Bedienungshilfen — der Schalter für „SideKeys Tastenbelegung" funktioniert jetzt.</string>
+    <string name="enable_step3_note">Zurück in die Bedienungshilfen — der Schalter für „SideKeys Tastenbelegung“ funktioniert jetzt.</string>
     <!-- Offenlegung zur Bedienungshilfe (von Google Play gefordert) -->
     <string name="consent_title">Bevor du loslegst</string>
     <string name="consent_intro">SideKeys nutzt Androids Bedienungshilfe-Dienst. Nur so kann eine App Hardware-Tastendrücke empfangen — daran hängt die gesamte Funktion. Hier steht genau, was das bedeutet.</string>
@@ -180,9 +180,9 @@
     <string name="capture_blocked_title">Erkannt: %1$s</string>
     <string name="capture_blocked_note">Diese Taste lässt sich nicht neu belegen. Ein- und Startbildschirm-Taste bringen dich zurück in diese App, falls eine Belegung schiefgeht — deshalb rührt SideKeys sie nicht an. Nimm eine andere Taste.</string>
     <string name="capture_nothing_title">Noch kein Tastendruck erkannt</string>
-    <string name="capture_nothing_note">Wenn hier beim Drücken deiner Seitentasten nichts passiert, verarbeitet die Firmware sie selbst und keine App kann sie empfangen. Suche in den Geräteeinstellungen nach einer Möglichkeit, die Taste freizugeben — oft unter „Custom key\", „Shortcut\" oder „Seitentaste\". Lautstärketasten funktionieren fast immer.</string>
+    <string name="capture_nothing_note">Wenn hier beim Drücken deiner Seitentasten nichts passiert, verarbeitet die Firmware sie selbst und keine App kann sie empfangen. Suche in den Geräteeinstellungen nach einer Möglichkeit, die Taste freizugeben — oft unter „Custom key“, „Shortcut“ oder „Seitentaste“. Lautstärketasten funktionieren fast immer.</string>
     <string name="capture_risky_title">%1$s ist eine Navigationstaste</string>
-    <string name="capture_risky_note">Du kannst sie belegen, verlierst aber ihre bisherige Funktion. Bei manchen E-Ink-Readern melden die Umblättertasten genau diesen Code — deshalb ist es erlaubt. Jede Druckart, die du auf „Keine Aktion\" lässt, funktioniert weiter wie bisher.</string>
+    <string name="capture_risky_note">Du kannst sie belegen, verlierst aber ihre bisherige Funktion. Bei manchen E-Ink-Readern melden die Umblättertasten genau diesen Code — deshalb ist es erlaubt. Jede Druckart, die du auf „Keine Aktion“ lässt, funktioniert weiter wie bisher.</string>
     <string name="capture_risky_confirm">Trotzdem belegen</string>
     <string name="action_block">Taste blockieren (nichts tun)</string>
     <string name="action_pass_through">Taste der App überlassen</string>
@@ -215,4 +215,7 @@
     <string name="volume_audio_note">Für Geräte, deren Firmware die Lautstärketasten schluckt, bevor Apps sie sehen (z. B. Viwoods). SideKeys empfängt den Druck dann über das Audiosystem. Einfach-, Doppel- und Langdruck funktionieren; bleibt der einfache Druck unbelegt, regelt er weiter die Lautstärke. Solange eine andere App aktiv Medien abspielt, bekommt diese App die Tasten. Schalte das nur ein, wenn deine Lautstärketasten beim Zuordnen nicht auftauchen — wo sie normal ankommen, braucht es diesen Weg nicht.</string>
     <string name="setting_volume_observer">Letzter Ausweg: Drücke aus Lautstärke-Änderungen zurückgewinnen</string>
     <string name="volume_observer_note">Nur falls die Tasten auch mit dem Schalter oben nicht auftauchen: Manche Firmwares geben den Druck auch nicht ans Audiosystem weiter — sie stellen einfach selbst die Lautstärke. Das hier erkennt diese Änderung, macht sie rückgängig und behandelt sie als den Tastendruck, der sie war. Nebenwirkung: Das Ziehen am Lautstärkeregler von Hand kann als Tastendruck gelesen werden, solange eine Lautstärketaste belegt ist — lass es also aus, wenn du es nicht brauchst.</string>
+    <string name="charge_alarm_channel_desc">Ton und Vibration, wenn der Akku den gewählten Stand erreicht. Beachtet „Nicht stören“, es sei denn, du erlaubst diesem Kanal hier das Überschreiben.</string>
+    <string name="charge_alarm_needs_notifications">Benachrichtigungen sind für SideKeys ausgeschaltet, deshalb kann der Wecker keinen Ton geben. Er läuft genau deswegen über eine Benachrichtigung, damit „Nicht stören“ für ihn gilt.</string>
+    <string name="charge_alarm_open_notif_settings">Benachrichtigungseinstellungen öffnen</string>
 </resources>

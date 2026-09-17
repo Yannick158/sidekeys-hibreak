@@ -9,6 +9,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.sidekeys.hibreak.core.data.Graph
 import com.sidekeys.hibreak.core.data.MappingRepository
 import com.sidekeys.hibreak.core.model.KeySettings
+import com.sidekeys.hibreak.core.model.VibrationStrength
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -29,6 +30,10 @@ class SettingsViewModel(private val repository: MappingRepository) : ViewModel()
     fun setDoublePressMs(value: Long) = update { it.copy(doublePressMs = value) }
 
     fun setHapticFeedback(enabled: Boolean) = update { it.copy(hapticFeedback = enabled) }
+
+    fun setVibrationStrength(strength: VibrationStrength) = update { it.copy(vibrationStrength = strength) }
+
+    fun setConfirmActions(enabled: Boolean) = update { it.copy(confirmActions = enabled) }
 
     fun setDebounceMs(value: Long) = update { it.copy(debounceMs = value) }
 

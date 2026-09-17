@@ -16,6 +16,14 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import com.sidekeys.hibreak.core.model.VibrationStrength
+import com.sidekeys.hibreak.service.Haptics
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -318,6 +326,91 @@ fun SettingsScreen(onBack: () -> Unit) {
                         ),
                     )
                 }
+                if (settings.hapticFeedback) {
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(R.string.setting_vibration_strength),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Spacer(Modifier.height(6.dp))
+                    // Tight padding: at the default 24dp per side three weighted
+                    // buttons leave ~45dp for the label on a 360dp screen, and
+                    // "Medium" breaks mid-word — on a 412dp HiBreak it breaks at
+                    // the Large font scale many e-ink users choose. Equal height
+                    // keeps a wrapped label from making one button taller.
+                    val tightPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp)
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier
+                            .height(IntrinsicSize.Min)
+                            .selectableGroup(),
+                    ) {
+                        VibrationStrength.entries.forEach { strength ->
+                            val label = stringResource(
+                                when (strength) {
+                                    VibrationStrength.LIGHT -> R.string.vibration_light
+                                    VibrationStrength.MEDIUM -> R.string.vibration_medium
+                                    VibrationStrength.STRONG -> R.string.vibration_strong
+                                },
+                            )
+                            // Selecting a level buzzes at that level, so the
+                            // choice is made by feel rather than by name.
+                            val onPick = {
+                                viewModel.setVibrationStrength(strength)
+                                Haptics.buzz(context, strength)
+                            }
+                            val isSelected = strength == settings.vibrationStrength
+                            // The filled button marks the choice only visually;
+                            // screen readers need it in the semantics tree.
+                            val buttonModifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight()
+                                .semantics { selected = isSelected }
+                            if (isSelected) {
+                                EInkButton(
+                                    text = label,
+                                    onClick = onPick,
+                                    modifier = buttonModifier,
+                                    contentPadding = tightPadding,
+                                )
+                            } else {
+                                EInkOutlinedButton(
+                                    text = label,
+                                    onClick = onPick,
+                                    modifier = buttonModifier,
+                                    contentPadding = tightPadding,
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            EInkCard {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.setting_confirm_actions),
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                    }
+                    Switch(
+                        checked = settings.confirmActions,
+                        onCheckedChange = { viewModel.setConfirmActions(it) },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = Color.White,
+                            checkedTrackColor = Color.Black,
+                            uncheckedThumbColor = Color.Black,
+                            uncheckedTrackColor = Color.White,
+                            uncheckedBorderColor = Color.Black,
+                        ),
+                    )
+                }
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.confirm_actions_note),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
             }
 
             EInkCard {
@@ -358,6 +451,53 @@ fun SettingsScreen(onBack: () -> Unit) {
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
+
+            FeedbackCard(onOpen = { openUrl(context, it) })
+
+            Spacer(Modifier.height(16.dp))
         }
+    }
+}
+
+private const val GITHUB_ISSUES_URL = "https://github.com/Yannick158/sidekeys-hibreak/issues"
+private const val REDDIT_URL = "https://www.reddit.com/r/Bigme/"
+
+private fun openUrl(context: android.content.Context, url: String) {
+    runCatching {
+        context.startActivity(
+            android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url))
+                .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK),
+        )
+    }.onFailure {
+        // Stripped-down e-ink firmwares sometimes ship without a browser. Show
+        // the address instead of a button that silently does nothing.
+        android.widget.Toast.makeText(context, url, android.widget.Toast.LENGTH_LONG).show()
+    }
+}
+
+@Composable
+private fun FeedbackCard(onOpen: (String) -> Unit) {
+    EInkCard {
+        Text(
+            text = stringResource(R.string.feedback_title),
+            style = MaterialTheme.typography.titleMedium,
+        )
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = stringResource(R.string.feedback_note),
+            style = MaterialTheme.typography.bodyMedium,
+        )
+        Spacer(Modifier.height(8.dp))
+        EInkOutlinedButton(
+            text = stringResource(R.string.feedback_github),
+            onClick = { onOpen(GITHUB_ISSUES_URL) },
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Spacer(Modifier.height(8.dp))
+        EInkOutlinedButton(
+            text = stringResource(R.string.feedback_reddit),
+            onClick = { onOpen(REDDIT_URL) },
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }

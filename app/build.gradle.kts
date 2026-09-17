@@ -14,8 +14,8 @@ android {
         applicationId = "com.sidekeys.hibreak"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 48
-        versionName = "1.19.1"
+        versionCode = 50
+        versionName = "1.20.0"
     }
 
     // The signing keystore lives OUTSIDE the repo tree so it can never be
@@ -43,7 +43,11 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // R8: Play measures how much of the DEX is optimised and warns below
+            // 25 %. Off, obfuscation sat at 0 %. The keep rules that make this
+            // safe live in proguard-rules.pro.
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             // Left unset without a keystore. The check below then fails only if a
             // release build is actually requested -- throwing here would run at

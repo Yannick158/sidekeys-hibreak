@@ -22,11 +22,13 @@ import android.provider.Settings
 import android.view.KeyEvent
 import android.widget.Toast
 import com.sidekeys.hibreak.R
+import com.sidekeys.hibreak.core.common.labelRes
 import com.sidekeys.hibreak.core.model.ActionType
 import com.sidekeys.hibreak.core.model.AppList
 import com.sidekeys.hibreak.core.model.CustomIntentMode
 import com.sidekeys.hibreak.core.model.CustomIntentSpec
 import com.sidekeys.hibreak.core.model.KeyAction
+import com.sidekeys.hibreak.core.model.VibrationStrength
 import kotlinx.serialization.json.Json
 
 /**
@@ -42,6 +44,9 @@ class ActionExecutor(private val service: AccessibilityService) {
 
     /** Scroll distance as a percentage of screen height; kept in sync by the service. */
     var scrollPercent: Int = 45
+
+    /** Mirrors [com.sidekeys.hibreak.core.model.KeySettings.confirmActions]. */
+    var confirmActions: Boolean = false
     private var torchEnabled = false
 
     private val torchCallback = object : CameraManager.TorchCallback() {
@@ -97,9 +102,18 @@ class ActionExecutor(private val service: AccessibilityService) {
             ActionType.LOCK_SCREEN -> lockScreen()
             ActionType.SCREENSHOT -> takeScreenshot()
             ActionType.FLASHLIGHT -> toggleFlashlight()
-            ActionType.MEDIA_PLAY_PAUSE -> dispatchMediaKey(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
-            ActionType.MEDIA_NEXT -> dispatchMediaKey(KeyEvent.KEYCODE_MEDIA_NEXT)
-            ActionType.MEDIA_PREVIOUS -> dispatchMediaKey(KeyEvent.KEYCODE_MEDIA_PREVIOUS)
+            ActionType.MEDIA_PLAY_PAUSE -> {
+                dispatchMediaKey(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
+                confirm(action.type.labelRes())
+            }
+            ActionType.MEDIA_NEXT -> {
+                dispatchMediaKey(KeyEvent.KEYCODE_MEDIA_NEXT)
+                confirm(action.type.labelRes())
+            }
+            ActionType.MEDIA_PREVIOUS -> {
+                dispatchMediaKey(KeyEvent.KEYCODE_MEDIA_PREVIOUS)
+                confirm(action.type.labelRes())
+            }
             ActionType.VOLUME_UP -> adjustVolume(AudioManager.ADJUST_RAISE)
             ActionType.VOLUME_DOWN -> adjustVolume(AudioManager.ADJUST_LOWER)
             ActionType.VOLUME_MUTE_TOGGLE -> adjustVolume(AudioManager.ADJUST_TOGGLE_MUTE)
@@ -109,16 +123,8 @@ class ActionExecutor(private val service: AccessibilityService) {
         }
     }
 
-    fun vibrate() {
-        runCatching {
-            val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                (service.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager).defaultVibrator
-            } else {
-                @Suppress("DEPRECATION")
-                service.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-            }
-            vibrator.vibrate(VibrationEffect.createOneShot(25, VibrationEffect.DEFAULT_AMPLITUDE))
-        }
+    fun vibrate(strength: VibrationStrength = VibrationStrength.LIGHT) {
+        Haptics.buzz(service, strength)
     }
 
     private fun launchAssistant() {
@@ -349,6 +355,7 @@ class ActionExecutor(private val service: AccessibilityService) {
         runCatching {
             cameraManager.setTorchMode(cameraId, newState)
             torchEnabled = newState
+            confirm(if (newState) R.string.confirm_flashlight_on else R.string.confirm_flashlight_off)
         }.onFailure {
             toast(R.string.error_action_failed)
         }
@@ -422,14 +429,18 @@ class ActionExecutor(private val service: AccessibilityService) {
             return
         }
         runCatching {
-            val current = notificationManager.currentInterruptionFilter
+            val turningOn =
+                notificationManager.currentInterruptionFilter == NotificationManager.INTERRUPTION_FILTER_ALL
             notificationManager.setInterruptionFilter(
-                if (current == NotificationManager.INTERRUPTION_FILTER_ALL) {
+                if (turningOn) {
                     NotificationManager.INTERRUPTION_FILTER_PRIORITY
                 } else {
                     NotificationManager.INTERRUPTION_FILTER_ALL
                 },
             )
+            // A haptic pulse is easy to miss and DND has no visible indicator of
+            // its own on many e-ink launchers -- the reason this exists.
+            confirm(if (turningOn) R.string.confirm_dnd_on else R.string.confirm_dnd_off)
         }.onFailure { toast(R.string.error_action_failed) }
     }
 
@@ -459,7 +470,11 @@ class ActionExecutor(private val service: AccessibilityService) {
                 CustomIntentMode.BROADCAST -> service.sendBroadcast(intent)
             }
         }
-        if (result.isFailure) toast(R.string.error_action_failed)
+        when {
+            result.isFailure -> toast(R.string.error_action_failed)
+            // A broadcast has no visible effect of its own; an opened screen does.
+            spec.mode == CustomIntentMode.BROADCAST -> confirm(R.string.action_custom_intent)
+        }
     }
 
     private fun startActivitySafely(intent: Intent): Boolean = try {
@@ -472,6 +487,16 @@ class ActionExecutor(private val service: AccessibilityService) {
         false
     } catch (_: Exception) {
         false
+    }
+
+    /**
+     * Confirmation for actions that give no feedback of their own. Deliberately
+     * not wired to navigation, scrolling or app launches: their result is on
+     * screen already, and a message per page turn would force an e-ink refresh
+     * every time.
+     */
+    private fun confirm(resId: Int) {
+        if (confirmActions) toast(resId)
     }
 
     private fun toast(resId: Int) {

@@ -1,5 +1,5 @@
-Der Ladewecker durchbricht „Nicht stören" nicht mehr
+Wähle, wie stark die Tasten vibrieren — und was ein Druck bewirkt hat
 
-Er hat Ton und Vibration bisher direkt ausgelöst, und beides ist keine Benachrichtigung — „Nicht stören" galt also nie, und der Schalter „Nicht stören überschreiben" war wirkungslos. Beides läuft jetzt über den Benachrichtigungskanal, wo der Schalter wirklich greift.
+Vibrationsstärke: leicht, mittel oder stark. Tippe eine Stufe an, um sie zu spüren. „Leicht" bleibt wie bisher. Viele E-Ink-Handys können die Stärke nicht regeln, darum sind die höheren Stufen auch länger.
 
-Nebeneffekte: Der Kanal wird einmalig neu angelegt, und ab Android 13 braucht der Wecker die Benachrichtigungsberechtigung.
+Neuer Schalter: Aktionen auf dem Bildschirm bestätigen. „Nicht stören", Taschenlampe, Medientasten und eigene Broadcasts melden, was sie getan haben. Standardmäßig aus, und bewusst still beim Blättern.

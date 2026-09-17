@@ -191,12 +191,36 @@ data class ChargeSettings(
     val alarmPercent: Int = 80,
 )
 
+/**
+ * How firmly the key-press confirmation buzzes.
+ *
+ * Duration carries most of the difference on purpose: many e-ink phones have no
+ * amplitude control, so on them a longer pulse is the only way a buzz can feel
+ * stronger. Amplitude is used on top where the hardware supports it.
+ *
+ * [LIGHT] is exactly the fixed pulse every earlier version used, so existing
+ * users feel no change until they pick something else.
+ */
+@Serializable
+enum class VibrationStrength(val durationMs: Long, val amplitude: Int) {
+    LIGHT(25, -1), // -1 is VibrationEffect.DEFAULT_AMPLITUDE: the legacy pulse
+    MEDIUM(55, 180),
+    STRONG(110, 255),
+}
+
 /** Global behaviour settings. */
 @Serializable
 data class KeySettings(
     val longPressMs: Long = 400,
     val doublePressMs: Long = 300,
     val hapticFeedback: Boolean = true,
+    val vibrationStrength: VibrationStrength = VibrationStrength.LIGHT,
+    /**
+     * Show a short on-screen message for actions that give no feedback of
+     * their own — Do Not Disturb, flashlight, media controls. Off by default:
+     * on an e-ink panel every message costs a refresh.
+     */
+    val confirmActions: Boolean = false,
     /**
      * The HiBreak Pro side keys are known to bounce and fire spurious double
      * presses; presses arriving faster than this are ignored.

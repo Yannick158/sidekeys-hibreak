@@ -282,6 +282,7 @@ class KeyInterceptorService : AccessibilityService() {
             repository.settings.collect {
                 settings = it
                 executor?.scrollPercent = it.scrollPercent
+                executor?.confirmActions = it.confirmActions
                 applyDuraSpeedGuard(it.keepDuraSpeedOff)
                 applyVolumeCapture(it.volumeAudioCapture, it.volumeChangeObserver)
             }
@@ -672,7 +673,9 @@ class KeyInterceptorService : AccessibilityService() {
                 android.os.SystemClock.uptimeMillis() + SELF_CHANGE_SUPPRESS_MS
         }
         // A blocked key should feel like a dead key, not like a triggered one.
-        if (settings.hapticFeedback && action.type != ActionType.BLOCK) executor?.vibrate()
+        if (settings.hapticFeedback && action.type != ActionType.BLOCK) {
+            executor?.vibrate(settings.vibrationStrength)
+        }
         executor?.execute(action, scrollPercent)
     }
 

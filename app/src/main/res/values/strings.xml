@@ -216,4 +216,18 @@
     <string name="charge_alarm_channel_desc">Sound and vibration when the battery reaches your chosen level. Respects Do Not Disturb unless you allow this channel to override it here.</string>
     <string name="charge_alarm_needs_notifications">Notifications are turned off for SideKeys, so the alarm cannot make a sound. It goes through a notification precisely so that Do Not Disturb applies to it.</string>
     <string name="charge_alarm_open_notif_settings">Open notification settings</string>
+    <string name="confirm_dnd_on">Do Not Disturb on</string>
+    <string name="confirm_dnd_off">Do Not Disturb off</string>
+    <string name="confirm_flashlight_on">Flashlight on</string>
+    <string name="confirm_flashlight_off">Flashlight off</string>
+    <string name="setting_vibration_strength">Vibration strength — tap to feel it</string>
+    <string name="vibration_light">Light</string>
+    <string name="vibration_medium">Medium</string>
+    <string name="vibration_strong">Strong</string>
+    <string name="setting_confirm_actions">Confirm actions on screen</string>
+    <string name="confirm_actions_note">Shows a short message for actions that give no feedback of their own — Do Not Disturb and flashlight with their new state, media controls and custom broadcasts by name. Scrolling, page turns and app launches stay silent: their result is already on screen, and a message for every page turn would make the e-ink display refresh each time.</string>
+    <string name="feedback_title">Feedback</string>
+    <string name="feedback_note">Found a bug, or have an idea for a key action? I read everything.</string>
+    <string name="feedback_github">Report on GitHub</string>
+    <string name="feedback_reddit">Discuss on Reddit</string>
 </resources>

@@ -1,8 +1,30 @@
-## SideKeys v1.19.1
+## SideKeys v1.20.0
 
 A button mapper for **E-Ink phones**: freely remap the extra side keys, the volume
 keys or almost any hardware key — separately for single press, double press and
 long press. Developed and tested on the Bigme HiBreak Pro.
+
+### New in 1.20.0
+
+- **Vibration strength is now yours to pick.** Light, Medium or Strong, in
+  Settings under the haptics switch; tapping a level buzzes at that level, so
+  you choose by feel rather than by guessing. Asked for by a user whose Do Not
+  Disturb shortcut he could barely feel.
+
+  The stronger levels are longer as well as harder, which is the point: a lot of
+  e-ink phones cannot vary vibration intensity at all, and on those, duration is
+  the only thing that makes a buzz feel stronger. Light is byte-for-byte the old
+  pulse and is the default, so an existing install feels exactly as it did.
+
+- **Confirm actions on screen.** A new switch, off by default. With it on, Do Not
+  Disturb, the flashlight, the media controls and custom broadcasts each say what
+  they just did. It stays deliberately quiet for scrolling, page turns and app
+  launches — you can already see those happen, and a message on every page turn
+  would refresh the e-ink panel every time.
+
+- **The app is smaller and faster to install.** R8 now shrinks and optimises the
+  release build, which Google Play also measures: the download drops from about
+  11 MB to under 2 MB.
 
 ### New in 1.19.1
 

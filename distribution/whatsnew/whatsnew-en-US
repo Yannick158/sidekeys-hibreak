@@ -1,5 +1,5 @@
-The charge alarm no longer breaks through Do Not Disturb
+Pick how strongly the keys buzz — and see what a press did
 
-It used to vibrate and play its sound directly, and neither is a notification — so Do Not Disturb never applied, and the channel's "override Do Not Disturb" switch had no effect. Both now go through the notification channel, where DND applies and that switch is the real control.
+Vibration strength: Light, Medium or Strong. Tap a level to feel it. Light is unchanged, so nothing changes unless you choose it. Many e-ink phones cannot vary intensity, so the stronger levels are longer too.
 
-Side effects: the channel is recreated once, and on Android 13+ the alarm needs notification permission.
+New switch: Confirm actions on screen. Do Not Disturb, the flashlight, media controls and custom broadcasts say what they did. Off by default, and deliberately silent for scrolling and page turns.

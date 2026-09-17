@@ -218,4 +218,18 @@
     <string name="charge_alarm_channel_desc">Ton und Vibration, wenn der Akku den gewählten Stand erreicht. Beachtet „Nicht stören“, es sei denn, du erlaubst diesem Kanal hier das Überschreiben.</string>
     <string name="charge_alarm_needs_notifications">Benachrichtigungen sind für SideKeys ausgeschaltet, deshalb kann der Wecker keinen Ton geben. Er läuft genau deswegen über eine Benachrichtigung, damit „Nicht stören“ für ihn gilt.</string>
     <string name="charge_alarm_open_notif_settings">Benachrichtigungseinstellungen öffnen</string>
+    <string name="confirm_dnd_on">„Nicht stören“ an</string>
+    <string name="confirm_dnd_off">„Nicht stören“ aus</string>
+    <string name="confirm_flashlight_on">Taschenlampe an</string>
+    <string name="confirm_flashlight_off">Taschenlampe aus</string>
+    <string name="setting_vibration_strength">Vibrationsstärke — antippen zum Fühlen</string>
+    <string name="vibration_light">Leicht</string>
+    <string name="vibration_medium">Mittel</string>
+    <string name="vibration_strong">Stark</string>
+    <string name="setting_confirm_actions">Aktionen auf dem Bildschirm bestätigen</string>
+    <string name="confirm_actions_note">Zeigt eine kurze Meldung bei Aktionen, die selbst keine Rückmeldung geben — „Nicht stören“ und Taschenlampe mit ihrem neuen Zustand, Mediensteuerung und eigene Broadcasts mit Namen. Scrollen, Umblättern und App-Starts bleiben still: Ihr Ergebnis ist ohnehin zu sehen, und eine Meldung bei jedem Umblättern würde das E-Ink-Display jedes Mal neu zeichnen lassen.</string>
+    <string name="feedback_title">Feedback</string>
+    <string name="feedback_note">Einen Fehler gefunden oder eine Idee für eine Tastenaktion? Ich lese alles.</string>
+    <string name="feedback_github">Auf GitHub melden</string>
+    <string name="feedback_reddit">Auf Reddit diskutieren</string>
 </resources>

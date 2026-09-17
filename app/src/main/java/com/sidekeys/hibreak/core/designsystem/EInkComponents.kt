@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -52,12 +53,14 @@ fun EInkButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
 ) {
     Button(
         onClick = onClick,
         modifier = modifier.heightIn(min = 52.dp),
         enabled = enabled,
         shape = RectangleShape,
+        contentPadding = contentPadding,
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black,
             contentColor = Color.White,
@@ -76,12 +79,14 @@ fun EInkOutlinedButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
 ) {
     OutlinedButton(
         onClick = onClick,
         modifier = modifier.heightIn(min = 52.dp),
         enabled = enabled,
         shape = RectangleShape,
+        contentPadding = contentPadding,
         border = BorderStroke(2.dp, Color.Black),
         colors = ButtonDefaults.outlinedButtonColors(
             containerColor = Color.White,

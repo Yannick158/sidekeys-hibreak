@@ -1,5 +1,5 @@
-Pick how strongly the keys buzz — and see what a press did
+Holding a volume key now keeps stepping
 
-Vibration strength: Light, Medium or Strong. Tap a level to feel it. Light is unchanged, so nothing changes unless you choose it. Many e-ink phones cannot vary intensity, so the stronger levels are longer too.
+If you map long press to Volume up or Volume down, holding the key walks the volume the way the built-in keys do, instead of moving it one step. It buzzes once at the start, not on every step, and stops the moment you let go.
 
-New switch: Confirm actions on screen. Do Not Disturb, the flashlight, media controls and custom broadcasts say what they did. Off by default, and deliberately silent for scrolling and page turns.
+Everything else still fires once per hold: repeating a toggle or an app launch would be wrong, and a repeat on e-ink would redraw the screen each time.

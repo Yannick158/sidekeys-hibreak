@@ -29,7 +29,7 @@ class AudioRouteGestureTest {
     private val scheduler = FakeScheduler()
     private val handler = KeyPressHandler(scheduler)
     private val fired = mutableListOf<ActionType>()
-    private val execute: (KeyAction) -> Unit = { fired += it.type }
+    private val execute: (KeyAction, Boolean) -> Unit = { action, _ -> fired += action.type }
 
     /** One tick and silence: DOWN now, synthetic UP 130 ms later. */
     private fun tap(mapping: KeyMapping, at: Long) {

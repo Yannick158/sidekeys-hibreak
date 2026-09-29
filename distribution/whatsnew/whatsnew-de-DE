@@ -1,5 +1,5 @@
-Wähle, wie stark die Tasten vibrieren — und was ein Druck bewirkt hat
+Eine gehaltene Lautstärketaste läuft jetzt weiter
 
-Vibrationsstärke: leicht, mittel oder stark. Tippe eine Stufe an, um sie zu spüren. „Leicht" bleibt wie bisher. Viele E-Ink-Handys können die Stärke nicht regeln, darum sind die höheren Stufen auch länger.
+Wenn du den langen Druck auf „Lauter" oder „Leiser" legst, läuft die Lautstärke beim Halten durch, wie bei den eingebauten Tasten — statt nur einen Schritt zu machen. Es vibriert einmal am Anfang, nicht bei jedem Schritt, und hört beim Loslassen sofort auf.
 
-Neuer Schalter: Aktionen auf dem Bildschirm bestätigen. „Nicht stören", Taschenlampe, Medientasten und eigene Broadcasts melden, was sie getan haben. Standardmäßig aus, und bewusst still beim Blättern.
+Alles andere löst weiter einmal pro Halten aus: Ein Schalter oder ein App-Start soll sich nicht wiederholen.

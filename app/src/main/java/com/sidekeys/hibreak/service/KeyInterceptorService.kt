@@ -381,12 +381,12 @@ class KeyInterceptorService : AccessibilityService() {
         val pressHandler = pressHandlers.getOrPut(keyId) { KeyPressHandler(HandlerScheduler(mainHandler)) }
         return when (event.action) {
             KeyEvent.ACTION_DOWN ->
-                pressHandler.onDown(mapping, settings, event.repeatCount, event.eventTime) {
-                    runMappedAction(it, mapping.scrollPercent)
+                pressHandler.onDown(mapping, settings, event.repeatCount, event.eventTime) { action, repeated ->
+                    runMappedAction(action, mapping.scrollPercent, haptics = !repeated)
                 }
             KeyEvent.ACTION_UP ->
-                pressHandler.onUp(mapping, settings, event.eventTime) {
-                    runMappedAction(it, mapping.scrollPercent)
+                pressHandler.onUp(mapping, settings, event.eventTime) { action, repeated ->
+                    runMappedAction(action, mapping.scrollPercent, haptics = !repeated)
                 }
             else -> true
         }
@@ -634,7 +634,9 @@ class KeyInterceptorService : AccessibilityService() {
         val gesture = audioGestures.getOrPut(keyCode) {
             AudioGesture(KeyPressHandler(HandlerScheduler(mainHandler)))
         }
-        val runner: (KeyAction) -> Unit = { runMappedAction(it, effective.scrollPercent) }
+        val runner: (KeyAction, Boolean) -> Unit = { action, repeated ->
+            runMappedAction(action, effective.scrollPercent, haptics = !repeated)
+        }
 
         gesture.synthUp?.let { pending ->
             // The key is considered held; this tick is its auto-repeat.
@@ -663,7 +665,13 @@ class KeyInterceptorService : AccessibilityService() {
         mainHandler.postDelayed(release, SYNTH_UP_MS)
     }
 
-    private fun runMappedAction(action: KeyAction, scrollPercent: Int? = null) {
+    private fun runMappedAction(
+        action: KeyAction,
+        scrollPercent: Int? = null,
+        // A held volume key repeats every 120 ms; buzzing each time would turn
+        // the phone into a rattle. Only the first step of a hold is felt.
+        haptics: Boolean = true,
+    ) {
         // A volume action changes the stream we watch; its broadcast is an
         // echo of ours, not a key press.
         if (action.type == ActionType.VOLUME_UP || action.type == ActionType.VOLUME_DOWN ||
@@ -673,7 +681,7 @@ class KeyInterceptorService : AccessibilityService() {
                 android.os.SystemClock.uptimeMillis() + SELF_CHANGE_SUPPRESS_MS
         }
         // A blocked key should feel like a dead key, not like a triggered one.
-        if (settings.hapticFeedback && action.type != ActionType.BLOCK) {
+        if (haptics && settings.hapticFeedback && action.type != ActionType.BLOCK) {
             executor?.vibrate(settings.vibrationStrength)
         }
         executor?.execute(action, scrollPercent)

@@ -1,8 +1,26 @@
-## SideKeys v1.20.0
+## SideKeys v1.20.1
 
 A button mapper for **E-Ink phones**: freely remap the extra side keys, the volume
 keys or almost any hardware key — separately for single press, double press and
 long press. Developed and tested on the Bigme HiBreak Pro.
+
+### New in 1.20.1
+
+- **A held volume key keeps stepping.** Mapping long press to Volume up or
+  Volume down used to change the volume exactly once, however long you held it,
+  which reads as a broken key. It now repeats every 120 ms until you let go,
+  close to the system's own volume repeat. Reported by a user who expected it to
+  behave like holding the built-in key.
+
+  Only volume repeats. A toggle would flip back and forth, an app launch would
+  fire over and over, and a repeating scroll would redraw the e-ink panel at
+  every step — so everything else still runs once per hold. The haptic buzz also
+  fires only on the first step, otherwise a held key would rattle.
+
+  One limit: on devices whose firmware never reports the volume keys as key
+  events, SideKeys recovers the press from the volume change itself. That route
+  cannot tell a held key from our own repeat, so there a hold still gives a
+  single step.
 
 ### New in 1.20.0
 

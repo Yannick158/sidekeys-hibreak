@@ -34,6 +34,7 @@ class KeyPressHandler(private val scheduler: Scheduler) {
     private var pendingSingle: Runnable? = null
     private var pendingLong: Runnable? = null
     private var pendingRelease: Runnable? = null
+    private var pendingRepeat: Runnable? = null
     private var lastUpTime = 0L
     private var lastDownTime = 0L
     private var bouncing = false
@@ -43,7 +44,7 @@ class KeyPressHandler(private val scheduler: Scheduler) {
         settings: KeySettings,
         repeatCount: Int,
         eventTime: Long,
-        execute: (KeyAction) -> Unit,
+        execute: (KeyAction, Boolean) -> Unit,
     ): Boolean {
         if (repeatCount > 0) return true
 
@@ -79,7 +80,10 @@ class KeyPressHandler(private val scheduler: Scheduler) {
             val runnable = Runnable {
                 longPressFired = true
                 pendingLong = null
-                execute(mapping.longPress)
+                execute(mapping.longPress, false)
+                if (mapping.longPress.type in REPEAT_WHILE_HELD) {
+                    startRepeating(mapping.longPress, execute)
+                }
             }
             pendingLong = runnable
             scheduler.postDelayed(runnable, settings.longPressMs)
@@ -91,7 +95,7 @@ class KeyPressHandler(private val scheduler: Scheduler) {
         mapping: KeyMapping,
         settings: KeySettings,
         eventTime: Long,
-        execute: (KeyAction) -> Unit,
+        execute: (KeyAction, Boolean) -> Unit,
     ): Boolean {
         if (bouncing) {
             bouncing = false
@@ -123,14 +127,40 @@ class KeyPressHandler(private val scheduler: Scheduler) {
         return true
     }
 
+    /**
+     * Keeps firing [action] until the key is released. Only volume does this:
+     * holding a volume key is expected to walk the slider, and firing once is
+     * what a user reads as a bug. Everything else stays single-shot — a repeat
+     * would be wrong (toggles), expensive (a shell per step) or unreadable on
+     * e-ink.
+     */
+    private fun startRepeating(action: KeyAction, execute: (KeyAction, Boolean) -> Unit) {
+        // One Runnable that re-posts itself, so cancelling that single instance
+        // stops the whole chain.
+        val runnable = object : Runnable {
+            override fun run() {
+                execute(action, true)
+                scheduler.postDelayed(this, REPEAT_INTERVAL_MS)
+            }
+        }
+        pendingRepeat = runnable
+        scheduler.postDelayed(runnable, REPEAT_INTERVAL_MS)
+    }
+
+    private fun stopRepeating() {
+        pendingRepeat?.let(scheduler::cancel)
+        pendingRepeat = null
+    }
+
     private fun commitRelease(
         mapping: KeyMapping,
         settings: KeySettings,
-        execute: (KeyAction) -> Unit,
+        execute: (KeyAction, Boolean) -> Unit,
     ) {
         isPressed = false
         pendingLong?.let(scheduler::cancel)
         pendingLong = null
+        stopRepeating()
 
         if (longPressFired) {
             longPressFired = false
@@ -140,7 +170,7 @@ class KeyPressHandler(private val scheduler: Scheduler) {
 
         if (isSecondTap) {
             isSecondTap = false
-            if (mapping.doublePress.type != ActionType.NONE) execute(mapping.doublePress)
+            if (mapping.doublePress.type != ActionType.NONE) execute(mapping.doublePress, false)
             return
         }
 
@@ -149,24 +179,26 @@ class KeyPressHandler(private val scheduler: Scheduler) {
             val runnable = Runnable {
                 awaitingSecondTap = false
                 pendingSingle = null
-                if (mapping.singlePress.type != ActionType.NONE) execute(mapping.singlePress)
+                if (mapping.singlePress.type != ActionType.NONE) execute(mapping.singlePress, false)
             }
             pendingSingle = runnable
             scheduler.postDelayed(runnable, settings.doublePressMs)
         } else if (mapping.singlePress.type != ActionType.NONE) {
-            execute(mapping.singlePress)
+            execute(mapping.singlePress, false)
         }
     }
 
     /** True while a gesture is in flight (key held, timers pending). */
     fun hasActiveGesture(): Boolean =
         isPressed || awaitingSecondTap || isSecondTap ||
-            pendingSingle != null || pendingLong != null || pendingRelease != null
+            pendingSingle != null || pendingLong != null || pendingRelease != null ||
+            pendingRepeat != null
 
     fun reset() {
         pendingSingle?.let(scheduler::cancel)
         pendingLong?.let(scheduler::cancel)
         pendingRelease?.let(scheduler::cancel)
+        stopRepeating()
         pendingSingle = null
         pendingLong = null
         pendingRelease = null
@@ -177,5 +209,15 @@ class KeyPressHandler(private val scheduler: Scheduler) {
         bouncing = false
         lastUpTime = 0L
         lastDownTime = 0L
+    }
+
+    private companion object {
+        /**
+         * Gap between repeats of a held volume key. Close to the system's own
+         * volume repeat, which is what the hand expects.
+         */
+        const val REPEAT_INTERVAL_MS = 120L
+
+        val REPEAT_WHILE_HELD = setOf(ActionType.VOLUME_UP, ActionType.VOLUME_DOWN)
     }
 }

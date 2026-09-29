@@ -40,9 +40,9 @@ class KeyPressHandlerTest {
         longPress = KeyAction(long),
     )
 
-    private fun down(m: KeyMapping) = handler.onDown(m, settings, 0, scheduler.now) { fired += it.type }
+    private fun down(m: KeyMapping) = handler.onDown(m, settings, 0, scheduler.now) { action, _ -> fired += action.type }
 
-    private fun up(m: KeyMapping) = handler.onUp(m, settings, scheduler.now) { fired += it.type }
+    private fun up(m: KeyMapping) = handler.onUp(m, settings, scheduler.now) { action, _ -> fired += action.type }
 
     @Test
     fun `single press fires on release when no double press is configured`() {
@@ -149,6 +149,55 @@ class KeyPressHandlerTest {
 
         assertTrue("no action may fire after reset", fired.isEmpty())
         assertEquals(0, scheduler.pendingCount)
+        assertFalse(handler.hasActiveGesture())
+    }
+
+    // --- Repeat while held (volume only) ---
+
+    @Test
+    fun `a held volume key keeps stepping until it is released`() {
+        val m = mapping(long = ActionType.VOLUME_DOWN)
+        down(m)
+        scheduler.advanceBy(400) // long press fires: one step
+        assertEquals(listOf(ActionType.VOLUME_DOWN), fired)
+
+        scheduler.advanceBy(360) // three more at 120 ms
+        assertEquals(4, fired.size)
+        assertTrue(fired.all { it == ActionType.VOLUME_DOWN })
+
+        up(m)
+        scheduler.advanceBy(1_000)
+        assertEquals("release must stop the repeat", 4, fired.size)
+    }
+
+    @Test
+    fun `repeats are marked as repeats, so only the first step buzzes`() {
+        val m = mapping(long = ActionType.VOLUME_UP)
+        val repeatFlags = mutableListOf<Boolean>()
+        handler.onDown(m, settings, 0, scheduler.now) { _, repeated -> repeatFlags += repeated }
+        scheduler.advanceBy(400 + 240)
+        handler.onUp(m, settings, scheduler.now) { _, repeated -> repeatFlags += repeated }
+
+        assertEquals(listOf(false, true, true), repeatFlags)
+    }
+
+    @Test
+    fun `actions other than volume still fire once per hold`() {
+        val m = mapping(long = ActionType.DND_TOGGLE)
+        down(m)
+        scheduler.advanceBy(2_000)
+        assertEquals(listOf(ActionType.DND_TOGGLE), fired)
+        up(m)
+    }
+
+    @Test
+    fun `reset stops a running repeat`() {
+        val m = mapping(long = ActionType.VOLUME_DOWN)
+        down(m)
+        scheduler.advanceBy(400)
+        handler.reset()
+        scheduler.advanceBy(1_000)
+        assertEquals(1, fired.size)
         assertFalse(handler.hasActiveGesture())
     }
 }

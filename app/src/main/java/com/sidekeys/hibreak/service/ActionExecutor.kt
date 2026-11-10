@@ -88,6 +88,8 @@ class ActionExecutor(private val service: AccessibilityService) {
             ActionType.LAUNCH_APPS -> launchApps(action.data)
             ActionType.DPAD_LEFT -> sendKeyEvent(KeyEvent.KEYCODE_DPAD_LEFT)
             ActionType.DPAD_RIGHT -> sendKeyEvent(KeyEvent.KEYCODE_DPAD_RIGHT)
+            ActionType.PAGE_UP -> sendKeyEvent(KeyEvent.KEYCODE_PAGE_UP)
+            ActionType.PAGE_DOWN -> sendKeyEvent(KeyEvent.KEYCODE_PAGE_DOWN)
             ActionType.TAP_LEFT_EDGE -> tapEdge(right = false)
             ActionType.TAP_RIGHT_EDGE -> tapEdge(right = true)
             ActionType.SCROLL_UP -> scroll(up = true, percent = scrollBy)

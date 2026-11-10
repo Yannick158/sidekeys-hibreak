@@ -18,6 +18,8 @@ fun ActionType.labelRes(): Int = when (this) {
     ActionType.LAUNCH_APPS -> R.string.action_launch_apps
     ActionType.DPAD_LEFT -> R.string.action_dpad_left
     ActionType.DPAD_RIGHT -> R.string.action_dpad_right
+    ActionType.PAGE_UP -> R.string.action_page_up
+    ActionType.PAGE_DOWN -> R.string.action_page_down
     ActionType.TAP_LEFT_EDGE -> R.string.action_tap_left_edge
     ActionType.TAP_RIGHT_EDGE -> R.string.action_tap_right_edge
     ActionType.SCROLL_UP -> R.string.action_scroll_up

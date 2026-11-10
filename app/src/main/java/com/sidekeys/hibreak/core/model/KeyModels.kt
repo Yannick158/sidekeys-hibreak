@@ -51,6 +51,14 @@ enum class ActionType {
     DPAD_RIGHT,
 
     /**
+     * Send a Page Up/Down press to the focused app.
+     * Some apps (like Firefox) respond better to this than Scroll Up/Down.
+     * (Same as D-pad keys, this goes through a shell and needs Shizuku)
+     */
+    PAGE_UP,
+    PAGE_DOWN,
+
+    /**
      * Synthetic tap on the left/right screen edge. The no-Shizuku route to page
      * turns: most readers flip on an edge tap, and dispatching a tap only needs
      * the gesture capability the service already has for scrolling.

@@ -189,6 +189,8 @@
     <string name="action_launch_apps">Launch several apps</string>
     <string name="action_dpad_left">D-pad left (needs Shizuku)</string>
     <string name="action_dpad_right">D-pad right (needs Shizuku)</string>
+    <string name="action_page_up">Page up (needs Shizuku)</string>
+    <string name="action_page_down">Page down (needs Shizuku)</string>
     <string name="error_needs_shizuku">This action sends a key press, which Android only allows through a shell. Start Shizuku and grant SideKeys access.</string>
     <string name="action_tap_left_edge">Tap left screen edge (page back in readers)</string>
     <string name="action_tap_right_edge">Tap right screen edge (page forward in readers)</string>

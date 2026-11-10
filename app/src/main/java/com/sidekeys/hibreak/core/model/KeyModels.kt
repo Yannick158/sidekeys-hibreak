@@ -47,6 +47,8 @@ enum class ActionType {
      * arrow keys. No public API lets an app inject key events, so this goes
      * through a shell and needs Shizuku.
      */
+    DPAD_UP,
+    DPAD_DOWN,
     DPAD_LEFT,
     DPAD_RIGHT,
 

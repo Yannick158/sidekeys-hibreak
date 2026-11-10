@@ -187,6 +187,8 @@
     <string name="action_pass_through_note">Applies to the whole key, not just this press type: SideKeys stops intercepting it. Use it in an app profile for readers that already use the key themselves.</string>
     <string name="key_scancode">Side key (scan code %1$d)</string>
     <string name="action_launch_apps">Launch several apps</string>
+    <string name="action_dpad_up">D-pad up (needs Shizuku)</string>
+    <string name="action_dpad_down">D-pad down (needs Shizuku)</string>
     <string name="action_dpad_left">D-pad left (needs Shizuku)</string>
     <string name="action_dpad_right">D-pad right (needs Shizuku)</string>
     <string name="action_page_up">Page up (needs Shizuku)</string>

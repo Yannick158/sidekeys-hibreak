@@ -47,8 +47,18 @@ enum class ActionType {
      * arrow keys. No public API lets an app inject key events, so this goes
      * through a shell and needs Shizuku.
      */
+    DPAD_UP,
+    DPAD_DOWN,
     DPAD_LEFT,
     DPAD_RIGHT,
+
+    /**
+     * Send a Page Up/Down press to the focused app.
+     * Some apps (like Firefox) respond better to this than Scroll Up/Down.
+     * (Same as D-pad keys, this goes through a shell and needs Shizuku)
+     */
+    PAGE_UP,
+    PAGE_DOWN,
 
     /**
      * Synthetic tap on the left/right screen edge. The no-Shizuku route to page
